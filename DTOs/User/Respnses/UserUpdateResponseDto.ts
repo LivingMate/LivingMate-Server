@@ -1,3 +1,3 @@
-import { UserUpdateDto } from '../Requests/UserUpdateDto';
+import { UserUpdateDto } from '../Requests/UserUpdateRequestDto';
 
 export interface UserUpdateResponseDto extends UserUpdateDto{}
