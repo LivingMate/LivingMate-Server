@@ -4,5 +4,4 @@ export interface CalendarDirectPostRequestDTO extends CalendarBaseDTO{
     scheduleEndAt: Date;
     //Routine?
     memo : string;
-
 }
