@@ -1,6 +1,5 @@
-export interface FeedUpdateRequestDTO{
-    feedId: string;
-    userId: string;
-    feedContent: string;
+import { FeedBaseDTO } from '../FeedBaseDTO';
+
+export interface FeedUpdateRequestDTO extends FeedBaseDTO{
     updatedAt: Date;
 }

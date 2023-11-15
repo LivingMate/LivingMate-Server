@@ -1,7 +1,3 @@
-export interface FeedBaseResponseDTO{
-    feedId:string;
-    userId: string;
-    feedContent: string;
-    createdAt: Date;
-    updatedAt: Date;
-}
+import { FeedBaseDTO } from '../FeedBaseDTO';
+
+export interface FeedBaseResponseDTO extends FeedBaseDTO {};
