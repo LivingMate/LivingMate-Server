@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 const findUserById = async(userId:string)=>{
     const user = await prisma.user.findUnique({
         where: {
-            userId: userId,
+            userId: userId, //오류 아직 안 잡음
         }
     });
     if(!user){
