@@ -32,7 +32,6 @@ model User {
   AdjustmentPlus  Adjustment[]         @relation("plusUser")
 }
 
-
 model Group {
   id                 String               @id @default("")
   groupName          String               @db.VarChar(255)
