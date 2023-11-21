@@ -12,6 +12,9 @@ datasource db {
 
 
 model User{
-  userId String @id @default(uuid())
-  userName String
+  userId String @id @default(cuid())
+  groupId String?
+  userName String?
+  userColor String
+  fcmToken String?
 }

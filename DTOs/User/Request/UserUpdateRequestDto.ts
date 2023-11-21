@@ -1,4 +1,4 @@
-export interface UserUpdateDto{
+export interface UserUpdateRequestDto{
     userName:string;
     userColor:string;
 }
