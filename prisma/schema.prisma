@@ -10,7 +10,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id              String               @id @default(cuid())
+  userName        String
+  userColor       String
+  email           String               @unique
+  sex             Boolean
+  age             Int
+  createdAt       DateTime             @default(now())
+  Feed            Feed[]
+  CalendarRight   CalendarRight[]
+  SingleSender    NotificationSingle[] @relation("sender")
+  SingleReciever  NotificationSingle[] @relation("reciever")
+  MultiSender     NotificationMulti[]  @relation("sender")
+  MultiReciever   NotificationMulti[]  @relation("reciever")
+  ScheduleReady   ScheduleReady[]
+  Scheduling      Scheduling[]
+  UserSpendings   UserSpendings[]
+  Calculator      Calculator[]
+  AdjustmentMinus Adjustment[]         @relation("minusUser")
+  AdjustmentPlus  Adjustment[]         @relation("plusUser")
+}
 
+<<<<<<< HEAD
 model User{
   userId String @id @default(cuid())
   groupId String?
@@ -18,3 +40,161 @@ model User{
   userColor String
   fcmToken String?
 }
+=======
+model Group {
+  id                 String               @id @default("")
+  groupName          String               @db.VarChar(255)
+  groupSpending      Float
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  Feed               Feed[]
+  NotificationSingle NotificationSingle[]
+  NotificationMulti  NotificationMulti[]
+  CalendarRight      CalendarRight[]
+  Scheduling         Scheduling[]
+  ScheduleReady      ScheduleReady[]
+  UserSpendings      UserSpendings[]
+  Calculator         Calculator[]
+  Adjustment         Adjustment[]
+}
+
+model Feed {
+  id        String   @id
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  group     Group    @relation(fields: [groupId], references: [id])
+  groupId   String
+  text      String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  pin       Boolean  @default(false)
+}
+
+model NotificationSingle {
+  id         Int      @id
+  group      Group    @relation(fields: [groupId], references: [id])
+  groupId    String
+  text       String   @db.LongText
+  createdAt  DateTime @default(now())
+  sender     User?    @relation(fields: [senderId], references: [id], name: "sender")
+  senderId   String?
+  reciever   User?    @relation(fields: [recieverId], references: [id], name: "reciever")
+  recieverId String?
+}
+
+model NotificationMulti {
+  id         Int      @id
+  group      Group    @relation(fields: [groupId], references: [id])
+  groupId    String
+  text       String   @db.LongText
+  createdAt  DateTime @default(now())
+  sender     User?    @relation(fields: [senderId], references: [id], name: "sender")
+  senderId   String?
+  reciever   User?    @relation(fields: [recieverId], references: [id], name: "reciever") // 배열로 받아야 함
+  recieverId String?
+}
+
+model CalendarRight {
+  id        Int      @id
+  user      User     @relation(fields: [userId], references: [id]) // 배열로 받아야 함
+  userId    String
+  group     Group    @relation(fields: [groupId], references: [id])
+  groupId   String
+  title     String   @db.VarChar(255)
+  dateStart DateTime @default(now()) @db.Date
+  dateEnd   DateTime @db.Date
+  timeStart DateTime @db.Time()
+  timeEnd   DateTime @db.Time()
+  memo      String   @db.Text
+  term      Int //주기를 매일:0 매주:1 매달:2 매년:3 이런식으로 받는건?
+}
+
+model ScheduleReady {
+  // ScheduleReady의 id는 밑에 CalendarSchedule때문에 String형으로 받았음
+  // 만약 이게 틀린거면 지우고, int형으로 바꾸기
+  id        String             @id
+  user      User               @relation(fields: [userId], references: [id])
+  userId    String // 배열로 받아야 함
+  group     Group              @relation(fields: [groupId], references: [id])
+  groupId   String
+  title     String             @db.VarChar(255)
+  dateStart DateTime           @default(now()) @db.Date
+  dateEnd   DateTime           @db.Date
+  timeStart DateTime           @db.Time()
+  timeEnd   DateTime           @db.Time()
+  calUser   CalendarSchedule[] @relation(name: "user")
+  calGroup  CalendarSchedule[] @relation(name: "group")
+}
+
+model Scheduling {
+  id        Int      @id
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  group     Group    @relation(fields: [groupId], references: [id])
+  groupId   String
+  day       Int
+  timeStart DateTime @db.Time()
+  timeEnd   DateTime @db.Time()
+}
+
+model CalendarSchedule {
+  // user, group을 이렇게 받아도 되는지 모르겠음
+  id        Int            @id
+  title     String
+  dateStart DateTime       @default(now()) @db.Date
+  dateEnd   DateTime       @db.Date
+  timeStart DateTime       @db.Time()
+  timeEnd   DateTime       @db.Time()
+  user      ScheduleReady? @relation(fields: [userId], references: [id], name: "user")
+  userId    String?
+  group     ScheduleReady? @relation(fields: [groupId], references: [id], name: "group")
+  groupId   String?
+}
+
+model UserSpendings {
+  id          Int           @id
+  user        User          @relation(fields: [userId], references: [id])
+  userId      String
+  group       Group         @relation(fields: [groupId], references: [id])
+  groupId     String
+  spendings   Float
+  category    Category[] // category를 저장해둔 db를 만들어야 하나?
+  subCategory SubCategory[]
+  createdAt   DateTime      @default(now())
+  isDone      Boolean
+}
+
+model Calculator {
+  id         Int     @id
+  user       User    @relation(fields: [userId], references: [id])
+  userId     String
+  group      Group   @relation(fields: [groupId], references: [id])
+  groupId    String
+  difference Float
+  isMinus    Boolean
+}
+
+model Adjustment {
+  id          Int     @id
+  group       Group   @relation(fields: [groupId], references: [id])
+  groupId     String
+  minusUser   User?   @relation(fields: [minusUserId], references: [id], name: "minusUser")
+  minusUserId String?
+  plusUser    User?   @relation(fields: [plusUserId], references: [id], name: "plusUser")
+  plusUserId  String?
+}
+
+model Category {
+  // 가계부 카테고리별 금액 확인할때 필요할것같아서 만들어봤음
+  id        Int             @id
+  name      String
+  spendings UserSpendings[]
+}
+
+model SubCategory {
+  // 필요성을 잘 모르겠지만,, 혹시 몰라서 만들어봄
+  id        Int             @id
+  name      String
+  spendings UserSpendings[]
+}
+>>>>>>> e7c2ea7603a658cd5d6cef300491f521a6f07a41
