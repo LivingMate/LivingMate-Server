@@ -92,7 +92,7 @@ model CalendarRight {
   group     Group    @relation(fields: [groupId], references: [id])
   groupId   String
   title     String   @db.VarChar(255)
-  dateStart DateTime @default(now()) @db.Date
+  dateStart DateTime @db.Date
   dateEnd   DateTime @db.Date
   timeStart DateTime @db.Time()
   timeEnd   DateTime @db.Time()
@@ -109,7 +109,7 @@ model ScheduleReady {
   group     Group              @relation(fields: [groupId], references: [id])
   groupId   String
   title     String             @db.VarChar(255)
-  dateStart DateTime           @default(now()) @db.Date
+  dateStart DateTime           @db.Date
   dateEnd   DateTime           @db.Date
   timeStart DateTime           @db.Time()
   timeEnd   DateTime           @db.Time()
@@ -132,7 +132,7 @@ model CalendarSchedule {
   // user, group을 이렇게 받아도 되는지 모르겠음
   id        Int            @id
   title     String
-  dateStart DateTime       @default(now()) @db.Date
+  dateStart DateTime       @db.Date
   dateEnd   DateTime       @db.Date
   timeStart DateTime       @db.Time()
   timeEnd   DateTime       @db.Time()
