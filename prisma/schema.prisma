@@ -32,15 +32,6 @@ model User {
   AdjustmentPlus  Adjustment[]         @relation("plusUser")
 }
 
-<<<<<<< HEAD
-model User{
-  userId String @id @default(cuid())
-  groupId String?
-  userName String?
-  userColor String
-  fcmToken String?
-}
-=======
 model Group {
   id                 String               @id @default("")
   groupName          String               @db.VarChar(255)
@@ -197,4 +188,3 @@ model SubCategory {
   name      String
   spendings UserSpendings[]
 }
->>>>>>> e7c2ea7603a658cd5d6cef300491f521a6f07a41
