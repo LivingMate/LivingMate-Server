@@ -3,20 +3,55 @@ import { UserBaseDTO } from "../DTOs/User/UserBaseDTO";
 import { SignupDto } from "../DTOs/Auth/Requests/SignupDto";
 import { UserUpdateRequestDto } from "../DTOs/User/Request/UserUpdateRequestDto";
 import { UserUpdateResponseDto } from "../DTOs/User/Response/UserUpdateResponseDto";
+import { UserProfileResponseDto } from '../DTOs/User/Response/UserProfileResponseDto';
+import { findGroupNameByGroupId } from './GroupServices';
 
 const prisma = new PrismaClient;
 
-const user = async(signupDtO : SignupDto):Promise<PostBaseResponseDto> =>{
-    //if 이미 존재하는 유저인지 확인
-    const userCreate = await prisma.user.create({
-        data: {
+const CreateUser = async(signupDtO : SignupDto):Promise<UserProfileResponseDto> =>{
+    const user = await prisma.user.create({
+        data:{ 
             userName: signupDtO.userName,
-            fcmToken: signupDtO.fcmToken,
-        }
+            sex: signupDtO.sex,
+            age: signupDtO.age,
+
+        },
         
-    });
+
+    })
+    //if 이미 존재하는 유저인지 확인
     return user;
 };
+
+
+
+
+
+const getUserAtHome = async (userId: string): Promise<UserProfileResponseDto> => {
+    try {
+      const userProfile = await findUserById(userId);
+  
+      if (!userProfile) {
+        throw new Error('User Not Found!');
+      }
+
+      const userGroupName = await findGroupNameByGroupId(userProfile.groupId)
+  
+      const data: UserProfileResponseDto = {
+        userName: userProfile.userName,
+        userColor: userProfile.userColor,
+        groupName: userGroupName,
+        // groupMembers: 
+        
+      };
+  
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+
 
 /*const updateUser = async(
     userId: string, 
@@ -32,7 +67,7 @@ const user = async(signupDtO : SignupDto):Promise<PostBaseResponseDto> =>{
 const findUserById = async(userId:string)=>{
     const user = await prisma.user.findUnique({
         where:{
-            userId: userId,
+            id: userId,
         }
     });
 
@@ -48,14 +83,14 @@ const findUserById = async(userId:string)=>{
 const findGroupIdByUserId = async(userId:string)=>{
     const group = prisma.user.findUnique({
         where:{
-            userId: userId,
+            id: userId,
         },
         select:{
             groupId: true,
         },
     });
     if(!group){
-        throw(console.error());
+        throw new Error ('Group not found!');
     }
    return group;
 };
@@ -63,7 +98,7 @@ const findGroupIdByUserId = async(userId:string)=>{
 const findUserByIdAndUpdate = async (userId:string, userUpdateRequestDto:UserUpdateRequestDto) =>{
     const updatedUser = await prisma.user.update({
         where:{
-            userId: userId,
+            id: userId,
         },
         data:{
             userName: userUpdateRequestDto.userName,
@@ -84,5 +119,4 @@ export default{
     findUserById,
     findGroupIdByUserId,
     findUserByIdAndUpdate,
-    user
 }

@@ -1,0 +1,8 @@
+-- AlterTable
+ALTER TABLE `calendarright` MODIFY `dateStart` DATE NOT NULL DEFAULT CURRENT_TIMESTAMP(3);
+
+-- AlterTable
+ALTER TABLE `calendarschedule` MODIFY `dateStart` DATE NOT NULL DEFAULT CURRENT_TIMESTAMP(3);
+
+-- AlterTable
+ALTER TABLE `scheduleready` MODIFY `dateStart` DATE NOT NULL DEFAULT CURRENT_TIMESTAMP(3);
