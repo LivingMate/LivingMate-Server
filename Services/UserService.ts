@@ -1,6 +1,7 @@
 import { Prisma, PrismaClient } from '@prisma/client'
 import { UserBaseDTO } from '../DTOs/User/UserBaseDTO'
 import { SignupDto } from '../DTOs/Auth/Requests/SignupDto'
+import { BaseResponseDto } from '../DTOs/Base/Response/BaseResponseDto'
 import { UserUpdateRequestDto } from '../DTOs/User/Request/UserUpdateRequestDto'
 import { UserUpdateResponseDto } from '../DTOs/User/Response/UserUpdateResponseDto'
 import { UserProfileResponseDto } from '../DTOs/User/Response/UserProfileResponseDto'
@@ -8,15 +9,15 @@ import { findGroupNameByGroupId } from './GroupServices'
 
 const prisma: PrismaClient = new PrismaClient()
 
-const CreateUser = async (SignupDto: SignupDto): Promise<UserProfileResponseDto> => {
+const CreateUser = async (SignupDto: SignupDto): Promise<BaseResponseDto> => {
   try {
-    const existingUser = await prisma.user.findUnique({
+    const existUser = await prisma.user.findUnique({
       where: {
         email: SignupDto.email,
       },
     })
 
-    if (existingUser) {
+    if (existUser) {
       throw new Error('User already exists')
     }
 
@@ -27,19 +28,25 @@ const CreateUser = async (SignupDto: SignupDto): Promise<UserProfileResponseDto>
         sex: SignupDto.sex,
         age: SignupDto.age,
         fcmToken: SignupDto.fcmToken,
-      } as Prisma.UserCreateManyInput,
+      } as Prisma.UserCreateInput,
     })
 
-    const userProfile: UserProfileResponseDto = {
-      userName: user.userName,
-      userColor: user.userColor,
-      groupName: '',
-      groupMembers: [],
-    }
+    const baseRespnse: BaseResponseDto = {
+      _id: user.id,
+    };
 
-    return userProfile
+    return baseRespnse;
   } catch (error) {
     throw error
+  }
+}
+
+const updateUser = async (
+  userId: string,
+  userUpdateDto: UserUpdateRequestDto
+) : Promise<UserUpdateResponseDto> => {
+  try {
+    
   }
 }
 
