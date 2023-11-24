@@ -46,7 +46,7 @@ const updateUser = async (
   userUpdateDto: UserUpdateRequestDto
 ) : Promise<UserUpdateResponseDto> => {
   try {
-    
+    await UserService
   }
 }
 
