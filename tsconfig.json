@@ -1,9 +1,10 @@
-{   
-  "compilerOptions" : {     
+{
+  "compilerOptions": {
     "sourceMap": true,
-    "outDir":"dist",
+    "outDir": "dist",
     "strict": true,
-    "lib":["esnext"],
-    "esModuleInterop": true
-  } 
+    "lib": ["esnext"],
+    "esModuleInterop": true,
+    "types": ["@prisma/client"]
+  }
 }

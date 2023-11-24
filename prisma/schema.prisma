@@ -20,6 +20,7 @@ model User {
   createdAt       DateTime             @default(now())
   group           Group                @relation(fields: [groupId], references: [id])
   groupId         String
+  fcmToken        String?
   Feed            Feed[]
   CalendarRight   CalendarRight[]
   SingleSender    NotificationSingle[] @relation("sender")
