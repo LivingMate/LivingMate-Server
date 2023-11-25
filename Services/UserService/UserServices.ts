@@ -1,15 +1,15 @@
 import {PrismaClient} from '@prisma/client';
-import { UserBaseDTO } from "../DTOs/User/UserBaseDTO";
-import { SignupDto } from "../DTOs/Auth/Requests/SignupDto";
-import { UserUpdateRequestDto } from "../DTOs/User/Request/UserUpdateRequestDto";
-import { UserUpdateResponseDto } from "../DTOs/User/Response/UserUpdateResponseDto";
-import { UserProfileResponseDto } from '../DTOs/User/Response/UserProfileResponseDto';
-import { findGroupNameByGroupId } from './GroupServices';
-import { findGroupMembersNamesByGroupId } from './GroupServices';
+import { UserBaseDTO } from "../../DTOs/User/UserBaseDTO";
+import { SignupDto } from "../../DTOs/Auth/Requests/SignupDto";
+import { UserUpdateRequestDto } from "../../DTOs/User/Request/UserUpdateRequestDto";
+import { UserUpdateResponseDto } from "../../DTOs/User/Response/UserUpdateResponseDto";
+import { UserProfileResponseDto } from '../../DTOs/User/Response/UserProfileResponseDto';
+import { findGroupNameByGroupId } from '../GroupServices';
+import { findGroupMembersNamesByGroupId } from '../GroupServices';
 
 const prisma = new PrismaClient;
 
-const CreateUser = async(signupDtO : SignupDto):Promise<UserProfileResponseDto> =>{
+const CreateUser = async(signupDtO : SignupDto) =>{
     const user = await prisma.user.create({
         data:{ 
             userName: signupDtO.userName,
@@ -43,8 +43,10 @@ const getUserProfile = async (userId: string): Promise<UserProfileResponseDto> =
         userName: userProfile.userName,
         userColor: userProfile.userColor,
         groupName: userGroupName.groupName,
-        groupMembers: userGroupMembers //prisma return 값이 object라서 생기는 문제. 얘의 멤버변수를 참조하면 되는데, groupMembers는 object로 이루어진 array라서 고민됨
-        
+        groupMembers: userGroupMembers 
+        //prisma return 값이 object라서 생기는 문제. 얘의 멤버변수를 참조하면 되는데, groupMembers는 object로 이루어진 array라서 고민됨
+        //groupservice 33줄 참고
+        //해결!!!!
       };
   
       return data;

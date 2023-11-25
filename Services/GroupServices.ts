@@ -19,18 +19,23 @@ const findGroupNameByGroupId = async(groupId:string)=>{
 }
 
 const findGroupMembersNamesByGroupId = async(groupId:string) =>{
-    const groupMember = await prisma.user.findMany({ 
+    const groupMembers = await prisma.user.findMany({ 
         where:{groupId:groupId},
         select:{
             userName:true,
-            //userColor:true 
+            //userColor:true array로 묶어서 같이 줄까 아님 따로 줄까 
         }
 
     })
-    return groupMember;
+    return groupMembers.map(member => member.userName);
 }
 
-//Returns would be in array of: 
+
+
+
+
+
+//Returns would ORIGINALLY be in array of: 
 // [
 //     {
 //         userName: 'User 1',
