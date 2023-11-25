@@ -40,7 +40,7 @@ const getUserAtHome = async (userId: string): Promise<UserProfileResponseDto> =>
       const data: UserProfileResponseDto = {
         userName: userProfile.userName,
         userColor: userProfile.userColor,
-        groupName: userGroupName,
+        groupName: userGroupName.groupName,
         // groupMembers: 
         
       };
