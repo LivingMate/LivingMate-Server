@@ -7,18 +7,20 @@ import { UserProfileResponseDto } from '../../DTOs/User/Response/UserProfileResp
 import { findGroupMembersColorsByGroupId, findGroupNameByGroupId } from '../GroupServices';
 import { findGroupMembersNamesByGroupId } from '../GroupServices';
 
+
+
 const prisma = new PrismaClient;
 
 const CreateUser = async(signupDtO : SignupDto) =>{
     const user = await prisma.user.create({
         data:{ 
             userName: signupDtO.userName,
+            userColor: "FFFFFF", //default, just temporary value for now
+            email: signupDtO.email,
             sex: signupDtO.sex,
             age: signupDtO.age,
 
         },
-        
-
     })
     //if 이미 존재하는 유저인지 확인
     return user;
@@ -31,14 +33,21 @@ const CreateUser = async(signupDtO : SignupDto) =>{
 const getUserProfile = async (userId: string): Promise<UserProfileResponseDto> => {
     try {
       const userProfile = await findUserById(userId);
-  
       if (!userProfile) {
         throw new Error('User Not Found!');
       }
-
       const userGroupName = await findGroupNameByGroupId(userProfile.groupId);
+      if(!userGroupName){
+        throw new Error('No Group Found!');
+      }
       const userGroupMembersNames = await findGroupMembersNamesByGroupId(userProfile.groupId);
+      if(!userGroupMembersNames){
+        throw new Error('No Group Member Found!')
+      }
       const userGroupMembersColors = await findGroupMembersColorsByGroupId(userProfile.groupId);
+      if(!userGroupMembersColors){
+        throw new Error('No Group Member Found!2')
+      }
   
       const data: UserProfileResponseDto = {
         userName: userProfile.userName,
@@ -48,8 +57,7 @@ const getUserProfile = async (userId: string): Promise<UserProfileResponseDto> =
         groupMembersColors: userGroupMembersColors
 
         //prisma return 값이 object라서 생기는 문제. 얘의 멤버변수를 참조하면 되는데, groupMembers는 object로 이루어진 array라서 고민됨
-        //groupservice 33줄 참고
-        //해결!!!!
+        // 해결 
       };
   
       return data;
@@ -58,18 +66,6 @@ const getUserProfile = async (userId: string): Promise<UserProfileResponseDto> =
     }
   };
 
-
-
-/*const updateUser = async(
-    userId: string, 
-    userUpdateRequestDto:UserUpdateRequestDto):Promise<UserUpdateResponseDto> =>{
-
-
-
-    return 
-    }
-
-*/
 
 const findUserById = async(userId:string)=>{
     const user = await prisma.user.findUnique({

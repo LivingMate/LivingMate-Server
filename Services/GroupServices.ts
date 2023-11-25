@@ -1,5 +1,7 @@
 import { PrismaClient } from '@prisma/client';
+import { SignupDto } from '../DTOs/Auth/Requests/SignupDto';
 const prisma = new PrismaClient;
+
 
 const findGroupNameByGroupId = async(groupId:string)=>{
     const groupName = await prisma.group.findUnique({
@@ -41,8 +43,6 @@ const findGroupMembersNamesByGroupId = async(groupId:string) =>{
     return groupMembers.map(member => member.userName); //이름만 묶어서 array로 반환하는 버전 
 }
 
-
-
 //return groupMembers 하면 나오는 모양: 
 // [
 //     {
@@ -68,6 +68,18 @@ const findGroupMembersColorsByGroupId = async(groupId:string) =>{
 }
 
 //멤버 이름과 컬러를 따로 받는 방법의 문제점: 순서가 그대로일지.. 모름... 색이 서로 바뀔 수도 있음. 
+
+
+const addUserToGroup = async(signupDTO:SignupDto, groupId:string)=>{
+    //1. createUser with signupDTO
+    //2. put her groupId in her record at User table
+    //3. assign her id(? not sure) to Group's User[]? Did it mean it had foreign relations with the table?
+}
+
+
+
+
+
 
 export{
     findGroupNameByGroupId,
