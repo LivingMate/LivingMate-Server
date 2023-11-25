@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response } from "express";
 import { UserProfileResponseDto } from '../DTOs/User/Response/UserProfileResponseDto';
 import {UserServices} from '../Services/UserServices';
 
