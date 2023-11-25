@@ -1,5 +1,4 @@
 import {PrismaClient} from '@prisma/client';
-import { UserBaseDTO } from "../../DTOs/User/UserBaseDTO";
 import { SignupDto } from "../../DTOs/Auth/Requests/SignupDto";
 import { UserUpdateRequestDto } from "../../DTOs/User/Request/UserUpdateRequestDto";
 import { UserUpdateResponseDto } from "../../DTOs/User/Response/UserUpdateResponseDto";
@@ -19,7 +18,6 @@ const CreateUser = async(signupDtO : SignupDto) =>{
             email: signupDtO.email,
             sex: signupDtO.sex,
             age: signupDtO.age,
-
         },
     })
     //if 이미 존재하는 유저인지 확인
@@ -36,25 +34,26 @@ const getUserProfile = async (userId: string): Promise<UserProfileResponseDto> =
       if (!userProfile) {
         throw new Error('User Not Found!');
       }
+
+      if (userProfile.groupId === null || userProfile.groupId === undefined) {
+        throw new Error('User has no group!');
+    }
       const userGroupName = await findGroupNameByGroupId(userProfile.groupId);
-      if(!userGroupName){
-        throw new Error('No Group Found!');
-      }
+      const groupName = userGroupName?.groupName ?? 'DefaultGroupName';
+      
       const userGroupMembersNames = await findGroupMembersNamesByGroupId(userProfile.groupId);
-      if(!userGroupMembersNames){
-        throw new Error('No Group Member Found!')
-      }
+      const groupMembersNames = userGroupMembersNames ?? [];
+      
       const userGroupMembersColors = await findGroupMembersColorsByGroupId(userProfile.groupId);
-      if(!userGroupMembersColors){
-        throw new Error('No Group Member Found!2')
-      }
+      const groupMembersColors = userGroupMembersColors ?? [];
+
   
       const data: UserProfileResponseDto = {
         userName: userProfile.userName,
         userColor: userProfile.userColor,
-        groupName: userGroupName.groupName,
-        groupMembersNames: userGroupMembersNames,
-        groupMembersColors: userGroupMembersColors
+        groupName,
+        groupMembersNames,
+        groupMembersColors,
 
         //prisma return 값이 object라서 생기는 문제. 얘의 멤버변수를 참조하면 되는데, groupMembers는 object로 이루어진 array라서 고민됨
         // 해결 
