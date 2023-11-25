@@ -5,8 +5,10 @@ import { UserUpdateRequestDto } from "../DTOs/User/Request/UserUpdateRequestDto"
 import { UserUpdateResponseDto } from "../DTOs/User/Response/UserUpdateResponseDto";
 import { UserProfileResponseDto } from '../DTOs/User/Response/UserProfileResponseDto';
 import { findGroupNameByGroupId } from './GroupServices';
+import { group } from 'console';
 
 const prisma = new PrismaClient;
+
 
 const CreateUser = async(signupDtO : SignupDto):Promise<UserProfileResponseDto> =>{
     const user = await prisma.user.create({
@@ -27,20 +29,20 @@ const CreateUser = async(signupDtO : SignupDto):Promise<UserProfileResponseDto> 
 
 
 
-const getUserAtHome = async (userId: string): Promise<UserProfileResponseDto> => {
+const getUserProfile = async (userId: string): Promise<UserProfileResponseDto> => {
     try {
       const userProfile = await findUserById(userId);
   
       if (!userProfile) {
         throw new Error('User Not Found!');
       }
-
+      
       const userGroupName = await findGroupNameByGroupId(userProfile.groupId)
   
       const data: UserProfileResponseDto = {
         userName: userProfile.userName,
         userColor: userProfile.userColor,
-        groupName: userGroupName,
+        groupName: userGroupName.groupName, 
         // groupMembers: 
         
       };
@@ -52,17 +54,6 @@ const getUserAtHome = async (userId: string): Promise<UserProfileResponseDto> =>
   };
 
 
-
-/*const updateUser = async(
-    userId: string, 
-    userUpdateRequestDto:UserUpdateRequestDto):Promise<UserUpdateResponseDto> =>{
-
-
-
-    return 
-    }
-
-*/
 
 const findUserById = async(userId:string)=>{
     const user = await prisma.user.findUnique({
@@ -119,4 +110,5 @@ export default{
     findUserById,
     findGroupIdByUserId,
     findUserByIdAndUpdate,
+    getUserProfile
 }
