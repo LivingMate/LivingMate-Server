@@ -4,6 +4,7 @@ import {FeedBaseDTO} from '../DTOs/Feed/FeedBaseDTO.ts'
 import {FeedCreateRequestDTO} from '../DTOs/Feed/Request/FeedCreateRequestDTO.ts'
 import {FeedUpdateRequestDTO} from '../DTOs/Feed/Request/FeedUpdateRequestDTO.ts'
 import {FeedBaseResponseDTO} from '../DTOs/Feed/Response/FeedBaseResponseDTO.ts'
+import {findGroupIdByUserId} from '../Services/UserService/UserServices.ts' //<- 이거 대체 왜 생기는 거임?!?!?!?!?!???
 
 
 //신규 피드 등록
@@ -11,20 +12,58 @@ const createFeed = async(FeedCreateRequestDTO:FeedCreateRequestDTO)=>{
     const newFeed = await prisma.feed.create({
         data:{
             userId: FeedCreateRequestDTO.userId,
-            groupId:FeedCreateRequestDTO.userId,
+            groupId:FeedCreateRequestDTO.groupId,
             text:FeedCreateRequestDTO.feedContent,
         }
     })
-    
+    //피드 보여주는 서비스를 불러줘야 하나? .then(ShowFeed()) 막 이렇게?
+    showFeed(newFeed.groupId)
 }
 
 
 
-//피드 보여주기
+//피드 보여주기 : 객체 타입의 배열로 반환됨! 우선 위의 10개만 반환되게 했음. 
+const showFeed = async(GroupId:string)=>{
+    const Feeds = await(prisma.feed.findMany({
+        take:10,
+        where:{
+            groupId : GroupId
+        }
+    }))
+    return Feeds;
+}
+
+
 
 //피드 수정
+const updateFeed = async(FeedUpdateRequestDTO:FeedUpdateRequestDTO)=>{
+    
+    try {const Feed = await findFeedByFeedId(FeedUpdateRequestDTO.feedId);
+    if(Feed){
+    
+    const UpdatedFeed = await prisma.feed.update({
+        where:{
+            id: FeedUpdateRequestDTO.feedId,
+        },
+        data:{
+            text: FeedUpdateRequestDTO.feedContent,
+        },
+    });
+    
+    return UpdatedFeed;
+    }
+    else{
+        throw new Error('Feed not found');
+    }
+}catch(error){
+    console.error('Error updating feed', error);
+    throw error;
+}
+
+}
 
 //피드 삭제
+
 
 //피드 고정
 
@@ -37,7 +76,18 @@ const createFeed = async(FeedCreateRequestDTO:FeedCreateRequestDTO)=>{
 //     feedContent: string;
 // }
 
-
+//피드 찾기
+const findFeedByFeedId = async(FeedId:number) =>{
+    const Feed = await(prisma.feed.findUnique({
+        where:{
+            id : FeedId
+        }
+    }))
+    if(!Feed){
+        throw new Error('No Feed Found!');
+    }
+    return Feed;
+}
 
 export default{
     createFeed
