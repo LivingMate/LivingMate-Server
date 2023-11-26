@@ -1,0 +1,44 @@
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient;
+import {FeedBaseDTO} from '../DTOs/Feed/FeedBaseDTO.ts'
+import {FeedCreateRequestDTO} from '../DTOs/Feed/Request/FeedCreateRequestDTO.ts'
+import {FeedUpdateRequestDTO} from '../DTOs/Feed/Request/FeedUpdateRequestDTO.ts'
+import {FeedBaseResponseDTO} from '../DTOs/Feed/Response/FeedBaseResponseDTO.ts'
+
+
+//신규 피드 등록
+const createFeed = async(FeedCreateRequestDTO:FeedCreateRequestDTO)=>{
+    const newFeed = await prisma.feed.create({
+        data:{
+            userId: FeedCreateRequestDTO.userId,
+            groupId:FeedCreateRequestDTO.userId,
+            text:FeedCreateRequestDTO.feedContent,
+        }
+    })
+    
+}
+
+
+
+//피드 보여주기
+
+//피드 수정
+
+//피드 삭제
+
+//피드 고정
+
+//공동일정 조율
+
+
+// export interface FeedBaseDTO{
+//     feedId:string;
+//     userId: string;
+//     feedContent: string;
+// }
+
+
+
+export default{
+    createFeed
+}
