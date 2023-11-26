@@ -25,12 +25,12 @@ const createFeed = async(FeedCreateRequestDTO:FeedCreateRequestDTO)=>{
 
 //피드 보여주기 : 객체 타입의 배열로 반환됨! 우선 위의 10개만 반환되게 했음. 
 const showFeed = async(GroupId:string)=>{
-    const Feeds = await(prisma.feed.findMany({
+    const Feeds = await prisma.feed.findMany({
         take:10,
         where:{
             groupId : GroupId
         }
-    }))
+    })
     return Feeds;
 }
 
@@ -63,7 +63,7 @@ const updateFeedContent = async(FeedUpdateRequestDTO:FeedUpdateRequestDTO)=>{
 
 }
 
-//피드 고정
+//피드 고정 -> 이거 업데이트에 한번에 합칠 수도 있는데.... 우선 모르고 걍 만들었으니 놔둬 봄... 
 const pinFeed = async(FeedId:number)=>{
     const pinnedFeed = await prisma.feed.update({
         where:{

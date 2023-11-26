@@ -116,9 +116,17 @@ const addUserToGroup = async(signupDTO:SignupDto, groupId:string)=>{
     //1. createUser with signupDTO
     //2. put her groupId in her record at User table
     //3. assign her id(? not sure) to Group's User[]? Did it mean it had foreign relations with the table?
-    const newUser = await createUser(signupDTO)
-    newUser.groupId = groupId;
-
+    const newUser = await createUser(signupDTO);
+    await prisma.user.update({
+        where:{
+            id:newUser.id,
+        },
+        data:{
+            groupId:groupId,
+        }
+    });
+    // newUser.groupId = groupId;
+    //return 값??
 
 }
 

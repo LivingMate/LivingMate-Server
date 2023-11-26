@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
-import { SignupDto } from '../DTOs/Auth/Requests/SignupDto';
 const prisma = new PrismaClient;
+import { SignupDto } from '../DTOs/Auth/Requests/SignupDto';
 
 
 const findGroupNameByGroupId = async(groupId:string)=>{

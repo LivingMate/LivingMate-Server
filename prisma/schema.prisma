@@ -156,7 +156,7 @@ model UserSpendings {
   category    Category[] // category를 저장해둔 db를 만들어야 하나?
   subCategory SubCategory[]
   createdAt   DateTime      @default(now())
-  isDone      Boolean
+  isDone      Boolean       @default(false)
 }
 
 model Calculator {
