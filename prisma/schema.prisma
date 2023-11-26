@@ -18,8 +18,8 @@ model User {
   sex             Boolean
   age             Int
   createdAt       DateTime             @default(now())
-  group           Group                @relation(fields: [groupId], references: [id])
-  groupId         String
+  group           Group?               @relation(fields: [groupId], references: [id])
+  groupId         String?
   fcmToken        String?
   Feed            Feed[]
   CalendarRight   CalendarRight[]
