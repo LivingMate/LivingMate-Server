@@ -35,8 +35,8 @@ const showFeed = async(GroupId:string)=>{
 
 
 
-//피드 수정
-const updateFeed = async(FeedUpdateRequestDTO:FeedUpdateRequestDTO)=>{
+//피드내용 수정
+const updateFeedContent = async(FeedUpdateRequestDTO:FeedUpdateRequestDTO)=>{
     
     try {const Feed = await findFeedByFeedId(FeedUpdateRequestDTO.feedId);
     if(Feed){
@@ -62,19 +62,49 @@ const updateFeed = async(FeedUpdateRequestDTO:FeedUpdateRequestDTO)=>{
 
 }
 
-//피드 삭제
-
-
 //피드 고정
+const pinFeed = async(FeedId:number)=>{
+    const pinnedFeed = await prisma.feed.update({
+        where:{
+            id:FeedId,
+        },
+        data:{
+            pin:true
+        }
+    })
+    return pinFeed; //리턴값을 어떻게 줘야 할지 모르겠는디.... 얘를 줘야 하나.. 아님 showFeed()를 걸어줘야 하나?
+}
+
+
+//피드 삭제
+const deleteFeed = async(FeedId:number)=>{
+    try{
+    const toBeDeleted = await findFeedByFeedId(FeedId)
+    if(!toBeDeleted){
+        throw new Error("Feed not found")
+    }
+    
+    await prisma.feed.delete({
+        where:{
+            id:FeedId,
+        },
+    });
+
+    return 0;
+    //삭제 이후에는 null값이나 빈 객체를 반환하기 때문에... 왜 Hous 팀이 msg를 만들었는지 알겠음. msg를 만들거나.. 해아 할 것 같음
+    }
+    catch(error){
+        throw new Error('Error deleting feed');
+    }
+
+}
+
+
 
 //공동일정 조율
 
 
-// export interface FeedBaseDTO{
-//     feedId:string;
-//     userId: string;
-//     feedContent: string;
-// }
+
 
 //피드 찾기
 const findFeedByFeedId = async(FeedId:number) =>{
@@ -90,5 +120,10 @@ const findFeedByFeedId = async(FeedId:number) =>{
 }
 
 export default{
-    createFeed
+    createFeed,
+    deleteFeed,
+    findFeedByFeedId,
+    pinFeed,
+    showFeed,
+    updateFeedContent
 }
