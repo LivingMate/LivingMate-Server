@@ -54,7 +54,7 @@ model Group {
 }
 
 model Feed {
-  id        String   @id
+  id        Int      @default(autoincrement())@id
   user      User     @relation(fields: [userId], references: [id])
   userId    String
   group     Group    @relation(fields: [groupId], references: [id])
