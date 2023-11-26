@@ -1,5 +1,6 @@
 export interface FeedBaseDTO{
-    feedId:string;
+    feedId:number;
     userId: string;
+    groupId: string;
     feedContent: string;
 }
