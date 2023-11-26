@@ -10,7 +10,7 @@ import { findGroupMembersNamesByGroupId } from '../GroupServices';
 
 const prisma = new PrismaClient;
 
-const CreateUser = async(signupDtO : SignupDto) =>{
+const createUser = async(signupDtO : SignupDto) =>{
     const user = await prisma.user.create({
         data:{ 
             userName: signupDtO.userName,
@@ -111,13 +111,22 @@ const findUserByIdAndUpdate = async (userId:string, userUpdateRequestDto:UserUpd
     return updatedUser;
 };
 
-//+ 그룹 참여하는 서비스도 만들어야 함. 
+//+ 그룹 참여하는 서비스
+const addUserToGroup = async(signupDTO:SignupDto, groupId:string)=>{
+    //1. createUser with signupDTO
+    //2. put her groupId in her record at User table
+    //3. assign her id(? not sure) to Group's User[]? Did it mean it had foreign relations with the table?
+    const newUser = await createUser(signupDTO)
+    newUser.groupId = groupId;
 
+
+}
 
 
 
 
 export default{
+    createUser,
     findUserById,
     findGroupIdByUserId,
     findUserByIdAndUpdate,
