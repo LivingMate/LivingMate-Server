@@ -4,7 +4,7 @@ import {FeedBaseDTO} from '../DTOs/Feed/FeedBaseDTO.ts'
 import {FeedCreateRequestDTO} from '../DTOs/Feed/Request/FeedCreateRequestDTO.ts'
 import {FeedUpdateRequestDTO} from '../DTOs/Feed/Request/FeedUpdateRequestDTO.ts'
 import {FeedBaseResponseDTO} from '../DTOs/Feed/Response/FeedBaseResponseDTO.ts'
-import {findGroupIdByUserId} from '../Services/UserService/UserServices.ts' //<- 이거 대체 왜 생기는 거임?!?!?!?!?!???
+import {findGroupIdByUserId} from './UserService/UserService.ts' //<- 이거 대체 왜 생기는 거임?!?!?!?!?!???
 
 
 //신규 피드 등록
@@ -15,9 +15,10 @@ const createFeed = async(FeedCreateRequestDTO:FeedCreateRequestDTO)=>{
             groupId:FeedCreateRequestDTO.groupId,
             text:FeedCreateRequestDTO.feedContent,
         }
-    })
+    });
     //피드 보여주는 서비스를 불러줘야 하나? .then(ShowFeed()) 막 이렇게?
     showFeed(newFeed.groupId)
+    //이렇게 하는게 별로 안 좋을 수도 있다네? Hous에서 어떻게 했는지 보고 바꿔야겠음. 
 }
 
 

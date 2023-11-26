@@ -3,8 +3,8 @@ import { SignupDto } from "../../DTOs/Auth/Requests/SignupDto";
 import { UserUpdateRequestDto } from "../../DTOs/User/Request/UserUpdateRequestDto";
 import { UserUpdateResponseDto } from "../../DTOs/User/Response/UserUpdateResponseDto";
 import { UserProfileResponseDto } from '../../DTOs/User/Response/UserProfileResponseDto';
-import { findGroupMembersColorsByGroupId, findGroupNameByGroupId } from '../GroupServices';
-import { findGroupMembersNamesByGroupId } from '../GroupServices';
+import { findGroupMembersColorsByGroupId, findGroupNameByGroupId } from '../GroupService';
+import { findGroupMembersNamesByGroupId } from '../GroupService';
 
 
 
