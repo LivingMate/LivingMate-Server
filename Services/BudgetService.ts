@@ -30,6 +30,7 @@ const showBudget = async(groupId:string)=>{
     })
     return Budgets;
 }
+//isDone도 보여지는지 확인해야 하네.. 
 
 //지출내역 수정
 const updateBudgetContent = async(BudgetUpdateRequestDTO:BudgetUpdateRequestDTO)=>{
@@ -45,13 +46,49 @@ const updateBudgetContent = async(BudgetUpdateRequestDTO:BudgetUpdateRequestDTO)
         });
     }
     catch(error){
-        console.error('Error updating budget', error);
-        throw error;
+        throw new Error('Error updating Budget Contents');
     }
 
 }
 
 
 //지출내역 삭제
+const deleteBudget = async(BudgetId:number) =>{
+    const deletedBudget = await prisma.userSpendings.delete({
+        where:{
+            id:BudgetId,
+        },
+    });
+    return 0;
+    //showBudget
+}
+//showBudget에 따라서 + 이런저런 사정에 따라서 파라미터로 받는게 GroupId가 될 수도 있고 DTO가 될 수도 있구나.. 
+// 그러면 수정 해줘야해...
+
+
 //지출내역 검색
+
 //지출 합산 내역 반환
+const getGroupSpending = async(BudgetId:string)=>{
+    const GroupSpending = await prisma.userSpendings.groupBy({
+        by:['groupId'],
+        _sum:{
+            spendings: true,
+        },
+        _avg:{
+            spendings: true
+        },
+        where:{
+            isDone: false,
+        }
+    }); //그룹 썸 구하기 
+
+    for (const group of GroupSpending){
+        const groupId = group.groupId;
+        const groupSum = group._sum.spendings;
+        const groupAvg = group._avg.spendings;
+
+
+    }
+
+}
