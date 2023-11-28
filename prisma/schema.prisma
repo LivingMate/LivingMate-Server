@@ -136,7 +136,7 @@ model UserSpendings {
   userId      String
   group       Group         @relation(fields: [groupId], references: [id])
   groupId     String
-  spendings   Float
+  spendings   Float         @default(0)
   category    Category[] // category를 저장해둔 db를 만들어야 하나?
   subCategory SubCategory[]
   createdAt   DateTime      @default(now())

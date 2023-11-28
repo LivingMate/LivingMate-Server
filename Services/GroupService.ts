@@ -77,7 +77,7 @@ const findGroupMembersColorsByGroupId = async(groupId:string) =>{
 
 
 
-export{
+export default{
     findGroupNameByGroupId,
     findGroupMembersNamesByGroupId,
     findGroupMembersColorsByGroupId
