@@ -149,6 +149,40 @@ const findCalendarEventById = async (eventId: number) => {
   }
 }
 
+const getCalendarEventsForGroup = async (groupId: string) => {
+  try {
+    const calendarGetEvents = await prisma.calendar.findMany({
+      where: {
+        groupId: groupId,
+      },
+    });
+    return calendarGetEvents;
+  } catch (error) {
+    console.error('Error retrieving calendar events for group', error);
+    throw error;
+  }
+};
+
+const searchCalendarEventsByDateRange = async ( dateStart: Date, dateEnd: Date) => {
+  try {
+    const calendarSearchEvents = await prisma.calendar.findMany({
+      where: {
+        dateStart: {
+          gte: dateStart,
+        },
+        dateEnd: {
+          lte: dateEnd,
+        },
+      },
+    });
+    return calendarSearchEvents;
+  } catch (error) {
+    console.error('Error searching calendar events by date range', error);
+    throw error;
+  }
+};
+
+
 export default {
   createCalendar,
   createScheduleReady,
@@ -156,4 +190,6 @@ export default {
   updateCalendar,
   deleteCalendar,
   findCalendarEventById,
+  getCalendarEventsForGroup,
+  searchCalendarEventsByDateRange
 }
