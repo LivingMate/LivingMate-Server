@@ -90,5 +90,11 @@ const getGroupSpending = async(BudgetId:string)=>{
 
 
     }
-
+}
+export default{
+    createBudget,
+    showBudget,
+    updateBudgetContent,
+    deleteBudget,
+    getGroupSpending
 }
