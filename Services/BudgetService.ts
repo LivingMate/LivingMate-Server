@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client'
-const prisma = new PrismaClient()
 import { BudgetBaseDTO } from '../DTOs/Budget/BudgetBaseDTO'
 import { BudgetCreateRequestDTO } from '../DTOs/Budget/Request/BudgetCreateRequestDTO'
 import { BudgetUpdateRequestDTO } from '../DTOs/Budget/Request/BudgetUpdateRequestDTO'
+const prisma = new PrismaClient()
 
 //지출내역 등록
 const createBudget = async (BudgetBaseDTO: BudgetBaseDTO) => {
