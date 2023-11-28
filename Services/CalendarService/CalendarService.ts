@@ -4,6 +4,7 @@ import { CalendarBaseDto } from '../../DTOs/Calendar/CalendarBaseDto'
 import { CalendarRightCreateDto } from '../../DTOs/Calendar/Request/CalendarRightCreateDto'
 import { ScheduleReadyCreateDto } from '../../DTOs/Calendar/Request/ScheduleReadyCreateDto'
 import { SchedulingCreateDto } from '../../DTOs/Calendar/Request/SchedulingCreateDto'
+import { differenceInDays } from 'date-fns'
 // 이 파일 아직 미완성임! 천천히 해볼게
 
 // 바로 등록 생성
@@ -33,7 +34,7 @@ const createCalendar = async (calendarData: CalendarBaseDto|CalendarRightCreateD
 // 일정 조율 생성
 const createScheduleReady = async (calendarData: ScheduleReadyCreateDto) => {
   try {
-    const newCalendar = await prisma.scheduleReady.create({
+    const newScheduleReady = await prisma.scheduleReady.create({
       data: {
         userId: calendarData.userId,
         groupId: calendarData.groupId,
@@ -46,7 +47,7 @@ const createScheduleReady = async (calendarData: ScheduleReadyCreateDto) => {
     })
 
     // Your logic here, e.g., send a notification, update UI, etc.
-    return newCalendar
+    return newScheduleReady
   } catch (error) {
     console.error('Error creating schedule-ready event', error)
     throw error
@@ -54,27 +55,103 @@ const createScheduleReady = async (calendarData: ScheduleReadyCreateDto) => {
 }
 
 // 시간표 생성
-const createScheduling = async (day: number, calendarData: SchedulingCreateDto) => {
+const createScheduling = async (calendarData: SchedulingCreateDto) => {
   try {
+    // dateStart랑 dateEnd 빼주기
+    const daysDifference = differenceInDays(calendarData.dateEnd, calendarData.dateStart);
 
+    // 배열 생성
+    const schedules = [];
 
+    // Iterate over the date range and create a schedule for each day
+    for (let i = 0; i <= daysDifference; i++) {
+      const currentDate = new Date(calendarData.dateStart);
+      currentDate.setDate(currentDate.getDate() + i);
 
-    const newCalendar = await prisma.scheduling.create({
-      data: {
-        userId: calendarData.userId,
-        groupId: calendarData.groupId,
-        day: calendarData,
-        timeStart: calendarData.timeStart,
-        timeEnd: calendarData.timeEnd,
-      },
-    })
+      const newScheduling = await prisma.scheduling.create({
+        data: {
+          userId: calendarData.userId,
+          groupId: calendarData.groupId,
+          day: i + 1,
+          timeStart: calendarData.timeStart,
+          timeEnd: calendarData.timeEnd
+        },
+      });
 
-    // Your logic here, e.g., send a notification, update UI, etc.
-    return newCalendar
+      schedules.push(newScheduling);
+    }
+    return schedules;
   } catch (error) {
-    console.error('Error creating schedule-ready event', error)
-    throw error
+    console.error('Error creating schedule-ready events', error);
+    throw error;
   }
-}
+};
+
+
+const updateCalendar = async (eventId: number, updateData: CalendarBaseDto) => {
+  try {
+    const existingEvent = await findCalendarEventById(eventId);
+    if (!existingEvent) {
+      throw new Error('Calendar event not found');
+    }
+
+    const updatedEvent = await prisma.calendar.update({
+      where: {
+        id: eventId,
+      },
+      data: {
+        userId: updateData.userId,
+        title: updateData.dutyName,
+        dateStart: updateData.dateStart,
+        dateEnd: updateData.dateEnd,
+        timeStart: updateData.timeStart,
+        timeEnd: updateData.timeEnd,
+      },
+    });
+
+    return updatedEvent;
+  } catch (error) {
+    console.error('Error updating calendar event', error);
+    throw error;
+  }
+};
+
+const findCalendarEventById = async (eventId: number) => {
+  try {
+    const event = await prisma.calendar.findUnique({
+      where: {
+        id: eventId,
+      },
+    });
+
+    return event;
+  } catch (error) {
+    console.error('Error finding calendar event by ID', error);
+    throw error;
+  }
+};
+
+
+const deleteCalendarEvent = async (eventId: number) => {
+  try {
+    const existingEvent = await findCalendarEventById(eventId);
+    if (!existingEvent) {
+      throw new Error('Calendar event not found');
+    }
+
+    await prisma.calendar.delete({
+      where: {
+        id: eventId,
+      },
+    });
+
+    return 0;
+  } catch (error) {
+    console.error('Error deleting calendar event', error);
+    throw error;
+  }
+};
+
+
 
 
