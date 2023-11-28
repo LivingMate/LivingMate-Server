@@ -4,8 +4,7 @@ import {FeedBaseDTO} from '../DTOs/Feed/FeedBaseDTO.js'
 import {FeedCreateRequestDTO} from '../DTOs/Feed/Request/FeedCreateRequestDTO.js'
 import {FeedUpdateRequestDTO} from '../DTOs/Feed/Request/FeedUpdateRequestDTO.js'
 import {FeedBaseResponseDTO} from '../DTOs/Feed/Response/FeedBaseResponseDTO.js'
-import {findGroupIdByUserId} from './UserService/UserService.js' //<- 이거 대체 왜 생기는 거임?!?!?!?!?!???
-// 예원 답장 : 언니가 쟤 기껏 import 시켜놓고 왜 안쓰냐는 뜻이야
+import {UserService} from './index.js' 
 
 
 //신규 피드 등록

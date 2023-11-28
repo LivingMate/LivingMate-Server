@@ -62,7 +62,7 @@ const deleteBudget = async (BudgetId: number) => {
 //지출내역 검색
 
 //지출 합산 내역 반환
-const getGroupSpending = async (BudgetId: string) => {
+const getGroupSpending = async (BudgetId: string, groupId: string) => {
   const GroupSpending = await prisma.userSpendings.groupBy({
     by: ['groupId'],
     _sum: {
@@ -80,8 +80,50 @@ const getGroupSpending = async (BudgetId: string) => {
     const groupId = group.groupId
     const groupSum = group._sum.spendings
     const groupAvg = group._avg.spendings
+   
+    let groupMemberSpendings:{userId: string; userSpending: number}[] =[];
+    groupMemberSpendings = await getUserSpending(groupId);
+  
+    groupMemberSpendings.forEach((member)=>{
+        if(member.userSpending == null || groupAvg ==null){
+            throw new Error('Null Error: getGroupSpending');
+        }
+        member.userSpending-=groupAvg;
+    })
+    return groupMemberSpendings;
   }
 }
+
+const getUserSpending = async(groupId: string): Promise<{userId:string; userSpending: number}[]>=>{
+    const userSpendings = await prisma.userSpendings.groupBy({
+        by:['userId'],
+        _sum:{
+            spendings: true,
+        },
+        where:{
+            groupId: groupId,
+            isDone: false,
+        },
+    });
+
+    const groupMemberSpendings:{userId: string; userSpending: number}[] =[];
+
+    userSpendings.forEach((record)=>{
+        const userId = record.userId;
+        const userSpending = record._sum.spendings;
+
+        if(userSpending == null){
+            throw new Error('Null error: groupMemberSpendings');
+        }
+
+        groupMemberSpendings.push({userId, userSpending});
+    });
+
+    return groupMemberSpendings;
+}
+
+
+
 export default {
   createBudget,
   showBudget,
