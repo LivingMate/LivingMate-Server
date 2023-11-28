@@ -88,20 +88,7 @@ const getGroupSpending = async(BudgetId:string)=>{
         const groupSum = group._sum.spendings;
         const groupAvg = group._avg.spendings;
 
-        const GroupMember = await prisma.userSpendings.findMany({
-            where:{
-                groupId:groupId
-            }
-        })
-
-
 
     }
-// {userId : userSpending - averageGroupSpending}[]
-   
 
 }
-
-//유저 썸 구하기.....
-//유저 아이디가 있으니까 sum 자체는 문제가 아닌데.. 
-//객체 반환하려면.... id, value 이렇게 나와줘야 하는데... 
