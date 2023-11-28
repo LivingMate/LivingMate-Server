@@ -1,6 +1,8 @@
 import { NextFunction, Request, Response } from "express";
+import { validationResult, Result, ValidationError } from 'express-validator';
 import { UserProfileResponseDto } from '../DTOs/User/Response/UserProfileResponseDto';
 import {UserService} from '../Services/index';
+
 
 const getUserProfile = async (
     req: Request,
@@ -11,7 +13,6 @@ const getUserProfile = async (
   
     try {
       const data: UserProfileResponseDto =
-        await UserService.getUserProfile(userId);
         await UserService.getUserProfile(userId);
   
       return res
