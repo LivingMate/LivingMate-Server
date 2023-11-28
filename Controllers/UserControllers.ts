@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { UserProfileResponseDto } from '../DTOs/User/Response/UserProfileResponseDto';
-import {UserServices} from '../Services/UserServices';
+import {UserService} from '../Services/index';
 
 const getUserProfile = async (
     req: Request,
@@ -11,7 +11,7 @@ const getUserProfile = async (
   
     try {
       const data: UserProfileResponseDto =
-        await UserServices.getUserProfile(userId);
+        await UserService.getUserProfile(userId);
   
       return res
         .send(data);
