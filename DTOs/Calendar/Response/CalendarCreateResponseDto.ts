@@ -1,7 +1,7 @@
-import { CalendarRightCreateDTO } from "../Request/CalendarRightCreateDTO";
+import { CalendarRightCreateDto } from "../Request/CalendarRightCreateDto";
 import { ScheduleCreateDto } from "../Request/ScheduleCreateDto";
 
-export interface CalendarRightCreateResponseDto extends CalendarRightCreateDTO{
+export interface CalendarRightCreateResponseDto extends CalendarRightCreateDto {
 
 }
 

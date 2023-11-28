@@ -1,5 +1,4 @@
-import { CalendarBaseDTO } from "../CalendarBaseDTO";
+import { CalendarBaseDto } from "../CalendarBaseDto";
 
-export interface ScheduleCreateDto extends CalendarBaseDTO{
-  userId: string;
+export interface ScheduleCreateDto extends CalendarBaseDto {
 }

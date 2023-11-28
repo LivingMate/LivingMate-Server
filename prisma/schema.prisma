@@ -22,11 +22,11 @@ model User {
   groupId         String?
   fcmToken        String?
   Feed            Feed[]
-  CalendarRight   CalendarRight[]
   SingleSender    NotificationSingle[] @relation("sender")
   SingleReciever  NotificationSingle[] @relation("reciever")
   MultiSender     NotificationMulti[]  @relation("sender")
   MultiReciever   NotificationMulti[]  @relation("reciever")
+  Calendar        Calendar[]
   ScheduleReady   ScheduleReady[]
   Scheduling      Scheduling[]
   UserSpendings   UserSpendings[]
@@ -45,7 +45,7 @@ model Group {
   Feed               Feed[]
   NotificationSingle NotificationSingle[]
   NotificationMulti  NotificationMulti[]
-  CalendarRight      CalendarRight[]
+  Calendar           Calendar[]
   Scheduling         Scheduling[]
   ScheduleReady      ScheduleReady[]
   UserSpendings      UserSpendings[]
@@ -54,7 +54,7 @@ model Group {
 }
 
 model Feed {
-  id        Int      @default(autoincrement())@id
+  id        Int      @id @default(autoincrement())
   user      User     @relation(fields: [userId], references: [id])
   userId    String
   group     Group    @relation(fields: [groupId], references: [id])
@@ -89,8 +89,8 @@ model NotificationMulti {
   recieverId String?
 }
 
-model CalendarRight {
-  id        Int      @id
+model Calendar {
+  id        Int      @id @default(autoincrement())
   user      User     @relation(fields: [userId], references: [id]) // 배열로 받아야 함
   userId    String
   group     Group    @relation(fields: [groupId], references: [id])
@@ -101,28 +101,26 @@ model CalendarRight {
   timeStart DateTime @db.Time()
   timeEnd   DateTime @db.Time()
   memo      String   @db.Text
-  term      Int //주기를 매일:0 매주:1 매달:2 매년:3 이런식으로 받는건?
+  term      Int? //주기를 매일:0 매주:1 매달:2 매년:3 이런식으로 받는건?
 }
 
 model ScheduleReady {
   // ScheduleReady의 id는 밑에 CalendarSchedule때문에 String형으로 받았음
   // 만약 이게 틀린거면 지우고, int형으로 바꾸기
-  id        String             @id
-  user      User               @relation(fields: [userId], references: [id])
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
   userId    String // 배열로 받아야 함
-  group     Group              @relation(fields: [groupId], references: [id])
+  group     Group    @relation(fields: [groupId], references: [id])
   groupId   String
-  title     String             @db.VarChar(255)
-  dateStart DateTime           @db.Date
-  dateEnd   DateTime           @db.Date
-  timeStart DateTime           @db.Time()
-  timeEnd   DateTime           @db.Time()
-  calUser   CalendarSchedule[] @relation(name: "user")
-  calGroup  CalendarSchedule[] @relation(name: "group")
+  title     String   @db.VarChar(255)
+  dateStart DateTime @db.Date
+  dateEnd   DateTime @db.Date
+  timeStart DateTime @db.Time()
+  timeEnd   DateTime @db.Time()
 }
 
 model Scheduling {
-  id        Int      @id
+  id        Int      @id @default(autoincrement())
   user      User     @relation(fields: [userId], references: [id])
   userId    String
   group     Group    @relation(fields: [groupId], references: [id])
@@ -130,20 +128,6 @@ model Scheduling {
   day       Int
   timeStart DateTime @db.Time()
   timeEnd   DateTime @db.Time()
-}
-
-model CalendarSchedule {
-  // user, group을 이렇게 받아도 되는지 모르겠음
-  id        Int            @id
-  title     String
-  dateStart DateTime       @db.Date
-  dateEnd   DateTime       @db.Date
-  timeStart DateTime       @db.Time()
-  timeEnd   DateTime       @db.Time()
-  user      ScheduleReady? @relation(fields: [userId], references: [id], name: "user")
-  userId    String?
-  group     ScheduleReady? @relation(fields: [groupId], references: [id], name: "group")
-  groupId   String?
 }
 
 model UserSpendings {

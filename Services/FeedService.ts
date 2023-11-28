@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient;
-import {FeedBaseDTO} from '../DTOs/Feed/FeedBaseDTO.js'
+import {FeedBaseDTO} from '../DTOs/Feed/FeedBaseDTO.ts'
 import {FeedCreateRequestDTO} from '../DTOs/Feed/Request/FeedCreateRequestDTO.js'
 import {FeedUpdateRequestDTO} from '../DTOs/Feed/Request/FeedUpdateRequestDTO.js'
 import {FeedBaseResponseDTO} from '../DTOs/Feed/Response/FeedBaseResponseDTO.js'

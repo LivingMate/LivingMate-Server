@@ -1,5 +1,3 @@
-import { CalendarBaseDTO } from '../CalendarBaseDTO'
+import { CalendarBaseDto } from '../CalendarBaseDto'
 
-export interface ScheduleReadyCreateDto extends CalendarBaseDTO{
-
-}
+export interface ScheduleReadyCreateDto extends CalendarBaseDto {}
