@@ -58,8 +58,7 @@ const updateFeedContent = async(FeedUpdateRequestDTO:FeedUpdateRequestDTO)=>{
         throw new Error('Feed not found');
     }
 }catch(error){
-    console.error('Error updating feed', error);
-    throw error;
+    throw new Error('Could not update Feed');
 }
 
 }
