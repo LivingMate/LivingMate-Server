@@ -1,1 +1,0 @@
-import { ScheduleReadyRequsetDto } from './ScheduelReadyRequestDto'

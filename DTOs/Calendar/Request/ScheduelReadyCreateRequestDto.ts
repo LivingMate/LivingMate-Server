@@ -1,4 +1,4 @@
 import { CalendarBaseDTO } from '../CalendarBaseDTO'
-export interface ScheduleReadyRequsetDto {
+export interface ScheduleReadyCreateRequsetDto {
 
 }
