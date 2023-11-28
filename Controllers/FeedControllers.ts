@@ -85,8 +85,18 @@ const showFeed = async (
     //const { feedId } = req.params;
 
     try{
-        await FeedService.updateFeedContent
+        await FeedService.updateFeedContent;
+        return res
+        .status(200)
+        .send('Feed Updated!');
+        //   util.success(statusCode.CREATED, message.CREATE_EVENT_SUCCESS, data)
+        // );
+    } catch (error) {
+      next(error);
     }
-}
+  };
 
-
+ /*
+  patch
+  /feeds/:feedId
+   */
