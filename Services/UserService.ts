@@ -1,10 +1,9 @@
 import {PrismaClient} from '@prisma/client';
-import { SignupDto } from "../../DTOs/Auth/Requests/SignupDto";
-import { UserUpdateRequestDto } from "../../DTOs/User/Request/UserUpdateRequestDto";
-import { UserUpdateResponseDto } from "../../DTOs/User/Response/UserUpdateResponseDto";
-import { UserProfileResponseDto } from '../../DTOs/User/Response/UserProfileResponseDto';
-import { findGroupMembersColorsByGroupId, findGroupNameByGroupId } from '../GroupService';
-import { findGroupMembersNamesByGroupId } from '../GroupService';
+import { SignupDto } from "../DTOs/Auth/Requests/SignupDto";
+import { UserUpdateRequestDto } from "../DTOs/User/Request/UserUpdateRequestDto";
+import { UserUpdateResponseDto } from "../DTOs/User/Response/UserUpdateResponseDto";
+import { UserProfileResponseDto } from '../DTOs/User/Response/UserProfileResponseDto';
+import {GroupService} from './index';
 
 
 
@@ -38,13 +37,13 @@ const getUserProfile = async (userId: string): Promise<UserProfileResponseDto> =
       if (userProfile.groupId === null || userProfile.groupId === undefined) {
         throw new Error('User has no group!');
     }
-      const userGroupName = await findGroupNameByGroupId(userProfile.groupId);
+      const userGroupName = await GroupService.findGroupNameByGroupId(userProfile.groupId);
       const groupName = userGroupName?.groupName ?? 'DefaultGroupName';
       
-      const userGroupMembersNames = await findGroupMembersNamesByGroupId(userProfile.groupId);
+      const userGroupMembersNames = await GroupService.findGroupMembersNamesByGroupId(userProfile.groupId);
       const groupMembersNames = userGroupMembersNames ?? [];
       
-      const userGroupMembersColors = await findGroupMembersColorsByGroupId(userProfile.groupId);
+      const userGroupMembersColors = await GroupService.findGroupMembersColorsByGroupId(userProfile.groupId);
       const groupMembersColors = userGroupMembersColors ?? [];
 
   
@@ -54,9 +53,6 @@ const getUserProfile = async (userId: string): Promise<UserProfileResponseDto> =
         groupName,
         groupMembersNames,
         groupMembersColors,
-
-        //prisma return 값이 object라서 생기는 문제. 얘의 멤버변수를 참조하면 되는데, groupMembers는 object로 이루어진 array라서 고민됨
-        // 해결 
       };
   
       return data;
