@@ -12,6 +12,7 @@ const getUserProfile = async (
     try {
       const data: UserProfileResponseDto =
         await UserService.getUserProfile(userId);
+        await UserService.getUserProfile(userId);
   
       return res
         .send(data);
