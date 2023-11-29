@@ -128,3 +128,12 @@ const showFeed = async (
 
 
 
+export default{
+  showFeed,
+  createFeed,
+  updateFeed,
+  deleteFeed
+}
+
+
+
