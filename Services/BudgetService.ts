@@ -67,7 +67,20 @@ const searchBudget = async(searchKey:string)=>{
       spendingName : {
         contains: searchKey,
     }
-  }})
+  }});
+
+  const results = searchedBudget.map((budget)=>{
+    return {
+      id: budget.id,
+      name: budget.spendingName,
+      spending: budget.spendings,
+      createdAt: budget.createdAt,
+      userId: budget.userId,
+      //category: budget.
+    };
+  });
+
+  return results;
 }
 
 
