@@ -10,6 +10,7 @@ const createBudget = async (BudgetBaseDTO: BudgetBaseDTO) => {
     data: {
       userId: BudgetBaseDTO.userid,
       groupId: BudgetBaseDTO.groupid,
+      spendingName: BudgetBaseDTO.name,
       spendings: BudgetBaseDTO.spending,
       category: BudgetBaseDTO.category, //모델이 []라서 오류가 생기는 거에용
     },
@@ -60,6 +61,19 @@ const deleteBudget = async (BudgetId: number) => {
 // 그러면 수정 해줘야해...
 
 //지출내역 검색
+const searchBudget = async(searchKey:string)=>{
+  const searchedBudget = await prisma.userSpendings.findMany({
+    where:{
+      spendingName : {
+        contains: searchKey,
+    }
+  }})
+}
+
+
+
+
+
 
 //지출 합산 내역 반환
 const getGroupSpending = async (BudgetId: string, groupId: string) => {
