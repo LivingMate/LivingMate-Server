@@ -6,13 +6,12 @@ import { FeedCreateRequestDTO } from '../DTOs/Feed/Request/FeedCreateRequestDTO'
 import { FeedUpdateRequestDTO } from '../DTOs/Feed/Request/FeedUpdateRequestDTO'
 import CalendarService from '../Services/CalendarService'
 
+
 /*
 get
 /feeds
 */
 
-const showFeed = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
-  const groupId: string = req.body.group.id
 const showFeed = async (
     req: Request,
     res: Response,
@@ -30,14 +29,6 @@ const showFeed = async (
     }
   };
 
-  try {
-    const data = await FeedService.showFeed(groupId)
-
-    return res.send(data)
-  } catch (error) {
-    next(error)
-  }
-}
 
 
 /*
@@ -67,6 +58,7 @@ const createFeed = async (req: Request, res: Response, next: NextFunction): Prom
   }
 }
 
+
 /*
   patch
   /feeds/:feedId
@@ -90,27 +82,6 @@ const updateFeed = async (req: Request, res: Response, next: NextFunction): Prom
     next(error)
   }
 }
-
-/*
-  patch
-  /feeds/:feedId
-   */
-
-export default {
-  getWeeksDuty,
-}
-=======
-    try{
-        await FeedService.updateFeedContent(FeedUpdateRequestDTO);
-        return res
-        .status(200)
-        .send('Feed Updated!');
-        //   util.success(statusCode.CREATED, message.CREATE_EVENT_SUCCESS, data)
-        // );
-    } catch (error) {
-      next(error);
-    }
-  };
 
 
  /*
@@ -153,4 +124,4 @@ export default{
 
 
 
->>>>>>> d688f92ccb53381a9fca5974a514959c89b4f107
+
