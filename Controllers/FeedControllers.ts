@@ -2,8 +2,8 @@ import { NextFunction, Request, Response } from 'express'
 import { validationResult, Result, ValidationError } from 'express-validator'
 import { FeedService } from '../Services/index'
 import { isPostfixUnaryExpression } from 'typescript'
-import { FeedCreateRequestDto } from '../DTOs/Feed/Request/FeedCreateRequestDtO'
-import { FeedUpdateRequestDto} from '../DTOs/Feed/Request/FeedUpdateRequestDTO'
+import { FeedCreateRequestDto } from '../DTOs/Feed/Request/FeedCreateRequestDto'
+import { FeedUpdateRequestDto} from '../DTOs/Feed/Request/FeedUpdateRequestDto'
 import CalendarService from '../Services/CalendarService'
 
 
@@ -70,11 +70,11 @@ const updateFeed = async (req: Request, res: Response, next: NextFunction): Prom
     throw new Error('Error at Controller: updateFeed')
   }
 
-  const FeedUpdateRequestDTO: FeedUpdateRequestDTO = req.body
+  const FeedUpdateRequestDTO: FeedUpdateRequestDto = req.body
   //const { feedId } = req.params;
 
   try {
-    await FeedService.updateFeedContent
+    await FeedService.updateFeedContent(FeedUpdateRequestDTO)
     return res.status(200).send('Feed Updated!')
     //   util.success(statusCode.CREATED, message.CREATE_EVENT_SUCCESS, data)
     // );
