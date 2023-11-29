@@ -4,9 +4,27 @@ import { CalendarBaseDto } from '../DTOs/Calendar/CalendarBaseDto'
 import { CalendarRightCreateDto } from '../DTOs/Calendar/Request/CalendarRightCreateDto'
 import { ScheduleReadyCreateDto } from '../DTOs/Calendar/Request/ScheduleReadyCreateDto'
 import { SchedulingCreateDto } from '../DTOs/Calendar/Request/SchedulingCreateDto'
-import { differenceInDays } from 'date-fns'
+import { differenceInDays, startOfWeek, endOfWeek } from 'date-fns'
 
-// 바로 등록 생성
+
+// Id로 반환
+const findCalendarEventById = async (eventId: number) => {
+  try {
+    const event = await prisma.calendar.findUnique({
+      where: {
+        id: eventId,
+      },
+    })
+
+    return event
+  } catch (error) {
+    console.error('Error finding calendar event by ID', error)
+    throw error
+  }
+}
+
+
+// 바로 등록 생성 // 스케줄링 끝내고 일정 생성할때도 이거 쓰기
 const createCalendar = async (calendarData: CalendarBaseDto | CalendarRightCreateDto) => {
   try {
     const newCalendar = await prisma.calendar.create({
@@ -30,6 +48,7 @@ const createCalendar = async (calendarData: CalendarBaseDto | CalendarRightCreat
   }
 }
 
+
 // 일정 조율 생성
 const createScheduleReady = async (calendarData: ScheduleReadyCreateDto) => {
   try {
@@ -52,6 +71,7 @@ const createScheduleReady = async (calendarData: ScheduleReadyCreateDto) => {
     throw error
   }
 }
+
 
 // 시간표 생성
 const createScheduling = async (calendarData: SchedulingCreateDto) => {
@@ -86,6 +106,8 @@ const createScheduling = async (calendarData: SchedulingCreateDto) => {
   }
 }
 
+
+// 일정 수정
 const updateCalendar = async (eventId: number, updateData: CalendarBaseDto) => {
   try {
     const existingEvent = await findCalendarEventById(eventId)
@@ -114,6 +136,8 @@ const updateCalendar = async (eventId: number, updateData: CalendarBaseDto) => {
   }
 }
 
+
+// 일정 삭제
 const deleteCalendar = async (eventId: number) => {
   try {
     const existingEvent = await findCalendarEventById(eventId)
@@ -134,62 +158,52 @@ const deleteCalendar = async (eventId: number) => {
   }
 }
 
-const findCalendarEventById = async (eventId: number) => {
-  try {
-    const event = await prisma.calendar.findUnique({
-      where: {
-        id: eventId,
-      },
-    })
 
-    return event
-  } catch (error) {
-    console.error('Error finding calendar event by ID', error)
-    throw error
-  }
-}
+// 이번주 날짜 반환
+const getCurrentWeekDates = () => {
+  const currentDate = new Date();
+  const startDate = startOfWeek(currentDate, { weekStartsOn: 1 }); // Assuming Monday is the start of the week
+  const endDate = endOfWeek(currentDate, { weekStartsOn: 1 });
 
-const getCalendarEventsForGroup = async (groupId: string) => {
+  return { startDate, endDate };
+};
+
+
+// 이번주 날짜로 일정 반환
+const searchThisWeeksDuty = async (groupId: string) => {
   try {
-    const calendarGetEvents = await prisma.calendar.findMany({
+    // Get the start and end dates of the current week
+    const { startDate, endDate } = getCurrentWeekDates();
+
+    // Get all calendar events for the group within the current week
+    const calendarEventsThisWeek = await prisma.calendar.findMany({
       where: {
         groupId: groupId,
+        dateStart: {
+          gte: startDate,
+        },
+        dateEnd: {
+          lte: endDate,
+        },
       },
     });
-    return calendarGetEvents;
+
+    return calendarEventsThisWeek;
   } catch (error) {
-    console.error('Error retrieving calendar events for group', error);
+    console.error('Error searching this week\'s duty', error);
     throw error;
   }
 };
 
-const searchCalendarEventsByDateRange = async ( dateStart: Date, dateEnd: Date) => {
-  try {
-    const calendarSearchEvents = await prisma.calendar.findMany({
-      where: {
-        dateStart: {
-          gte: dateStart,
-        },
-        dateEnd: {
-          lte: dateEnd,
-        },
-      },
-    });
-    return calendarSearchEvents;
-  } catch (error) {
-    console.error('Error searching calendar events by date range', error);
-    throw error;
-  }
-};
 
 
 export default {
+  findCalendarEventById,
   createCalendar,
   createScheduleReady,
   createScheduling,
   updateCalendar,
   deleteCalendar,
-  findCalendarEventById,
-  getCalendarEventsForGroup,
-  searchCalendarEventsByDateRange
+  getCurrentWeekDates,
+  searchThisWeeksDuty,
 }

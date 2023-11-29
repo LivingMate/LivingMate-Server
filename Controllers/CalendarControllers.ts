@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import CalendarService from '../Services/CalendarService';
 
+
+// POST
 const createCalendarEvent = async (req: Request, res: Response) => {
   try {
     const calendarData = req.body;
@@ -34,6 +36,7 @@ const createSchedulingEvent = async (req: Request, res: Response) => {
   }
 };
 
+// FETCH
 const updateCalendarEvent = async (req: Request, res: Response) => {
   try {
     const eventId = parseInt(req.params.id, 10);
@@ -46,6 +49,7 @@ const updateCalendarEvent = async (req: Request, res: Response) => {
   }
 };
 
+// DELETE
 const deleteCalendarEvent = async (req: Request, res: Response) => {
   try {
     const eventId = parseInt(req.params.id, 10);
@@ -57,28 +61,6 @@ const deleteCalendarEvent = async (req: Request, res: Response) => {
   }
 };
 
-const getGroupCalendarEvents = async (req: Request, res: Response) => {
-    try {
-      const groupId = req.params.groupId;
-      const calendarEvents = await CalendarService.getCalendarEventsForGroup(groupId);
-      res.status(200).json(calendarEvents);
-    } catch (error) {
-      console.error('Error retrieving calendar events for group', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
-  };
-  
-  const searchCalendarEvents = async (req: Request, res: Response) => {
-    try {
-      const startDate = new Date(req.query.startDate as string);
-      const endDate = new Date(req.query.endDate as string);
-      const calendarEvents = await CalendarService.searchCalendarEventsByDateRange(startDate, endDate);
-      res.status(200).json(calendarEvents);
-    } catch (error) {
-      console.error('Error searching calendar events by date range', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
-  };
 
 export {
   createCalendarEvent,
@@ -86,6 +68,4 @@ export {
   createSchedulingEvent,
   updateCalendarEvent,
   deleteCalendarEvent,
-  getGroupCalendarEvents,
-  searchCalendarEvents
 };
