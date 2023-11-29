@@ -1,4 +1,4 @@
-export interface BudgetBaseDTO{
+export interface BudgetBaseDto{
     userid: string;
     groupid: string;
     name: string;

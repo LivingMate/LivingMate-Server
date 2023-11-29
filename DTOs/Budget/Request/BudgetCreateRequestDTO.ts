@@ -1,2 +1,2 @@
-import { BudgetBaseDTO } from '../BudgetBaseDTO'
-export interface BudgetCreateRequestDTO{}
+import { BudgetBaseDto } from '../BudgetBaseDto'
+export interface BudgetCreateRequestDto{}

@@ -1,18 +1,18 @@
 import { PrismaClient } from '@prisma/client'
-import { BudgetBaseDTO } from '../DTOs/Budget/BudgetBaseDTO'
-import { BudgetCreateRequestDTO } from '../DTOs/Budget/Request/BudgetCreateRequestDTO'
-import { BudgetUpdateRequestDTO } from '../DTOs/Budget/Request/BudgetUpdateRequestDTO'
+import { BudgetBaseDto } from '../DTOs/Budget/BudgetBaseDto'
+import { BudgetCreateRequestDto } from '../DTOs/Budget/Request/BudgetCreateRequestDto'
+import { BudgetUpdateRequestDto } from '../DTOs/Budget/Request/BudgetUpdateRequestDTO'
 const prisma = new PrismaClient()
 
 //지출내역 등록
-const createBudget = async (BudgetBaseDTO: BudgetBaseDTO) => {
+const createBudget = async (BudgetBaseDto: BudgetBaseDto) => {
   const newBudget = await prisma.userSpendings.create({
     data: {
-      userId: BudgetBaseDTO.userid,
-      groupId: BudgetBaseDTO.groupid,
-      spendingName: BudgetBaseDTO.name,
-      spendings: BudgetBaseDTO.spending,
-      category: BudgetBaseDTO.category, //모델이 []라서 오류가 생기는 거에용
+      userId: BudgetBaseDto.userid,
+      groupId: BudgetBaseDto.groupid,
+      spendingName: BudgetBaseDto.name,
+      spendings: BudgetBaseDto.spending,
+      category: BudgetBaseDto.category, //모델이 []라서 오류가 생기는 거에용
     },
   })
   //리턴값 어케할지.. showBudget 할지.. 이거 정해야 행
@@ -31,15 +31,15 @@ const showBudget = async (groupId: string) => {
 //isDone도 보여지는지 확인해야 하네.. -> 되겠지! 
 
 //지출내역 수정
-const updateBudgetContent = async (BudgetUpdateRequestDTO: BudgetUpdateRequestDTO) => {
+const updateBudgetContent = async (BudgetUpdateRequestDTO: BudgetUpdateRequestDto) => {
   try {
     const updatedBudget = await prisma.userSpendings.update({
       where: {
-        id: BudgetUpdateRequestDTO.budgetId,
+        id: BudgetUpdateRequestDto.budgetId,
       },
       data: {
-        spendings: BudgetUpdateRequestDTO.spending,
-        category: BudgetUpdateRequestDTO.category,
+        spendings: BudgetUpdateRequestDto.spending,
+        category: BudgetUpdateRequestDto.category,
       },
     })
   } catch (error) {

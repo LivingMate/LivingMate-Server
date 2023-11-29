@@ -1,4 +1,4 @@
-export interface GroupJoinResponseDTO {
+export interface GroupJoinResponseDto {
   _id: string;
   userName: string;
 }

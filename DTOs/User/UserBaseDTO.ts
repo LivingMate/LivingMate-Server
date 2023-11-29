@@ -1,4 +1,4 @@
-export interface UserBaseDTO{
+export interface UserBaseDto{
     userId : string;
     userName : string;
     userColor: string;

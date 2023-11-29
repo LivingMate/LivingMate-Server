@@ -1,4 +1,4 @@
-export interface GroupResponseDTO{
+export interface GroupResponseDto{
     _id: string;
     groupCode: string;
 }

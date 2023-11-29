@@ -1,5 +1,5 @@
-import { FeedBaseDTO } from '../FeedBaseDTO';
+import { FeedBaseDto } from '../FeedBaseDto';
 
-export interface FeedBaseResponseDTO extends FeedBaseDTO {
+export interface FeedBaseResponseDto extends FeedBaseDto {
     createdAt: Date;
 };

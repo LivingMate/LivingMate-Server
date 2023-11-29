@@ -1,19 +1,19 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient;
-import {FeedBaseDTO} from '../DTOs/Feed/FeedBaseDTO'
-import {FeedCreateRequestDTO} from '../DTOs/Feed/Request/FeedCreateRequestDTO'
-import {FeedUpdateRequestDTO} from '../DTOs/Feed/Request/FeedUpdateRequestDTO'
-import {FeedBaseResponseDTO} from '../DTOs/Feed/Response/FeedBaseResponseDTO'
+//import { FeedBaseDto } from '../DTOs/Feed/FeedBaseDto';
+import { FeedCreateRequestDto } from '../DTOs/Feed/Request/FeedCreateRequestDto';
+import { FeedUpdateRequestDto } from '../DTOs/Feed/Request/FeedUpdateRequestDto';
+//import {FeedBaseResponseDto} from '../DTOs/Feed/Response/FeedBaseResponseDto'
 import {UserService} from './index.js' 
 
 
 //신규 피드 등록
-const createFeed = async(FeedCreateRequestDTO:FeedCreateRequestDTO)=>{
+const createFeed = async(FeedCreateRequestDto:FeedCreateRequestDto)=>{
     const newFeed = await prisma.feed.create({
         data:{
-            userId: FeedCreateRequestDTO.userId,
-            groupId:FeedCreateRequestDTO.groupId,
-            text:FeedCreateRequestDTO.feedContent,
+            userId: FeedCreateRequestDto.userId,
+            groupId:FeedCreateRequestDto.groupId,
+            text:FeedCreateRequestDto.feedContent,
         }
     });
     //피드 보여주는 서비스를 불러줘야 하나? .then(ShowFeed()) 막 이렇게?
@@ -37,17 +37,17 @@ const showFeed = async(GroupId:string)=>{
 
 
 //피드내용 수정
-const updateFeedContent = async(FeedUpdateRequestDTO:FeedUpdateRequestDTO)=>{
+const updateFeedContent = async(FeedUpdateRequestDto:FeedUpdateRequestDto)=>{
     
-    try {const Feed = await findFeedByFeedId(FeedUpdateRequestDTO.feedId);
+    try {const Feed = await findFeedByFeedId(FeedUpdateRequestDto.feedId);
     if(Feed){
     
     const UpdatedFeed = await prisma.feed.update({
         where:{
-            id: FeedUpdateRequestDTO.feedId,
+            id: FeedUpdateRequestDto.feedId,
         },
         data:{
-            text: FeedUpdateRequestDTO.feedContent,
+            text: FeedUpdateRequestDto.feedContent,
         },
     });
     

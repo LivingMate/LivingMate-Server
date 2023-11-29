@@ -2,8 +2,8 @@ import { NextFunction, Request, Response } from 'express'
 import { validationResult, Result, ValidationError } from 'express-validator'
 import { FeedService } from '../Services/index'
 import { isPostfixUnaryExpression } from 'typescript'
-import { FeedCreateRequestDTO } from '../DTOs/Feed/Request/FeedCreateRequestDTO'
-import { FeedUpdateRequestDTO } from '../DTOs/Feed/Request/FeedUpdateRequestDTO'
+import { FeedCreateRequestDto } from '../DTOs/Feed/Request/FeedCreateRequestDtO'
+import { FeedUpdateRequestDto} from '../DTOs/Feed/Request/FeedUpdateRequestDTO'
 import CalendarService from '../Services/CalendarService'
 
 
@@ -43,7 +43,7 @@ const createFeed = async (req: Request, res: Response, next: NextFunction): Prom
   }
 
   const userId: string = req.body.user._id
-  const feedCreateDto: FeedCreateRequestDTO = req.body
+  const feedCreateDto: FeedCreateRequestDto = req.body
   //const { roomId } = req.params;
 
   try {
