@@ -18,7 +18,7 @@ const showFeed = async (
     res: Response,
     next: NextFunction
   ): Promise<void | Response> => {
-    const groupId: string = req.body.group.id;
+    const groupId: string = req.body.group.id; 
   
     try {
       const data = await FeedService.showFeed(groupId);
@@ -85,7 +85,7 @@ const showFeed = async (
     //const { feedId } = req.params;
 
     try{
-        await FeedService.updateFeedContent;
+        await FeedService.updateFeedContent(FeedUpdateRequestDTO);
         return res
         .status(200)
         .send('Feed Updated!');
@@ -96,7 +96,35 @@ const showFeed = async (
     }
   };
 
+
  /*
-  patch
+  delete
   /feeds/:feedId
-   */
+  */
+
+  const deleteFeed = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void | Response> => {
+    const errors: Result<ValidationError> = validationResult(req);
+    if (!errors.isEmpty()) {
+      throw new Error('Error at Controller: updateFeed');
+    }
+
+    const feedId  = parseInt(req.params.feedId);
+
+    try{
+       await FeedService.deleteFeed(feedId);
+        return res
+        .status(200)
+        .send('Feed Deleted!');
+        //   util.success(statusCode.CREATED, message.CREATE_EVENT_SUCCESS, data)
+        // );
+    } catch (error) {
+      next(error);
+    }
+  };
+
+
+
