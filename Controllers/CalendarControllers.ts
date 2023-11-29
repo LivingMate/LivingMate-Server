@@ -36,6 +36,7 @@ const createSchedulingEvent = async (req: Request, res: Response) => {
   }
 };
 
+
 // FETCH
 const updateCalendarEvent = async (req: Request, res: Response) => {
   try {
@@ -48,6 +49,7 @@ const updateCalendarEvent = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
 
 // DELETE
 const deleteCalendarEvent = async (req: Request, res: Response) => {
@@ -62,10 +64,25 @@ const deleteCalendarEvent = async (req: Request, res: Response) => {
 };
 
 
+// GET
+const getThisWeeksDuty = async (req: Request, res: Response) => {
+    try {
+      const groupId: string = req.params.groupId;
+      const thisWeeksDuty = await CalendarService.searchThisWeeksDuty(groupId);
+      res.status(200).json(thisWeeksDuty);
+    } catch (error) {
+      console.error('Error getting this week\'s duty', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+
+
 export {
   createCalendarEvent,
   createScheduleReadyEvent,
   createSchedulingEvent,
   updateCalendarEvent,
   deleteCalendarEvent,
+  getThisWeeksDuty
 };

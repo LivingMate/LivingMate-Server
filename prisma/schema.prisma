@@ -131,17 +131,17 @@ model Scheduling {
 }
 
 model UserSpendings {
-  id          Int           @id
-  user        User          @relation(fields: [userId], references: [id])
-  userId      String
-  group       Group         @relation(fields: [groupId], references: [id])
-  groupId     String
-  spendings   Float         @default(0)
-  category    Category[] // category를 저장해둔 db를 만들어야 하나?
-  subCategory SubCategory[]
-  createdAt   DateTime      @default(now())
+  id           Int           @id
+  user         User          @relation(fields: [userId], references: [id])
+  userId       String
+  group        Group         @relation(fields: [groupId], references: [id])
+  groupId      String
+  spendings    Float         @default(0)
+  category     Category[] // category를 저장해둔 db를 만들어야 하나?
+  subCategory  SubCategory[]
+  createdAt    DateTime      @default(now())
   spendingName String
-  isDone      Boolean       @default(false)
+  isDone       Boolean       @default(false)
 }
 
 model Calculator {
