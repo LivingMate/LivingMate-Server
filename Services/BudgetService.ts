@@ -28,7 +28,7 @@ const showBudget = async (groupId: string) => {
   })
   return Budgets
 }
-//isDone도 보여지는지 확인해야 하네..
+//isDone도 보여지는지 확인해야 하네.. -> 되겠지! 
 
 //지출내역 수정
 const updateBudgetContent = async (BudgetUpdateRequestDTO: BudgetUpdateRequestDTO) => {
@@ -121,6 +121,8 @@ const getGroupSpending = async (BudgetId: string, groupId: string) => {
   }
 }
 
+
+
 const getUserSpending = async(groupId: string): Promise<{userId:string; userSpending: number}[]>=>{
     const userSpendings = await prisma.userSpendings.groupBy({
         by:['userId'],
@@ -151,10 +153,31 @@ const getUserSpending = async(groupId: string): Promise<{userId:string; userSpen
 
 
 
+
+//정산 마이너 기능 (날짜 반환)
+const getDayReturn = async(groupId: string)=>{
+  const lastday = await prisma.userSpendings.findFirst({
+    where:{
+      groupId: groupId,
+    },
+    orderBy:{
+      createdAt:'desc',
+    },
+  });
+  if (!lastday) {
+    throw new Error('Error in retrieving date: dayreturn')
+  } 
+
+  return lastday;
+};
+
+
 export default {
   createBudget,
   showBudget,
   updateBudgetContent,
   deleteBudget,
   getGroupSpending,
+  getDayReturn
+  
 }
