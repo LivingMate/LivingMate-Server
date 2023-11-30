@@ -131,17 +131,19 @@ model Scheduling {
 }
 
 model UserSpendings {
-  id           Int           @id
-  user         User          @relation(fields: [userId], references: [id])
-  userId       String
-  group        Group         @relation(fields: [groupId], references: [id])
-  groupId      String
-  spendings    Float         @default(0)
-  category     Category[] // category를 저장해둔 db를 만들어야 하나?
-  subCategory  SubCategory[]
-  createdAt    DateTime      @default(now())
-  spendingName String
-  isDone       Boolean       @default(false)
+  id            Int         @id
+  user          User        @relation(fields: [userId], references: [id])
+  userId        String
+  group         Group       @relation(fields: [groupId], references: [id])
+  groupId       String
+  spendings     Float       @default(0)
+  category      Category    @relation(fields: [categoryId], references: [id])
+  categoryId    Int
+  subCategory   SubCategory @relation(fields: [subCategoryId], references: [id])
+  subCategoryId Int
+  createdAt     DateTime    @default(now())
+  spendingName  String
+  isDone        Boolean     @default(false)
 }
 
 model Calculator {
@@ -166,14 +168,14 @@ model Adjustment {
 
 model Category {
   // 가계부 카테고리별 금액 확인할때 필요할것같아서 만들어봤음
-  id        Int             @id
+  id        Int             @id @default(autoincrement())
   name      String
   spendings UserSpendings[]
 }
 
 model SubCategory {
   // 필요성을 잘 모르겠지만,, 혹시 몰라서 만들어봄
-  id        Int             @id
+  id        Int             @id @default(autoincrement())
   name      String
   spendings UserSpendings[]
 }
