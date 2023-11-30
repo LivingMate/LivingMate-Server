@@ -1,9 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient;
-import { FeedBaseDto } from '../DTOs/Feed/FeedBaseDto';
-import { FeedCreateRequestDto } from '../DTOs/Feed/Request/FeedCreateRequestDto';
-import { FeedUpdateRequestDto } from '../DTOs/Feed/Request/FeedUpdateRequestDto';
-import {FeedBaseResponseDto} from '../DTOs/Feed/Response/FeedBaseResponseDto'
+import { FeedBaseDto } from '../DTOs/Feed/FeedBaseDto21';
+import { FeedCreateRequestDto } from '../DTOs/Feed/Request/FeedCreateRequestDto12';
+import { FeedUpdateRequestDto } from '../DTOs/Feed/Request/FeedUpdateRequestDto23';
+import {FeedBaseResponseDto} from '../DTOs/Feed/Response/FeedBaseResponseDto23'
 import {UserService} from './index.js' 
 
 
