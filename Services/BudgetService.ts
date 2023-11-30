@@ -12,7 +12,7 @@ const createBudget = async (BudgetBaseDto: BudgetBaseDto) => {
       groupId: BudgetBaseDto.groupid,
       spendingName: BudgetBaseDto.name,
       spendings: BudgetBaseDto.spending,
-      category: BudgetBaseDto.category, //모델이 []라서 오류가 생기는 거에용
+      category: BudgetBaseDto.category, 
     },
   })
   //리턴값 어케할지.. showBudget 할지.. 이거 정해야 행
