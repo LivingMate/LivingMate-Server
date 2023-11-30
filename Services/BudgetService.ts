@@ -28,7 +28,7 @@ const showBudget = async (groupId: string) => {
   })
   return Budgets
 }
-//isDone도 보여지는지 확인해야 하네.. -> 되겠지! 
+//isDone도 보여지는지 확인해야 하네.. -> 되겠지!
 
 //지출내역 수정
 const updateBudgetContent = async (BudgetUpdateRequestDto: BudgetUpdateRequestDto) => {
@@ -61,15 +61,16 @@ const deleteBudget = async (BudgetId: number) => {
 // 그러면 수정 해줘야해...
 
 //지출내역 검색
-const searchBudget = async(searchKey:string)=>{
+const searchBudget = async (searchKey: string) => {
   const searchedBudget = await prisma.userSpendings.findMany({
-    where:{
-      spendingName : {
+    where: {
+      spendingName: {
         contains: searchKey,
-    }
-  }});
+      },
+    },
+  })
 
-  const results = searchedBudget.map((budget)=>{
+  const results = searchedBudget.map((budget) => {
     return {
       id: budget.id,
       name: budget.spendingName,
@@ -77,16 +78,11 @@ const searchBudget = async(searchKey:string)=>{
       createdAt: budget.createdAt,
       userId: budget.userId,
       //category: budget.
-    };
-  });
+    }
+  })
 
-  return results;
+  return results
 }
-
-
-
-
-
 
 //지출 합산 내역 반환
 const getGroupSpending = async (BudgetId: string, groupId: string) => {
@@ -107,70 +103,64 @@ const getGroupSpending = async (BudgetId: string, groupId: string) => {
     const groupId = group.groupId
     const groupSum = group._sum.spendings
     const groupAvg = group._avg.spendings
-   
-    let groupMemberSpendings:{userId: string; userSpending: number}[] =[];
-    groupMemberSpendings = await getUserSpending(groupId);
-  
-    groupMemberSpendings.forEach((member)=>{
-        if(member.userSpending == null || groupAvg ==null){
-            throw new Error('Null Error: getGroupSpending');
-        }
-        member.userSpending-=groupAvg;
+
+    let groupMemberSpendings: { userId: string; userSpending: number }[] = []
+    groupMemberSpendings = await getUserSpending(groupId)
+
+    groupMemberSpendings.forEach((member) => {
+      if (member.userSpending == null || groupAvg == null) {
+        throw new Error('Null Error: getGroupSpending')
+      }
+      member.userSpending -= groupAvg
     })
-    return groupMemberSpendings;
+    return groupMemberSpendings
   }
 }
 
+const getUserSpending = async (groupId: string): Promise<{ userId: string; userSpending: number }[]> => {
+  const userSpendings = await prisma.userSpendings.groupBy({
+    by: ['userId'],
+    _sum: {
+      spendings: true,
+    },
+    where: {
+      groupId: groupId,
+      isDone: false,
+    },
+  })
 
+  const groupMemberSpendings: { userId: string; userSpending: number }[] = []
 
-const getUserSpending = async(groupId: string): Promise<{userId:string; userSpending: number}[]>=>{
-    const userSpendings = await prisma.userSpendings.groupBy({
-        by:['userId'],
-        _sum:{
-            spendings: true,
-        },
-        where:{
-            groupId: groupId,
-            isDone: false,
-        },
-    });
+  userSpendings.forEach((record) => {
+    const userId = record.userId
+    const userSpending = record._sum.spendings
 
-    const groupMemberSpendings:{userId: string; userSpending: number}[] =[];
+    if (userSpending == null) {
+      throw new Error('Null error: groupMemberSpendings')
+    }
 
-    userSpendings.forEach((record)=>{
-        const userId = record.userId;
-        const userSpending = record._sum.spendings;
+    groupMemberSpendings.push({ userId, userSpending })
+  })
 
-        if(userSpending == null){
-            throw new Error('Null error: groupMemberSpendings');
-        }
-
-        groupMemberSpendings.push({userId, userSpending});
-    });
-
-    return groupMemberSpendings;
+  return groupMemberSpendings
 }
 
-
-
-
 //정산 마이너 기능 (날짜 반환)
-const getDayReturn = async(groupId: string)=>{
+const getDayReturn = async (groupId: string) => {
   const lastday = await prisma.userSpendings.findFirst({
-    where:{
+    where: {
       groupId: groupId,
     },
-    orderBy:{
-      createdAt:'desc',
+    orderBy: {
+      createdAt: 'desc',
     },
-  });
+  })
   if (!lastday) {
     throw new Error('Error in retrieving date: dayreturn')
-  } 
+  }
 
-  return lastday;
-};
-
+  return lastday
+}
 
 export default {
   createBudget,
@@ -178,6 +168,5 @@ export default {
   updateBudgetContent,
   deleteBudget,
   getGroupSpending,
-  getDayReturn
-  
+  getDayReturn,
 }
