@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import FeedRouter from './FeedRouter';
+import FeedRouter from './FeedRouter'
 
 
 const router : Router = Router();
@@ -9,6 +9,4 @@ router.use(
     FeedRouter
 );
 
-export default{
-    router
-};
+export default router;

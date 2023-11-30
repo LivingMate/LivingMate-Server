@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, Request, Response } from "express";
 import {body, query} from "express-validator";
 import FeedController from "../Controllers/FeedController"
 
@@ -11,6 +11,4 @@ router.post('/feed',FeedController.createFeed);
 router.patch('/feed/:feedId',FeedController.updateFeed);
 router.delete('/feed/:feedId', FeedController.deleteFeed);
 
-export default{
-    router
-};
+export default router;
