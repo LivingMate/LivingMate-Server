@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
-import { CalendarBaseDto } from '../DTOs/Calendar/CalendarBaseDto'
+import { CalendarBaseDto } from '../DTOs/Calendar/CalendarBaseDto32'
 import { CalendarRightCreateDto } from '../DTOs/Calendar/Request/CalendarRightCreateDto'
 import { ScheduleReadyCreateDto } from '../DTOs/Calendar/Request/ScheduleReadyCreateDto'
 import { SchedulingCreateDto } from '../DTOs/Calendar/Request/SchedulingCreateDto'
