@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import CalendarService from '../Services/CalendarService';
 import { CalendarRightCreateDto } from '../DTOs/Calendar/Request/CalendarRightCreateDto';
-import { CalendarBaseDto } from '../DTOs/Calendar/CalendarBaseDto32';
+import { CalendarBaseDto } from '../DTOs/Calendar/CalendarBaseDto';
 import { ScheduleReadyCreateDto } from '../DTOs/Calendar/Request/ScheduleReadyCreateDto';
 import { SchedulingCreateDto } from '../DTOs/Calendar/Request/SchedulingCreateDto';
 

@@ -1,4 +1,4 @@
-import { CalendarBaseDto } from "../CalendarBaseDto32";
+import { CalendarBaseDto } from "../CalendarBaseDto";
 
 export interface CalendarRightCreateDto extends CalendarBaseDto {
   routine: number
