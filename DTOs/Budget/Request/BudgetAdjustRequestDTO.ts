@@ -1,4 +1,4 @@
-export interface BudgetAdjustRequestDTO{
+export interface BudgetAdjustRequestDto{
     startId: number;
     endId: number;
     groupId: string;

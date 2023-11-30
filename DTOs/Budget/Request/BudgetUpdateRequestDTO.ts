@@ -1,6 +1,6 @@
 import { BudgetBaseDto} from '../BudgetBaseDto';
 
-export interface BudgetUpdateRequestDTO extends BudgetBaseDto{
+export interface BudgetUpdateRequestDto extends BudgetBaseDto{
     budgetId: number;
 }
 
