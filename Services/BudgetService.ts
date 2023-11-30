@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import { BudgetBaseDto } from '../DTOs/Budget/BudgetBaseDto'
 import { BudgetCreateRequestDto } from '../DTOs/Budget/Request/BudgetCreateRequestDto'
-import { BudgetUpdateRequestDto } from '../DTOs/Budget/Request/BudgetUpdateRequestDTO'
+import { BudgetUpdateRequestDto } from '../DTOs/Budget/Request/BudgetUpdateRequestDto'
 const prisma = new PrismaClient()
 
 //지출내역 등록
@@ -31,7 +31,7 @@ const showBudget = async (groupId: string) => {
 //isDone도 보여지는지 확인해야 하네.. -> 되겠지! 
 
 //지출내역 수정
-const updateBudgetContent = async (BudgetUpdateRequestDTO: BudgetUpdateRequestDto) => {
+const updateBudgetContent = async (BudgetUpdateRequestDto: BudgetUpdateRequestDto) => {
   try {
     const updatedBudget = await prisma.userSpendings.update({
       where: {
