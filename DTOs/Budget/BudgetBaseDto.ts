@@ -4,4 +4,5 @@ export interface BudgetBaseDto{
     name: string;
     spending: number; //지출금액
     category: number;
+    subCategory: number;
 }

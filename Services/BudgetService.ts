@@ -12,10 +12,11 @@ const createBudget = async (BudgetBaseDto: BudgetBaseDto) => {
       groupId: BudgetBaseDto.groupid,
       spendingName: BudgetBaseDto.name,
       spendings: BudgetBaseDto.spending,
-      category: BudgetBaseDto.category, 
+      categoryId: BudgetBaseDto.category,
+      subCategoryId: BudgetBaseDto.subCategory,
     },
   })
-  //리턴값 어케할지.. showBudget 할지.. 이거 정해야 행
+  return newBudget;
 }
 
 //지출내역 보여주기
@@ -28,7 +29,7 @@ const showBudget = async (groupId: string) => {
   })
   return Budgets
 }
-//isDone도 보여지는지 확인해야 하네.. -> 되겠지!
+
 
 //지출내역 수정
 const updateBudgetContent = async (BudgetUpdateRequestDto: BudgetUpdateRequestDto) => {
@@ -39,7 +40,8 @@ const updateBudgetContent = async (BudgetUpdateRequestDto: BudgetUpdateRequestDt
       },
       data: {
         spendings: BudgetUpdateRequestDto.spending,
-        category: BudgetUpdateRequestDto.category,
+        categoryId: BudgetUpdateRequestDto.category,
+        subCategoryId: BudgetUpdateRequestDto.subCategory,
       },
     })
   } catch (error) {
@@ -55,7 +57,6 @@ const deleteBudget = async (BudgetId: number) => {
     },
   })
   return 0
-  //showBudget
 }
 //showBudget에 따라서 + 이런저런 사정에 따라서 파라미터로 받는게 GroupId가 될 수도 있고 DTO가 될 수도 있구나..
 // 그러면 수정 해줘야해...
@@ -77,7 +78,8 @@ const searchBudget = async (searchKey: string) => {
       spending: budget.spendings,
       createdAt: budget.createdAt,
       userId: budget.userId,
-      //category: budget.
+      category: budget.categoryId,
+      subcategory: budget.subCategoryId
     }
   })
 
@@ -161,6 +163,11 @@ const getDayReturn = async (groupId: string) => {
 
   return lastday
 }
+
+// 서브카테고리 추가+삭제
+// 
+
+
 
 export default {
   createBudget,
