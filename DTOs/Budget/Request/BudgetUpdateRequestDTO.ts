@@ -1,4 +1,4 @@
-import { BudgetBaseDto } from '../ruokay'
+import { BudgetBaseDto } from '../BudgetBaseDto'
 
 export interface BudgetUpdateRequestDto extends BudgetBaseDto {
   budgetId: number
