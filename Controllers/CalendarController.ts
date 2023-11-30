@@ -83,7 +83,7 @@ const getThisWeeksDuty = async (req: Request, res: Response) => {
 
 
 
-export {
+export default{
   createCalendarEvent,
   createScheduleReadyEvent,
   createSchedulingEvent,

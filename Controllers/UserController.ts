@@ -21,3 +21,7 @@ const getUserProfile = async (
       next(error);
     }
   };
+
+  export default{
+    getUserProfile
+  }
