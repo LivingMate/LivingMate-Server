@@ -1,15 +1,14 @@
 import { Router } from 'express';
-import FeedRouter from 'FeedRouter'
+import FeedRouter from './FeedRouter';
 
-const router = Router();
+
+const router : Router = Router();
 
 router.use(
     '/feed',
     FeedRouter
 );
 
-
-
 export default{
-    FeedRouter
-}
+    router
+};
