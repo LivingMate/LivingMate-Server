@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import { BudgetBaseDto } from '../DTOs/Budget/BudgetBaseDto'
+import { BudgetBaseDto } from '../DTOs/Budget/ruokay'
 import { BudgetCreateRequestDto } from '../DTOs/Budget/Request/BudgetCreateRequestDto'
 import { BudgetUpdateRequestDto } from '../DTOs/Budget/Request/BudgetUpdateRequestDto'
 const prisma = new PrismaClient()
