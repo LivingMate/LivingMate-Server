@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import { BudgetBaseDto } from '../DTOs/Budget/BudgetBaseDto'
-import { BudgetCreateRequestDto } from '../DTOs/Budget/Request/BudgetCreateRequestDTO23423'
-import { BudgetUpdateRequestDto } from '../DTOs/Budget/Request/BudgetUpdateRequestDTO23'
+import { BudgetCreateRequestDto } from '../DTOs/Budget/Request/BudgetCreateRequestDto'
+import { BudgetUpdateRequestDto } from '../DTOs/Budget/Request/BudgetUpdateRequestDto'
 const prisma = new PrismaClient()
 
 //지출내역 등록
