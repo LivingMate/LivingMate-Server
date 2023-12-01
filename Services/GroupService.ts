@@ -5,11 +5,7 @@ import { SignupDto } from '../DTOs/Auth/Requests/SignupDto';
 
 // const createGroup
 
-// const joinGroup
-
 // const leaveGroup
-
-// const createGroupCode
 
 
 
