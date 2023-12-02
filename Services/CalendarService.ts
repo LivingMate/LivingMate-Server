@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Scheduling } from '@prisma/client'
 const prisma = new PrismaClient()
 import { CalendarBaseDto } from '../DTOs/Calendar/CalendarBaseDto'
 import { CalendarRightCreateDto } from '../DTOs/Calendar/Request/CalendarRightCreateDto'
@@ -80,14 +80,14 @@ const createScheduling = async (calendarData: SchedulingCreateDto) => {
     const daysDifference = differenceInDays(calendarData.dateEnd, calendarData.dateStart)
 
     // 배열 생성
-    const schedules = []
+    const schedules:Scheduling[] = []
 
     // Iterate over the date range and create a schedule for each day
     for (let i = 0; i <= daysDifference; i++) {
       const currentDate = new Date(calendarData.dateStart)
       currentDate.setDate(currentDate.getDate() + i)
 
-      const newScheduling = await prisma.scheduling.create({
+      const newScheduling:Scheduling = await prisma.scheduling.create({
         data: {
           userId: calendarData.userId,
           groupId: calendarData.groupId,
@@ -105,6 +105,24 @@ const createScheduling = async (calendarData: SchedulingCreateDto) => {
     throw error
   }
 }
+
+
+
+// 일정 보여주기
+const showCalendar = async (groupId: string) => {
+  try {
+    const calendarEvents = await prisma.calendar.findMany({
+      take: 1000,
+      where: {
+        groupId: groupId,
+      },
+    });
+    return calendarEvents;
+  } catch (error) {
+    console.error('Error retrieving calendar events', error);
+    throw error;
+  }
+};
 
 
 // 일정 수정
