@@ -1,8 +1,9 @@
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 import { SignupDto } from '../DTOs/Auth/Requests/SignupDto'
+import { GroupResponseDto } from '../DTOs/Group/Responses/GroupResponseDto'
 
-// find userById
+// userId로 user 찾기
 const findUserById = async (userId: string) => {
   const user = await prisma.user.findUnique({
     where: {
@@ -17,10 +18,71 @@ const findUserById = async (userId: string) => {
   return user
 }
 
+// groupId로 group찾기
+const findGroupById = async (groupId: string) => {
+    const group = await prisma.group.findUnique({
+        where:{
+            id:groupId,
+        },
+    })
+    if (!group) {
+        throw new Error('No group found with the given groupId')
+    }
+    return group
+}
+
+// 유효한 그룹인지 확인
+const checkForbiddenGroup = async (
+    userGroupId: string, // Assuming the ID is of type number in Prisma
+    GroupId: string // Assuming the ID is of type number in Prisma
+  ) => {
+    try {
+      const userGroup = await prisma.group.findUnique({
+        where: {
+          id: userGroupId,
+        },
+      });
+  
+      if (!userGroup || userGroup.id !== GroupId) {
+        throw new Error('Forbidden Room');
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+
+// join된 그룹인지 확인하기
+  const checkJoinedGroupId = async (groupId: string) => {
+    try {
+      // Assuming your model is named `Room` and you have an `id` field in it
+      const existingGroup = await prisma.group.findUnique({
+        where: {
+          id: groupId,
+        },
+      });
+  
+      if (!existingGroup) {
+        throw new Error('Joined Group');
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+
 // createGroup
+const createGroup = async (userId: string): Promise<GroupResponseDto> => {
+  try {
+    const user = await findUserById(userId)
 
 
 
+
+
+
+  } catch (error) {
+    throw error
+  }
+}
 
 // const leaveGroup
 
@@ -88,6 +150,11 @@ const findGroupMembersColorsByGroupId = async (groupId: string) => {
 //멤버 이름과 컬러를 따로 받는 방법의 문제점: 순서가 그대로일지.. 모름... 색이 서로 바뀔 수도 있음.
 
 export default {
+  findUserById,
+  findGroupById,
+  checkForbiddenGroup,
+  checkJoinedGroupId,
+  createGroup,
   findGroupNameByGroupId,
   findGroupMembersNamesByGroupId,
   findGroupMembersColorsByGroupId,
