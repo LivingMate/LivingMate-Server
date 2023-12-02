@@ -17,7 +17,7 @@ const findUserById = async (userId: string) => {
   return user
 }
 
-// const createGroup
+// createGroup
 
 
 

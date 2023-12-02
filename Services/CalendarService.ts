@@ -220,6 +220,7 @@ export default {
   createCalendar,
   createScheduleReady,
   createScheduling,
+  showCalendar,
   updateCalendar,
   deleteCalendar,
   getCurrentWeekDates,
