@@ -87,6 +87,39 @@ const searchBudget = async (groupId: string, searchKey: string) => {
   return results
 }
 
+
+// 서브카테고리 추가+삭제
+const updateSubCategory = async(budgetId: number, subCategoryId:number)=>{
+  if(!subCategoryId){
+    throw new Error('no such category found: updateSubCategory')
+  }
+
+  const newBudget = await prisma.userSpendings.update({
+    where:{
+      id : budgetId,
+    },
+    data:{
+      subCategoryId: subCategoryId,
+    }
+  })
+
+  return newBudget;
+}
+
+
+// 서브카테고리 새로 만들기
+const updateNewSubCategory = async(groupId:number, name:string)=>{
+  const newSubCategory = await prisma.subCategory.create({
+    data:{
+      name: name,
+    }
+  })
+  return newSubCategory;
+}
+
+
+
+
 //정산 파트1: 지출 합산 내역 반환
 const getGroupMemberSpending = async (groupId: string) => {
   const GroupSpending = await prisma.userSpendings.groupBy({
@@ -151,7 +184,7 @@ const getUserSpending = async (groupId: string): Promise<{ userId: string; userS
 
 
 //정산 파트2 : 누가 누구한테 얼마나 주면 될까요?
-const getAdjustments = async (groupId: string)=> {
+const getAdjustmentsCalc = async (groupId: string)=> {
   const GroupMemberSpendingsAfter = await getGroupMemberSpending(groupId);
   //{userId,userSpending-AvgGroupSpending}[] 모양
 
@@ -192,7 +225,7 @@ const getAdjustments = async (groupId: string)=> {
       Negatives[0].userSpending = null;
       Positives[0].userSpending = null;
     }
-    
+
     Positives = Positives.sort((a,b)=>b.userSpending - a.userSpending);
     Negatives = Negatives.sort((a,b)=>b.userSpending - a.userSpending); 
   }
@@ -213,13 +246,24 @@ const sendToAdjustments = async(groupId: string, fromId:string, toId:string, cha
   })
 
 }
-//근데 여기서 2번 이상 레코드로 적힌 애들 중에 뭐가 진짜 마지막 계산 결과인지를 알아내지?
+//근데 여기서 2번 이상 레코드로 적힌 애들 중에 뭐가 진짜 마지막 계산 결과인지를 알아내지? => 두 번 이상 안 적히나?
 // Distinction으로 묶어내고.. 그런데 distinction으로 묶을 기준을 알기 어려움. 무슨 말이냐면.. 어디부터 어디까지가 distinction id 1로 쳐 질건데?
 // 아니면 한 그룹에서 정산을 이어서 여러번 하지 않을 확률이 높다는 걸 가지고 같은 날짜에 이루어진 transaction만 뽑아내는 방법도 있음
 // 이거 괜찮을 것 같아. 그리고 "정산은 하루에 1회만 가능합니다." 라고 못박아두자 
 
 const takeFromAdjustments = async(groupId: string, datetime: string)=>{
-
+  const Adjustment = await prisma.adjustment.findMany({
+    select:{
+      plusUserId: true,
+      minusUserId: true,
+      change: true
+    },
+    where:{
+      groupId: groupId,
+      createdAt: datetime
+    }
+  })
+  return Adjustment;
 }
 
 
@@ -240,36 +284,14 @@ const getDayReturn = async (groupId: string) => {
   return lastday;
 }
 
+const getAdjustments = async(groupId: string, datetime: string)=>{
+  const AdjustedResult = await takeFromAdjustments(groupId, datetime);
+  const LastCalculatedDate = await getDayReturn(groupId);
 
-
-// 서브카테고리 추가+삭제
-const updateSubCategory = async(budgetId: number, subCategoryId:number)=>{
-  if(!subCategoryId){
-    throw new Error('no such category found: updateSubCategory')
-  }
-
-  const newBudget = await prisma.userSpendings.update({
-    where:{
-      id : budgetId,
-    },
-    data:{
-      subCategoryId: subCategoryId,
-    }
-  })
-
-  return newBudget;
+  return {LastCalculatedDate, AdjustedResult};
 }
 
 
-// 서브카테고리 새로 만들기
-const updateNewSubCategory = async(groupId:number, name:string)=>{
-  const newSubCategory = await prisma.subCategory.create({
-    data:{
-      name: name,
-    }
-  })
-  return newSubCategory;
-}
 
 
 
@@ -282,5 +304,9 @@ export default {
   getGroupMemberSpending,
   getDayReturn,
   updateSubCategory,
-  updateNewSubCategory
+  updateNewSubCategory,
+  takeFromAdjustments,
+  sendToAdjustments,
+  getAdjustmentsCalc,
+  getAdjustments
 }
