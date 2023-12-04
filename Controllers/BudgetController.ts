@@ -105,10 +105,12 @@ const deleteBudget = async (
   }
 }
 
+
 /*
 updateBudget
+/budget/:budgetId
 */
-const updateBudgetContent = async (
+const updateBudget = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -126,5 +128,21 @@ const updateBudgetContent = async (
 
 
 /*
-updateCategory
+updateNewCategory
+/budget
 */
+const updateBudgetCategory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void | Response> => {
+  const groupId = req.body.id;
+  const subCategoryName = req.body.data
+  
+  try{
+    await BudgetService.updateNewSubCategory(groupId, subCategoryName);
+    res.status(200).send();
+  }catch(error){
+    res.status(500).json({ error: 'Error Updating Budget Content: Controller' });
+  }
+}

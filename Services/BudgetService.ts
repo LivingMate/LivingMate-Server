@@ -221,7 +221,7 @@ const updateSubCategory = async(budgetId: number, subCategoryId:number)=>{
 
 
 // 서브카테고리 새로 만들기
-const updateNewSubCategory = async(budgetId:number, name:string)=>{
+const updateNewSubCategory = async(groupId:number, name:string)=>{
   const newSubCategory = await prisma.subCategory.create({
     data:{
       name: name,
