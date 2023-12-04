@@ -159,7 +159,7 @@ model Calculator {
 }
 
 model Adjustment {
-  id          Int     @id
+  id          Int     @id @default(autoincrement())
   group       Group   @relation(fields: [groupId], references: [id])
   groupId     String
   minusUser   User?   @relation(fields: [minusUserId], references: [id], name: "minusUser")
@@ -167,6 +167,7 @@ model Adjustment {
   plusUser    User?   @relation(fields: [plusUserId], references: [id], name: "plusUser")
   plusUserId  String?
   change      Int
+  createdAt   DateTime @default(now())
 }
 
 model Category {

@@ -107,7 +107,7 @@ const getGroupMemberSpending = async (groupId: string) => {
     const groupSum = group._sum.spendings
     const groupAvg = group._avg.spendings
 
-    let groupMemberSpendings: { userId: string; userSpending: number }[] = []
+    let groupMemberSpendings: { userId: string; userSpending: number}[] = []
     groupMemberSpendings = await getUserSpending(groupId)
 
     groupMemberSpendings.forEach((member) => {
@@ -121,7 +121,7 @@ const getGroupMemberSpending = async (groupId: string) => {
 }
 
 
-const getUserSpending = async (groupId: string): Promise<{ userId: string; userSpending: number }[]> => {
+const getUserSpending = async (groupId: string): Promise<{ userId: string; userSpending: number}[]> => {
   const userSpendings = await prisma.userSpendings.groupBy({
     by: ['userId'],
     _sum: {
@@ -133,7 +133,7 @@ const getUserSpending = async (groupId: string): Promise<{ userId: string; userS
     },
   })
 
-  const groupMemberSpendingsBefore: { userId: string; userSpending: number }[] = []
+  const groupMemberSpendingsBefore: { userId: string; userSpending: number}[] = []
 
   userSpendings.forEach((record) => {
     const userId = record.userId
@@ -156,17 +156,45 @@ const getAdjustments = async (groupId: string)=> {
   //{userId,userSpending-AvgGroupSpending}[] 모양
 
   if(!GroupMemberSpendingsAfter){
-    throw new Error("No Spendings found: getAdjustmets")
+    throw new Error("No Spendings found: getAdjustments")
   }
 
-  let Positives = GroupMemberSpendingsAfter.filter(obj => obj.userSpending>=0);
-  let Negatives = GroupMemberSpendingsAfter.filter(obj => obj.userSpending<0);
+  if(GroupMemberSpendingsAfter.some(obj => obj.userSpending === null)){
+    throw new Error('Null Value error')
+  }
 
-  Positives.sort((a,b)=>b.userSpending - a.userSpending);
-  Negatives.sort((a,b)=>b.userSpending - a.userSpending); //내림차순 정렬 완료
+  let Positives = GroupMemberSpendingsAfter.filter(obj => obj.userSpending >= 0);
+  let Negatives = GroupMemberSpendingsAfter.filter(obj => obj.userSpending < 0);
+
+  Positives = Positives.sort((a,b)=>b.userSpending - a.userSpending);
+  Negatives = Negatives.sort((a,b)=>b.userSpending - a.userSpending); //내림차순 정렬 완료
 
   while(Positives[0].userSpending != null && Negatives[0].userSpending != null){
 
+    Positives = Positives.filter(obj => obj.userSpending != null);
+    Negatives = Negatives.filter(obj => obj.userSpending != null);
+
+    if(Positives[0].userSpending > Negatives[0].userSpending){
+      sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Negatives[0].userSpending);
+      Positives[0].userSpending += Negatives[0].userSpending;
+      Negatives[0].userSpending = null; 
+      //null 값이 아니라.... 아예 엄청 큰 수 or 엄청 작은 수 이렇게 넣어놓을까? 아무리 그래도 -6525429986548956 원을 쓰진 않을 테니까..?
+    }
+
+    else if(Positives[0].userSpending < Negatives[0].userSpending){
+      sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Positives[0].userSpending);
+      Negatives[0].userSpending += Positives[0].userSpending;
+      Positives[0].userSpending = null;
+    }
+
+    else{
+      sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Positives[0].userSpending);
+      Negatives[0].userSpending = null;
+      Positives[0].userSpending = null;
+    }
+    
+    Positives = Positives.sort((a,b)=>b.userSpending - a.userSpending);
+    Negatives = Negatives.sort((a,b)=>b.userSpending - a.userSpending); 
   }
 
 
@@ -174,12 +202,25 @@ const getAdjustments = async (groupId: string)=> {
 }
 
 
-const sendToAdjustments = async(groupId: string, Distiction: number, positivesId:string, negativesId:string, change:number)=>{
+const sendToAdjustments = async(groupId: string, fromId:string, toId:string, change:number)=>{
+  const Adjustment = await prisma.adjustment.create({
+    data:{
+      groupId: groupId,
+      plusUserId: toId,
+      minusUserId: fromId,
+      change: change
+    }
+  })
 
-}//근데 여기서 2번 이상 레코드로 적힌 애들 중에 뭐가 진짜 마지막 계산 결과인지를 알아내지?
-// Distinction으로 묶어내고.. 
+}
+//근데 여기서 2번 이상 레코드로 적힌 애들 중에 뭐가 진짜 마지막 계산 결과인지를 알아내지?
+// Distinction으로 묶어내고.. 그런데 distinction으로 묶을 기준을 알기 어려움. 무슨 말이냐면.. 어디부터 어디까지가 distinction id 1로 쳐 질건데?
+// 아니면 한 그룹에서 정산을 이어서 여러번 하지 않을 확률이 높다는 걸 가지고 같은 날짜에 이루어진 transaction만 뽑아내는 방법도 있음
+// 이거 괜찮을 것 같아. 그리고 "정산은 하루에 1회만 가능합니다." 라고 못박아두자 
 
+const takeFromAdjustments = async(groupId: string, datetime: string)=>{
 
+}
 
 
 //정산 마이너 기능 (날짜 반환)
@@ -196,7 +237,7 @@ const getDayReturn = async (groupId: string) => {
     throw new Error('Error in retrieving date: dayreturn')
   }
 
-  return lastday
+  return lastday;
 }
 
 
