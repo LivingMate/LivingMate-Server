@@ -166,6 +166,7 @@ model Adjustment {
   minusUserId String?
   plusUser    User?   @relation(fields: [plusUserId], references: [id], name: "plusUser")
   plusUserId  String?
+  change      Int
 }
 
 model Category {
