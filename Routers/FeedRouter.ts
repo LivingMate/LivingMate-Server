@@ -2,7 +2,7 @@ import { Router, Request, Response } from "express";
 import {body, query} from "express-validator";
 import FeedController from "../Controllers/FeedController"
 
-const router : Router = Router();
+const router = Router();
 
 
 

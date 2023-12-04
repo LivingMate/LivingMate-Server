@@ -10,8 +10,8 @@
     "module": "commonjs",
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "rootDir": "./src",
+    "rootDir": ".",
   },
-  "include": ["src/**/*.ts"],
+  "include": ["*.ts"],
   "exclude": ["node_modules"]
 }

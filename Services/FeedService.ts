@@ -16,9 +16,7 @@ const createFeed = async(FeedCreateRequestDto:FeedCreateRequestDto)=>{
             text:FeedCreateRequestDto.feedContent,
         }
     });
-    //피드 보여주는 서비스를 불러줘야 하나? .then(ShowFeed()) 막 이렇게?
-    showFeed(newFeed.groupId)
-    //이렇게 하는게 별로 안 좋을 수도 있다네? Hous에서 어떻게 했는지 보고 바꿔야겠음. 
+    return newFeed;
 }
 
 
