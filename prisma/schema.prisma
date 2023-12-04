@@ -38,6 +38,8 @@ model User {
 model Group {
   id                 String               @id @default("")
   groupName          String               @db.VarChar(255)
+  groupOwner         String
+  groupCode          String
   groupSpending      Float
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
