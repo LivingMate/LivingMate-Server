@@ -1,4 +1,4 @@
 export interface GroupResponseDto{
     _id: string;
-    groupCode: string;
+    groupCode: string | null;
 }

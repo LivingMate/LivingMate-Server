@@ -202,7 +202,7 @@ const getAdjustmentsCalc = async (groupId: string)=> {
   Positives = Positives.sort((a,b)=>b.userSpending - a.userSpending);
   Negatives = Negatives.sort((a,b)=>b.userSpending - a.userSpending); //내림차순 정렬 완료
 
-  while(Positives[0].userSpending != null && Negatives[0].userSpending != null){
+  while(!isNaN(Positives[0].userSpending) && !isNaN(Negatives[0].userSpending)){
 
     Positives = Positives.filter(obj => obj.userSpending != null);
     Negatives = Negatives.filter(obj => obj.userSpending != null);
@@ -210,20 +210,20 @@ const getAdjustmentsCalc = async (groupId: string)=> {
     if(Positives[0].userSpending > Negatives[0].userSpending){
       sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Negatives[0].userSpending);
       Positives[0].userSpending += Negatives[0].userSpending;
-      Negatives[0].userSpending = null; 
+      Negatives[0].userSpending = NaN; 
       //null 값이 아니라.... 아예 엄청 큰 수 or 엄청 작은 수 이렇게 넣어놓을까? 아무리 그래도 -6525429986548956 원을 쓰진 않을 테니까..?
     }
 
     else if(Positives[0].userSpending < Negatives[0].userSpending){
       sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Positives[0].userSpending);
       Negatives[0].userSpending += Positives[0].userSpending;
-      Positives[0].userSpending = null;
+      Positives[0].userSpending = NaN;
     }
 
     else{
       sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Positives[0].userSpending);
-      Negatives[0].userSpending = null;
-      Positives[0].userSpending = null;
+      Negatives[0].userSpending = NaN;
+      Positives[0].userSpending = NaN;
     }
 
     Positives = Positives.sort((a,b)=>b.userSpending - a.userSpending);

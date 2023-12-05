@@ -74,7 +74,7 @@ const createGroup = async (userId: string): Promise<GroupResponseDto> => {
     const createdGroup = await prisma.group.create({
       data: {
         groupOwner: userId,
-        groupCode: user.groupId || '',
+        groupCode: user.groupId,
         groupName: '',
         groupSpending: 0,
       },
