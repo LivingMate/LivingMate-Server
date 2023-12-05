@@ -10,15 +10,14 @@ const google = async() => {
    passport.use(
       new GoogleStrategy(
          {
-            clientID: process.env.GOOGLE_ID, // 구글 로그인에서 발급받은 REST API 키
+            clientID: process.env.GOOGLE_ID, 
             clientSecret: process.env.GOOGLE_SECRET,
-            callbackURL: '/auth/google/callback', // 구글 로그인 Redirect URI 경로
+            callbackURL: '/auth/google/callback',
          },
          async (accessToken, refreshToken, profile, done) => {
             console.log('google profile : ', profile);
             try {
                const exUser = await prisma.user.findUnique({
-                  // 구글 플랫폼에서 로그인 했고 & snsId필드에 구글 아이디가 일치할경우
                   where: { email: profile.email},
                });
                // 이미 가입된 구글 프로필이면 성공
