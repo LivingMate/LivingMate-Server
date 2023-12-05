@@ -7,7 +7,7 @@ const prisma = new PrismaClient;
 
 //const User = require('../models/user');
 
-module.exports = () => {
+const google = async() => {
    passport.use(
       new GoogleStrategy(
          {
@@ -45,4 +45,24 @@ module.exports = () => {
          },
       ),
    );
+};
+
+
+module.exports = () => {
+
+   passport.serializeUser((user, done) => {
+      done(null, user.id);
+   });
+
+   passport.deserializeUser((id, done) => {
+    prisma.user.findUnique({
+        where:{
+            id:id,
+        }
+    }).then (user=>done(null,user))
+    .catch(err=>done(err))
+   }); 
+
+   
+   google(); // 구글 전략 등록
 };

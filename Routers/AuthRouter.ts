@@ -1,8 +1,7 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
 import { AuthController } from '../Controllers';
-
-const passport = require('passport');
+import {passport} from 'passport';
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 
