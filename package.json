@@ -21,7 +21,9 @@
     "express-session": "^1.17.3",
     "express-validator": "^7.0.1",
     "next-auth": "^4.24.5",
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0"
   },
   "devDependencies": {
     "@types/date-fns": "^2.6.0",
