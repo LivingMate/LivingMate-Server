@@ -21,13 +21,15 @@ const createFeed = async(FeedCreateRequestDto:FeedCreateRequestDto)=>{
 
 
 
-//피드 보여주기 : 객체 타입의 배열로 반환됨! 우선 위의 10개만 반환되게 했음. 
+//피드 보여주기 : 객체 타입의 배열로 반환됨! 우선 위의 10개만 반환되게 했음.  //
 const showFeed = async(GroupId:string)=>{
     const Feeds = await prisma.feed.findMany({
-        take:10,
         where:{
             groupId : GroupId
-        }
+        },
+        orderBy:{
+            id: 'desc',
+        },
     })
     return Feeds;
 }
@@ -70,7 +72,7 @@ const pinFeed = async(FeedId:number)=>{
             pin:true
         }
     })
-    return pinFeed; //리턴값을 어떻게 줘야 할지 모르겠는디.... 얘를 줘야 하나.. 아님 showFeed()를 걸어줘야 하나?
+    return pinnedFeed; //리턴값을 어떻게 줘야 할지 모르겠는디.... 얘를 줘야 하나.. 아님 showFeed()를 걸어줘야 하나?
 }
 
 

@@ -5,8 +5,7 @@ import { UserService } from '../Services';
 
 const prisma = new PrismaClient;
 
-//const User = require('../models/user');
-
+module.exports=()=>{
 const google = async() => {
    passport.use(
       new GoogleStrategy(
@@ -46,8 +45,9 @@ const google = async() => {
       ),
    );
 };
+}
 
-
+/*
 module.exports = () => {
 
    passport.serializeUser((user, done) => {
@@ -66,3 +66,4 @@ module.exports = () => {
    
    google(); // 구글 전략 등록
 };
+*/
