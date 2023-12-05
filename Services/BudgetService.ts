@@ -229,9 +229,7 @@ const getAdjustmentsCalc = async (groupId: string)=> {
     Positives = Positives.sort((a,b)=>b.userSpending - a.userSpending);
     Negatives = Negatives.sort((a,b)=>b.userSpending - a.userSpending); 
   }
-
-
-
+  return 0;
 }
 
 
@@ -251,7 +249,9 @@ const sendToAdjustments = async(groupId: string, fromId:string, toId:string, cha
 // 아니면 한 그룹에서 정산을 이어서 여러번 하지 않을 확률이 높다는 걸 가지고 같은 날짜에 이루어진 transaction만 뽑아내는 방법도 있음
 // 이거 괜찮을 것 같아. 그리고 "정산은 하루에 1회만 가능합니다." 라고 못박아두자 
 
-const takeFromAdjustments = async(groupId: string, datetime: string)=>{
+//정산 완료를 누르면 adjustment 지워버리기...
+
+const takeFromAdjustments = async(groupId: string)=>{
   const Adjustment = await prisma.adjustment.findMany({
     select:{
       plusUserId: true,
@@ -260,12 +260,21 @@ const takeFromAdjustments = async(groupId: string, datetime: string)=>{
     },
     where:{
       groupId: groupId,
-      createdAt: datetime
     }
   })
   return Adjustment;
 }
+//userId 별로 보여줘야 함
 
+//adjustment 지우기 -> 정산 완료 눌렀을 때 사용할 것.. 
+const deleteAdjustment = async(groupId: string)=>{
+  const AdjustmentDeletion = await prisma.adjustment.deleteMany({
+    where:{
+      groupId: groupId
+    }
+  })
+  return 0;
+}
 
 //정산 마이너 기능 (날짜 반환)
 const getDayReturn = async (groupId: string) => {
@@ -284,8 +293,8 @@ const getDayReturn = async (groupId: string) => {
   return lastday;
 }
 
-const getAdjustments = async(groupId: string, datetime: string)=>{
-  const AdjustedResult = await takeFromAdjustments(groupId, datetime);
+const getAdjustments = async(groupId: string)=>{
+  const AdjustedResult = await takeFromAdjustments(groupId);
   const LastCalculatedDate = await getDayReturn(groupId);
 
   return {LastCalculatedDate, AdjustedResult};
