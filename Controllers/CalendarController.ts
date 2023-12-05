@@ -81,6 +81,16 @@ const getThisWeeksDuty = async (req: Request, res: Response) => {
     }
 };
 
+const showCalendar = async (req: Request, res: Response) => {
+  try {
+    const groupId: string = req.params.groupId;
+    const calendarEvents = await CalendarService.showCalendar(groupId);
+    res.status(200).json(calendarEvents);
+  } catch (error) {
+    console.error('Error retrieving calendar events', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
 
 
 export default{
@@ -89,5 +99,6 @@ export default{
   createSchedulingEvent,
   updateCalendarEvent,
   deleteCalendarEvent,
-  getThisWeeksDuty
+  getThisWeeksDuty,
+  showCalendar
 };
