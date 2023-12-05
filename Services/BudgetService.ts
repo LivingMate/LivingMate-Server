@@ -204,14 +204,13 @@ const getAdjustmentsCalc = async (groupId: string)=> {
 
   while(!isNaN(Positives[0].userSpending) && !isNaN(Negatives[0].userSpending)){
 
-    Positives = Positives.filter(obj => obj.userSpending != null);
-    Negatives = Negatives.filter(obj => obj.userSpending != null);
+    //Positives = Positives.filter(obj => obj.userSpending != null);
+    //Negatives = Negatives.filter(obj => obj.userSpending != null);
 
     if(Positives[0].userSpending > Negatives[0].userSpending){
       sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Negatives[0].userSpending);
       Positives[0].userSpending += Negatives[0].userSpending;
       Negatives[0].userSpending = NaN; 
-      //null 값이 아니라.... 아예 엄청 큰 수 or 엄청 작은 수 이렇게 넣어놓을까? 아무리 그래도 -6525429986548956 원을 쓰진 않을 테니까..?
     }
 
     else if(Positives[0].userSpending < Negatives[0].userSpending){
@@ -265,6 +264,7 @@ const takeFromAdjustments = async(groupId: string)=>{
   return Adjustment;
 }
 //userId 별로 보여줘야 함
+// show Category
 
 //adjustment 지우기 -> 정산 완료 눌렀을 때 사용할 것.. 
 const deleteAdjustment = async(groupId: string)=>{

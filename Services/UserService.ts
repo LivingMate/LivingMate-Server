@@ -121,8 +121,7 @@ const addUserToGroup = async(signupDTO:SignupDto, groupId:string)=>{
             groupId:groupId,
         }
     });
-    // newUser.groupId = groupId;
-    //return 값??
+    return newUser;
 
 }
 
