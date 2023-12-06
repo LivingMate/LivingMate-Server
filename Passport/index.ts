@@ -1,7 +1,8 @@
-const passport = require('passport');
+import passport from 'passport';
 import {PrismaClient} from '@prisma/client';
 import { UserService } from '../Services';
-const google = require('./googleStrategy');
+import google from './googleStrategy';
+
 
 const prisma = new PrismaClient;
 

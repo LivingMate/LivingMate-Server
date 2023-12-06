@@ -5,7 +5,7 @@ import { UserService } from '../Services';
 
 const prisma = new PrismaClient;
 
-module.exports=()=>{
+
 const google = async() => {
    passport.use(
       new GoogleStrategy(
@@ -44,7 +44,10 @@ const google = async() => {
       ),
    );
 };
-}
+
+
+export default google;
+
 
 /*
 module.exports = () => {
