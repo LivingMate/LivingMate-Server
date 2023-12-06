@@ -1,4 +1,4 @@
-
+import express from 'express';
 import { body } from 'express-validator';
 //import { AuthController } from '../Controllers';
 import {passport} from 'passport';
@@ -23,9 +23,11 @@ failureFlash: true
 );*/
 
 
+/*
 router.get('/auth/logout', (req, res) => {
     // req.user (사용자 정보가 안에 들어있다. 당연히 로그인되어있으니 로그아웃하려는 거니까)
     req.logout();
     res.redirect('/auth/login');
  });
- 
+ */
+ export default router;
