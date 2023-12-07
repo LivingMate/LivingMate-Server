@@ -1,19 +1,16 @@
-import calendarRouter from './Routers/CalendarRouter'
-
-import express, { NextFunction, Request, Response } from 'express'
-import morgan from 'morgan'
-
-const app = express()
-
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const CalendarRouter_1 = __importDefault(require("./Routers/CalendarRouter"));
+const express_1 = __importDefault(require("express"));
+const app = (0, express_1.default)();
 // app.use('/feed', router);
-app.use(calendarRouter)
-
+app.use(CalendarRouter_1.default);
 app.listen(3000, () => {
-  console.log('서버가 3000번 포트에서 실행 중')
-})
-
-console.log('please say something');
-
+    console.log('서버가 3000번 포트에서 실행 중');
+});
 /*
 ...
 const passport = require('passport');
@@ -50,3 +47,4 @@ app.use('/auth', authRouter);
 
 ...
  */
+//# sourceMappingURL=index.js.map

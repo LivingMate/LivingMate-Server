@@ -5,12 +5,9 @@ import CalendarController from '../Controllers/CalendarController'
 const calendarRouter = express.Router();
 
 
-calendarRouter.get('/', CalendarController.showCalendar)
-
-calendarRouter.post('/', CalendarController.createCalendarEvent)
-
-calendarRouter.patch('/', CalendarController.updateCalendarEvent)
-
-calendarRouter.delete('/', CalendarController.deleteCalendarEvent)
+calendarRouter.get('/:calendar', CalendarController.showCalendar)
+calendarRouter.post('/:calendar', CalendarController.createCalendarEvent)
+calendarRouter.patch(':calendar', CalendarController.updateCalendarEvent)
+calendarRouter.delete('/:calendar', CalendarController.deleteCalendarEvent)
 
 export default calendarRouter;
