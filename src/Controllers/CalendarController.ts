@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import CalendarService from '../Services/CalendarService'
+import * as CalendarService from '../Services/CalendarService'
 import { CalendarRightCreateDto } from '../DTOs/Calendar/Request/CalendarRightCreateDto'
 import { CalendarBaseDto } from '../DTOs/Calendar/CalendarBaseDto'
 import { ScheduleReadyCreateDto } from '../DTOs/Calendar/Request/ScheduleReadyCreateDto'
@@ -87,7 +87,7 @@ const showCalendar = async (req: Request, res: Response) => {
   }
 }
 
-export default {
+export{
   createCalendarEvent,
   createScheduleReadyEvent,
   createSchedulingEvent,

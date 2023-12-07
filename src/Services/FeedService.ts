@@ -4,7 +4,7 @@ import { FeedBaseDto } from '../DTOs/Feed/FeedBaseDto';
 import { FeedCreateRequestDto } from '../DTOs/Feed/Request/FeedCreateRequestDto';
 import { FeedUpdateRequestDto } from '../DTOs/Feed/Request/FeedUpdateRequestDto';
 import {FeedBaseResponseDto} from '../DTOs/Feed/Response/FeedBaseResponseDto'
-import {UserService} from './index.js' 
+import * as UserService from './UserService'
 
 
 //신규 피드 등록
@@ -119,7 +119,7 @@ const findFeedByFeedId = async(FeedId:number) =>{
     return Feed;
 }
 
-export default{
+export{
     createFeed,
     deleteFeed,
     findFeedByFeedId,

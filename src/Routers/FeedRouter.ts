@@ -1,14 +1,14 @@
 import { Router, Request, Response } from "express";
 import {body, query} from "express-validator";
-import FeedController from "../Controllers/FeedController"
+import * as FeedController from "../Controllers/FeedController"
 
-const router = Router();
+const FeedRouter = Router();
 
 
 
-router.get('/feed',FeedController.showFeed);
-router.post('/feed',FeedController.createFeed);
-router.patch('/feed/:feedId',FeedController.updateFeed);
-router.delete('/feed/:feedId', FeedController.deleteFeed);
+FeedRouter.get('/feed',FeedController.showFeed);
+FeedRouter.post('/feed',FeedController.createFeed);
+FeedRouter.patch('/feed/:feedId',FeedController.updateFeed);
+FeedRouter.delete('/feed/:feedId', FeedController.deleteFeed);
 
-export default router;
+export {FeedRouter};

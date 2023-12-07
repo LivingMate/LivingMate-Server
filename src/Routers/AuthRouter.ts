@@ -1,7 +1,7 @@
 import express from 'express';
 import { body } from 'express-validator';
 //import { AuthController } from '../Controllers';
-import {passport} from 'passport';
+import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import { Router, Request, Response } from "express";
 

@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express'
 import { validationResult, Result, ValidationError } from 'express-validator'
-import { FeedService } from '../Services/index'
+import * as FeedService from '../Services/FeedService'
 import { isPostfixUnaryExpression } from 'typescript'
 import { FeedCreateRequestDto } from '../DTOs/Feed/Request/FeedCreateRequestDto'
 import { FeedUpdateRequestDto} from '../DTOs/Feed/Request/FeedUpdateRequestDto'
-import CalendarService from '../Services/CalendarService'
+import * as CalendarService from '../Services/CalendarService'
 
 
 /*
@@ -115,7 +115,7 @@ const updateFeed = async (req: Request, res: Response, next: NextFunction): Prom
 
 
 
-export default{
+export{
   showFeed,
   createFeed,
   updateFeed,

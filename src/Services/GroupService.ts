@@ -229,7 +229,7 @@ const getGroup = async (userId: string): Promise<string | null> => {
   };
 
 
-export default {
+export {
   findUserById,
   findGroupById,
   checkForbiddenGroup,

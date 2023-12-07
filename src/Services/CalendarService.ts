@@ -215,7 +215,7 @@ const searchThisWeeksDuty = async (groupId: string) => {
 
 
 
-export default {
+export {
   findCalendarEventById,
   createCalendar,
   createScheduleReady,
