@@ -6,7 +6,7 @@
     "lib": ["esnext"],
     "esModuleInterop": true,
     "types": ["@prisma/client"],
-    "target": "es6",
+    "target": "ESNext",
     "module": "CommonJS",
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
