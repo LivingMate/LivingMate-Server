@@ -6,11 +6,19 @@
     "lib": ["esnext"],
     "esModuleInterop": true,
     "types": ["@prisma/client"],
-    "target": "es2020",
-    "module": "commonjs",
+    "target": "ESNext",
+    "module": "ESNext",
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "rootDir": ".",
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "Node",
+    "pretty": true,
+    "allowJs": true,
+    "resolveJsonModule": true,
+  },
+  "ts-node": {
+    "esm":true
   },
   "include": ["*.ts", "src/index.ts"],
   "exclude": ["node_modules"]
