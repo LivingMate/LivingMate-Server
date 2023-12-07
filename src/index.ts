@@ -1,23 +1,16 @@
-const express = require('express');
-const app = express();
-import router from './Routers/index'; 
+import router from './Routers'
 
+import express, { NextFunction, Request, Response } from 'express'
+import morgan from 'morgan'
 
+const app = express()
 
-// app.use('/feed', router); 
-app.use('/calendar', router);
+// app.use('/feed', router);
+app.use(router)
 
 app.listen(3000, () => {
-  console.log('서버가 3000번 포트에서 실행 중');
-});
-
-
-
-
-
-
-
-
+  console.log('서버가 3000번 포트에서 실행 중')
+})
 
 /*
 ...

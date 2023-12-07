@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node -r tsconfig-paths/register ./Routers/index.ts"
+    "start": "ts-node -r tsconfig-paths/register ./src/index.ts",
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
@@ -17,11 +18,13 @@
     "@prisma/client": "^5.6.0",
     "@types/node": "^20.9.0",
     "bcrypt": "^5.1.1",
+    "config": "^3.3.9",
     "cookie-parser": "^1.4.6",
     "date-fns": "^2.30.0",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "express-validator": "^7.0.1",
+    "morgan": "^1.10.0",
     "next-auth": "^4.24.5",
     "nodemon": "^3.0.1",
     "passport": "^0.7.0",
@@ -30,6 +33,7 @@
   "devDependencies": {
     "@types/date-fns": "^2.6.0",
     "@types/express": "^4.17.21",
+    "@types/morgan": "^1.9.9",
     "prettier-plugin-prisma": "^5.0.0",
     "prisma": "^5.6.0",
     "ts-node": "^10.9.1",
