@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { validationResult, Result, ValidationError } from 'express-validator'
-import { BudgetService } from '../Services/index'
+import * as BudgetService from '../Services/BudgetService'
 import { BudgetBaseDto } from '../DTOs/Budget/BudgetBaseDto';
 
 
@@ -145,4 +145,13 @@ const updateBudgetCategory = async (
   }catch(error){
     res.status(500).json({ error: 'Error Updating Budget Content: Controller' });
   }
+}
+
+export{
+  updateBudgetCategory,
+  updateBudget,
+  deleteBudget,
+  createBudget,
+  getBudgetSearch,
+  showBudget
 }

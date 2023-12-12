@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { validationResult, Result, ValidationError } from 'express-validator';
 import { UserProfileResponseDto } from '../DTOs/User/Response/UserProfileResponseDto';
-import {UserService} from '../Services/index';
+import * as UserService from '../Services/UserService';
 
 
 const getUserProfile = async (
@@ -22,6 +22,6 @@ const getUserProfile = async (
     }
   };
 
-  export default{
+  export{
     getUserProfile
   }

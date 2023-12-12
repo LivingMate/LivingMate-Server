@@ -3,7 +3,7 @@ import { SignupDto } from "../DTOs/Auth/Requests/SignupDto";
 import { UserUpdateRequestDto } from "../DTOs/User/Request/UserUpdateRequestDto";
 import { UserUpdateResponseDto } from "../DTOs/User/Response/UserUpdateResponseDto";
 import { UserProfileResponseDto } from '../DTOs/User/Response/UserProfileResponseDto';
-import {GroupService} from './index';
+import * as GroupService from './GroupService';
 
 
 
@@ -128,7 +128,7 @@ const addUserToGroup = async(signupDTO:SignupDto, groupId:string)=>{
 
 
 
-export default{
+export{
     createUser,
     findUserById,
     findGroupIdByUserId,

@@ -1,10 +1,10 @@
-// import { Router } from 'express'
-// import FeedRouter from './FeedRouter'
-// import CalendarRouter from './CalendarRouter'
+import { Router } from 'express'
+import {FeedRouter} from './FeedRouter'
+import CalendarRouter from './CalendarRouter'
 
-// const router: Router = Router()
+const router = Router()
 
-// router.use('/feed', FeedRouter)
-// router.use('/Calendar', CalendarRouter)
+router.use('/feed', FeedRouter)
+router.use('/Calendar', CalendarRouter)
 
-// export default router;
+export default router;
