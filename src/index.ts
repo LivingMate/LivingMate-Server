@@ -1,9 +1,7 @@
-//import routes from "./Routers"
-
 import express, { NextFunction, Request, Response } from 'express'
 import { Router } from 'express'
 import {FeedRouter} from './Routers/FeedRouter'
-import CalendarRouter from './Routers/CalendarRouter'
+import {CalendarRouter} from './Routers/CalendarRouter'
 
 
 const app = express()
