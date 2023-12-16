@@ -1,13 +1,23 @@
-import express, { NextFunction, Request, Response } from 'express'
-import { Router } from 'express'
-import {FeedRouter} from './Routers/FeedRouter'
-import {CalendarRouter} from './Routers/CalendarRouter'
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient;
+import express, { NextFunction, Request, Response } from 'express';
+import { Router } from 'express';
+import {FeedRouter} from './Routers/FeedRouter';
+import {CalendarRouter} from './Routers/CalendarRouter';
+import routes from "./Routers";
+//import routes from './Routers';
 
 
-const app = express()
+const app = express();
+app.use(express.json());
+app.use(express.urlencoded({extended: true}));
 
-// app.use('/feed', router);
-app.use(Router)
+
+app.use('/feed', );
+app.use(routes);
+app.use(function(req:Request, res:Response, next:NextFunction){
+   res.status(404);
+})
 
 app.listen(3000, () => {
   console.log('서버가 3000번 포트에서 실행 중')
@@ -18,8 +28,24 @@ const router = Router()
 router.use('/feed', FeedRouter)
 router.use('/Calendar', CalendarRouter)
 
-// app.use('/feed', router);
-//app.use(routes)
+interface ErrorType {
+   message: string;
+   status: number;
+ }
+ 
+ app.use(function (
+   err: ErrorType,
+   req: Request,
+   res: Response,
+   next: NextFunction
+ ) {
+   res.locals.message = err.message;
+   res.locals.error = req.app.get('env') === 'production' ? err : {};
+ 
+   // render the error page
+   res.status(err.status || 500);
+   res.render('error');
+ });
 
 /*
 ...
