@@ -2,9 +2,8 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient;
 import express, { NextFunction, Request, Response } from 'express';
 import { Router } from 'express';
-import {FeedRouter} from './Routers/FeedRouter';
-import {CalendarRouter} from './Routers/CalendarRouter';
 import routes from "./Routers";
+import * as feedService from './Services/FeedService';
 
 const router = Router();
 const app = express();
@@ -77,3 +76,6 @@ app.use(passport.session()); // req.session 객체에 passport정보를 추가 �
 
 ...
  */
+
+
+
