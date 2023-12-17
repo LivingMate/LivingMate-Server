@@ -4,9 +4,7 @@ import * as FeedController from "../Controllers/FeedController"
 
 const FeedRouter = Router();
 
-
-
-FeedRouter.get('/feed',FeedController.showFeed);
+FeedRouter.get('/feed/:groupId',FeedController.showFeed);
 FeedRouter.post('/feed',FeedController.createFeed);
 FeedRouter.patch('/feed/:feedId',FeedController.updateFeed);
 FeedRouter.delete('/feed/:feedId', FeedController.deleteFeed);

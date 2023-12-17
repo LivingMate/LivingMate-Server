@@ -81,6 +81,7 @@ const showCalendar = async (req: Request, res: Response) => {
     const groupId: string = req.params.groupId
     const calendarEvents = await CalendarService.showCalendar(groupId)
     res.status(200).json(calendarEvents)
+    console.log(calendarEvents);
   } catch (error) {
     console.error('Error retrieving calendar events', error)
     res.status(500).json({ error: 'Internal Server Error' })

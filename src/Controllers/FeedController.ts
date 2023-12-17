@@ -17,13 +17,13 @@ const showFeed = async (
     res: Response,
     next: NextFunction
   ): Promise<void | Response> => {
-    const groupId: string = req.body.group.id; 
+    const groupId: string = req.params.groupId; 
   
     try {
       const data = await FeedService.showFeed(groupId);
-  
-      return res
-        .send(data);
+      console.log(data);
+
+      return res.send(data);
     } catch (error) {
       next(error);
     }
