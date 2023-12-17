@@ -6,7 +6,7 @@ import {FeedRouter} from './Routers/FeedRouter';
 import {CalendarRouter} from './Routers/CalendarRouter';
 import routes from "./Routers";
 
-const router = Router()
+const router = Router();
 const app = express();
 
 app.use(express.json());
@@ -26,21 +26,21 @@ app.listen(3000, () => {
 interface ErrorType {
    message: string;
    status: number;
- }
+}
  
- app.use(function (
-   err: ErrorType,
-   req: Request,
-   res: Response,
-   next: NextFunction
- ) {
-   res.locals.message = err.message;
-   res.locals.error = req.app.get('env') === 'production' ? err : {};
+// app.use(function(
+//    err: ErrorType,
+//    req: Request,
+//    res: Response,
+//    next: NextFunction
+//   ) {
+//    res.locals.message = err.message;
+//    res.locals.error = req.app.get('env') === 'production' ? err : {};
  
-   // render the error page
-   res.status(err.status || 500);
-   res.render('error');
- });
+//    // render the error page
+//    res.status(err.status || 500);
+//    res.render('error');
+//  });
 
 /*
 ...
