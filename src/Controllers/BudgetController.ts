@@ -15,7 +15,7 @@ const showBudget = async (
     res: Response,
     next: NextFunction
   ): Promise<void | Response> => {
-    const groupId: string = req.body.group.id; 
+    const groupId: string = req.params.groupId; 
   
     try {
       const data = await BudgetService.showBudget(groupId);
@@ -41,7 +41,7 @@ const getBudgetSearch = async (
   res: Response,
   next: NextFunction
   ): Promise<void | Response> => {
-    const groupId: string = req.body.group.id; 
+    const groupId: string = req.params.groupId; 
     const searchKey: string = req.body.data;
     
     try {
@@ -72,7 +72,7 @@ post
     res: Response,
     next: NextFunction
   ): Promise<void | Response> => {
-    const groupId: string = req.body.group.id; 
+    const groupId: string = req.params.groupId; 
     const BudgetBaseDTO: BudgetBaseDto =  req.body.data;
   
     try {
@@ -115,7 +115,7 @@ const updateBudget = async (
   res: Response,
   next: NextFunction
 ): Promise<void | Response> => {
-  const budgetId = req.body.id;
+  const budgetId = req.params.budgetId;
   const BudgetUpdateRequestDto = req.body.data
   
   try{
@@ -136,7 +136,7 @@ const updateBudgetCategory = async (
   res: Response,
   next: NextFunction
 ): Promise<void | Response> => {
-  const groupId = req.body.id;
+  const groupId = req.params.groupId;
   const subCategoryName = req.body.data
   
   try{
