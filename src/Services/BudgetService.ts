@@ -44,7 +44,7 @@ const findCategIdByName = async (categoryName: string) => {
   try {
     const category = await prisma.category.findUnique({
       where: {
-        name: categoryName,
+        name,
       },
       select: {
         id: true,

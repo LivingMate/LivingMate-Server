@@ -39,19 +39,9 @@ const findGroupById = (groupId) => __awaiter(void 0, void 0, void 0, function* (
 });
 exports.findGroupById = findGroupById;
 // 유효한 그룹인지 확인
-const checkForbiddenGroup = (userGroupId, GroupId) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const userGroup = yield prisma.group.findUnique({
-            where: {
-                id: userGroupId,
-            },
-        });
-        if (!userGroup || userGroup.id !== GroupId) {
-            throw new Error('Forbidden Room');
-        }
-    }
-    catch (error) {
-        throw error;
+const checkForbiddenGroup = (userGroupId, groupId) => __awaiter(void 0, void 0, void 0, function* () {
+    if (userGroupId !== groupId) {
+        throw new Error('Forbidden Group');
     }
 });
 exports.checkForbiddenGroup = checkForbiddenGroup;

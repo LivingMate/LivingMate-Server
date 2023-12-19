@@ -12,14 +12,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.searchThisWeeksDuty = exports.getCurrentWeekDates = exports.deleteCalendar = exports.updateCalendar = exports.showCalendar = exports.createScheduling = exports.createScheduleReady = exports.createCalendar = exports.findCalendarEventById = exports.findGroupById = exports.findUserById = void 0;
+exports.getThisWeeksDuty = exports.getCurrentWeekDates = exports.deleteCalendar = exports.updateCalendar = exports.showCalendar = exports.createScheduling = exports.createSchedule = exports.createCalendar = exports.findCalendarEventById = exports.findGroupById = exports.findUserById = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const dayjs_1 = __importDefault(require("dayjs"));
 const GroupService_1 = require("./GroupService");
 const date_fns_1 = require("date-fns");
 const message_1 = __importDefault(require("../modules/message"));
-// 유저 반환
+//---------utils-----------
+// 유저 찾기
 const findUserById = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     const numericUserId = parseInt(userId, 10);
     const user = yield prisma.calendar.findUnique({
@@ -33,19 +34,21 @@ const findUserById = (userId) => __awaiter(void 0, void 0, void 0, function* () 
     return user;
 });
 exports.findUserById = findUserById;
+// 그룹 찾기
 const findGroupById = (groupId) => __awaiter(void 0, void 0, void 0, function* () {
     const numericGroupId = parseInt(groupId, 10);
     const group = yield prisma.calendar.findUnique({
         where: {
-            groupId: numericGroupId,
+            id: numericGroupId,
         },
     });
     if (!group) {
         throw new Error(message_1.default.UNAUTHORIZED);
     }
+    return group;
 });
 exports.findGroupById = findGroupById;
-// Id로 반환
+// 일정 찾기
 const findCalendarEventById = (eventId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const event = yield prisma.calendar.findUnique({
@@ -56,37 +59,43 @@ const findCalendarEventById = (eventId) => __awaiter(void 0, void 0, void 0, fun
         return event;
     }
     catch (error) {
-        console.error('Error finding calendar event by ID', error);
+        console.error('error :: service/calendar/findCalendarEventById', error);
         throw error;
     }
 });
 exports.findCalendarEventById = findCalendarEventById;
+// ------------real services-------------
 // 바로 등록 생성 // 스케줄링 끝내고 일정 생성할때도 이거 쓰기
 const createCalendar = (userId, groupId, calendarCreateDto) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
         const user = yield findUserById(userId);
         const group = yield findGroupById(groupId);
-        yield (0, GroupService_1.checkForbiddenGroup)(user.groupId, group);
+        yield (0, GroupService_1.checkForbiddenGroup)(user.groupId, groupId);
         const event = yield prisma.calendar.create({
             data: {
+                id: calendarCreateDto.calendarId,
                 userId: userId,
                 groupId: groupId,
                 title: calendarCreateDto.dutyName,
                 dateStart: new Date((0, dayjs_1.default)(calendarCreateDto.dateStart).format('YYYY-MM-DD')),
                 dateEnd: new Date((0, dayjs_1.default)(calendarCreateDto.dateEnd).format('YYYY-MM-DD')),
-                timeStart: new Date(calendarCreateDto.timeStart),
-                timeEnd: new Date(calendarCreateDto.timeEnd),
+                timeStart: new Date((0, dayjs_1.default)(calendarCreateDto.timeStart).format('HH:mm:ss')),
+                timeEnd: new Date((0, dayjs_1.default)(calendarCreateDto.timeEnd).format('HH:mm:ss')),
+                term: calendarCreateDto.routine,
                 memo: calendarCreateDto.memo || '',
             },
         });
         const data = {
+            calendarId: event.id,
             userId: event.userId,
             groupId: event.groupId,
-            title: event.title,
+            dutyName: event.title,
             dateStart: (0, dayjs_1.default)(event.dateStart).format('YYYY-MM-DD'),
             dateEnd: (0, dayjs_1.default)(event.dateEnd).format('YYYY-MM-DD'),
-            timeStart: event.timeStart,
-            timeEnd: event.timeEnd,
+            timeStart: (0, dayjs_1.default)(event.timeStart).format('HH:mm:ss'), // String으로 변환
+            timeEnd: (0, dayjs_1.default)(event.timeEnd).format('HH:mm:ss'),
+            routine: (_a = event.term) !== null && _a !== void 0 ? _a : 0,
             memo: event.memo,
         };
         return data;
@@ -98,28 +107,41 @@ const createCalendar = (userId, groupId, calendarCreateDto) => __awaiter(void 0,
 });
 exports.createCalendar = createCalendar;
 // 일정 조율 생성
-const createScheduleReady = (calendarData) => __awaiter(void 0, void 0, void 0, function* () {
+const createSchedule = (userId, groupId, scheduleCreateDto) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const newScheduleReady = yield prisma.scheduleReady.create({
+        const user = yield findUserById(userId);
+        const group = yield findGroupById(groupId);
+        yield (0, GroupService_1.checkForbiddenGroup)(user.groupId, groupId);
+        const event = yield prisma.scheduleReady.create({
             data: {
-                userId: calendarData.userId,
-                groupId: calendarData.groupId,
-                title: calendarData.dutyName,
-                dateStart: calendarData.dateStart,
-                dateEnd: calendarData.dateEnd,
-                timeStart: calendarData.timeStart,
-                timeEnd: calendarData.timeEnd,
+                id: scheduleCreateDto.calendarId,
+                userId: userId,
+                groupId: groupId,
+                title: scheduleCreateDto.dutyName,
+                dateStart: new Date((0, dayjs_1.default)(scheduleCreateDto.dateStart).format('YYYY-MM-DD')),
+                dateEnd: new Date((0, dayjs_1.default)(scheduleCreateDto.dateEnd).format('YYYY-MM-DD')),
+                timeStart: new Date((0, dayjs_1.default)(scheduleCreateDto.timeStart).format('HH:mm:ss')),
+                timeEnd: new Date((0, dayjs_1.default)(scheduleCreateDto.timeEnd).format('HH:mm:ss')),
             },
         });
-        // Your logic here, e.g., send a notification, update UI, etc.
-        return newScheduleReady;
+        const data = {
+            calendarId: event.id,
+            dutyName: event.title,
+            userId: event.userId,
+            groupId: event.groupId,
+            dateStart: event.dateStart,
+            dateEnd: event.dateEnd,
+            timeStart: (0, dayjs_1.default)(event.timeStart).format('HH:mm:ss'),
+            timeEnd: (0, dayjs_1.default)(event.timeEnd).format('HH:mm:ss'),
+        };
+        return data;
     }
     catch (error) {
-        console.error('Error creating schedule-ready event', error);
+        console.error('error :: service/calendar/createSchedule', error);
         throw error;
     }
 });
-exports.createScheduleReady = createScheduleReady;
+exports.createSchedule = createSchedule;
 // 시간표 생성
 const createScheduling = (calendarData) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -127,7 +149,6 @@ const createScheduling = (calendarData) => __awaiter(void 0, void 0, void 0, fun
         const daysDifference = (0, date_fns_1.differenceInDays)(calendarData.dateEnd, calendarData.dateStart);
         // 배열 생성
         const schedules = [];
-        // Iterate over the date range and create a schedule for each day
         for (let i = 0; i <= daysDifference; i++) {
             const currentDate = new Date(calendarData.dateStart);
             currentDate.setDate(currentDate.getDate() + i);
@@ -145,7 +166,7 @@ const createScheduling = (calendarData) => __awaiter(void 0, void 0, void 0, fun
         return schedules;
     }
     catch (error) {
-        console.error('Error creating schedule-ready events', error);
+        console.error('error :: service/calendar/createScheduling', error);
         throw error;
     }
 });
@@ -162,35 +183,36 @@ const showCalendar = (groupId) => __awaiter(void 0, void 0, void 0, function* ()
         return calendarEvents;
     }
     catch (error) {
-        console.error('Error retrieving calendar events', error);
+        console.error('error :: service/calendar/showCalendar', error);
         throw error;
     }
 });
 exports.showCalendar = showCalendar;
 // 일정 수정
-const updateCalendar = (eventId, updateData) => __awaiter(void 0, void 0, void 0, function* () {
+const updateCalendar = (eventId, calendarUpdateDto) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const existingEvent = yield findCalendarEventById(eventId);
         if (!existingEvent) {
-            throw new Error('Calendar event not found');
+            throw new Error(message_1.default.NOT_FOUND_CAL);
         }
         const updatedEvent = yield prisma.calendar.update({
             where: {
                 id: eventId,
             },
             data: {
-                userId: updateData.userId,
-                title: updateData.dutyName,
-                dateStart: updateData.dateStart,
-                dateEnd: updateData.dateEnd,
-                timeStart: updateData.timeStart,
-                timeEnd: updateData.timeEnd,
+                title: calendarUpdateDto.dutyName,
+                dateStart: calendarUpdateDto.dateStart,
+                dateEnd: calendarUpdateDto.dateEnd,
+                timeStart: calendarUpdateDto.timeStart,
+                timeEnd: calendarUpdateDto.timeEnd,
+                term: calendarUpdateDto.routine,
+                memo: calendarUpdateDto.memo,
             },
         });
         return updatedEvent;
     }
     catch (error) {
-        console.error('Error updating calendar event', error);
+        console.error('error :: service/calendar/updateCalendar', error);
         throw error;
     }
 });
@@ -200,7 +222,7 @@ const deleteCalendar = (eventId) => __awaiter(void 0, void 0, void 0, function* 
     try {
         const existingEvent = yield findCalendarEventById(eventId);
         if (!existingEvent) {
-            throw new Error('Calendar event not found');
+            throw new Error(message_1.default.NOT_FOUND_CAL);
         }
         yield prisma.calendar.delete({
             where: {
@@ -210,21 +232,28 @@ const deleteCalendar = (eventId) => __awaiter(void 0, void 0, void 0, function* 
         return 0;
     }
     catch (error) {
-        console.error('Error deleting calendar event', error);
+        console.error('error :: service/calendar/deleteCalendar', error);
         throw error;
     }
 });
 exports.deleteCalendar = deleteCalendar;
 // 이번주 날짜 반환
 const getCurrentWeekDates = () => {
-    const currentDate = new Date();
-    const startDate = (0, date_fns_1.startOfWeek)(currentDate, { weekStartsOn: 1 }); // Assuming Monday is the start of the week
-    const endDate = (0, date_fns_1.endOfWeek)(currentDate, { weekStartsOn: 1 });
-    return { startDate, endDate };
+    try {
+        const currentDate = new Date();
+        // 월요일을 시작 날짜로
+        const startDate = (0, date_fns_1.startOfWeek)(currentDate, { weekStartsOn: 1 });
+        const endDate = (0, date_fns_1.endOfWeek)(currentDate, { weekStartsOn: 1 });
+        return { startDate, endDate };
+    }
+    catch (error) {
+        console.error('error :: service/calendar/getCurrentWeekDates', error);
+        throw error;
+    }
 };
 exports.getCurrentWeekDates = getCurrentWeekDates;
-// 이번주 날짜로 일정 반환
-const searchThisWeeksDuty = (groupId) => __awaiter(void 0, void 0, void 0, function* () {
+// 이번주 날짜의 일정 반환
+const getThisWeeksDuty = (groupId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         // Get the start and end dates of the current week
         const { startDate, endDate } = getCurrentWeekDates();
@@ -247,5 +276,5 @@ const searchThisWeeksDuty = (groupId) => __awaiter(void 0, void 0, void 0, funct
         throw error;
     }
 });
-exports.searchThisWeeksDuty = searchThisWeeksDuty;
+exports.getThisWeeksDuty = getThisWeeksDuty;
 //# sourceMappingURL=CalendarService.js.map

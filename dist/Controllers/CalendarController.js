@@ -45,7 +45,8 @@ const util_1 = __importDefault(require("../modules/util"));
 const createCalendarEvent = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
-        return res.status(statusCode_1.default.BAD_REQUEST)
+        return res
+            .status(statusCode_1.default.BAD_REQUEST)
             .send(util_1.default.fail(statusCode_1.default.BAD_REQUEST, message_1.default.BAD_REQUEST, errors.array()));
     }
     const userId = req.body.user._id;
