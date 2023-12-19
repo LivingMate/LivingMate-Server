@@ -39,13 +39,13 @@ app.use(FeedRouter_1.FeedRouter);
 app.listen(3000, () => {
     console.log('서버가 3000번 포트에서 실행 중');
 });
-app.use(function (err, req, res, next) {
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'production' ? err : {};
-    // render the error page
-    res.status(err.status || 500);
-    res.render('error');
-});
+// app.use(function (err: ErrorType, req: Request, res: Response, next: NextFunction) {
+//   res.locals.message = err.message
+//   res.locals.error = req.app.get('env') === 'production' ? err : {}
+//   // render the error page
+//   res.status(err.status || 500)
+//   res.render('error')
+// })
 /*
 ...
 const passport = require('passport');

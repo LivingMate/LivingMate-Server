@@ -36,7 +36,7 @@ app.get('/', (req: Request, res: Response) => {
 //    }
 //  });
 
-app.use(FeedRouter)
+app.use(FeedRouter);
 //app.use(CalendarRouter);
 //sapp.use(BudgetRouter);
 
@@ -49,14 +49,14 @@ interface ErrorType {
   status: number
 }
 
-app.use(function (err: ErrorType, req: Request, res: Response, next: NextFunction) {
-  res.locals.message = err.message
-  res.locals.error = req.app.get('env') === 'production' ? err : {}
+// app.use(function (err: ErrorType, req: Request, res: Response, next: NextFunction) {
+//   res.locals.message = err.message
+//   res.locals.error = req.app.get('env') === 'production' ? err : {}
 
-  // render the error page
-  res.status(err.status || 500)
-  res.render('error')
-})
+//   // render the error page
+//   res.status(err.status || 500)
+//   res.render('error')
+// })
 
 /*
 ...
