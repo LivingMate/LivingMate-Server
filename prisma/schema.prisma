@@ -7,7 +7,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = "mysql://admin:dbadminlogin:3306/livingmate-main-database"
+  url      = env("DATABASE_URL")
 }
 
 model User {
