@@ -1,11 +1,44 @@
 import { PrismaClient, Scheduling } from '@prisma/client'
 const prisma = new PrismaClient()
+import dayjs from 'dayjs';
 import { CalendarBaseDto } from '../DTOs/Calendar/CalendarBaseDto'
-import { CalendarRightCreateDto } from '../DTOs/Calendar/Request/CalendarRightCreateDto'
+import { CalendarCreateDto } from '../DTOs/Calendar/Request/CalendarCreateDto'
+import { CalendarCreateResponseDto } from '../DTOs/Calendar/Response/CalendarCreateResponseDto';
 import { ScheduleReadyCreateDto } from '../DTOs/Calendar/Request/ScheduleReadyCreateDto'
 import { SchedulingCreateDto } from '../DTOs/Calendar/Request/SchedulingCreateDto'
+import { checkForbiddenGroup } from './GroupService'
 import { differenceInDays, startOfWeek, endOfWeek } from 'date-fns'
+import message from '../modules/message'
 
+// 유저 반환
+const findUserById = async(userId:string) => {
+  const numericUserId = parseInt(userId, 10);
+
+  const user = await prisma.calendar.findUnique({
+    where:{
+      id:numericUserId,
+    },
+  });
+
+  if(!user){
+    throw new Error(message.UNAUTHORIZED);
+  }
+  return user;
+}
+
+const findGroupById = async (groupId:string)=>{
+  const numericGroupId = parseInt(groupId, 10);
+
+  const group = await prisma.calendar.findUnique({
+    where:{
+      groupId: numericGroupId,
+    },
+  });
+
+  if(!group){
+    throw new Error(message.UNAUTHORIZED)
+  }
+}
 
 // Id로 반환
 const findCalendarEventById = async (eventId: number) => {
@@ -23,31 +56,42 @@ const findCalendarEventById = async (eventId: number) => {
   }
 }
 
-
 // 바로 등록 생성 // 스케줄링 끝내고 일정 생성할때도 이거 쓰기
-const createCalendar = async (calendarData: CalendarBaseDto | CalendarRightCreateDto) => {
+const createCalendar = async (userId: string, groupId:string, calendarCreateDto: CalendarCreateDto):Promise<CalendarCreateDto> => {
   try {
-    const newCalendar = await prisma.calendar.create({
+    const user = await findUserById(userId);
+    const group = await findGroupById(groupId);
+    await checkForbiddenGroup(user.groupId, group);
+
+    const event = await prisma.calendar.create({
       data: {
-        userId: calendarData.userId,
-        groupId: calendarData.groupId,
-        title: calendarData.dutyName,
-        dateStart: calendarData.dateStart,
-        dateEnd: calendarData.dateEnd,
-        timeStart: calendarData.timeStart,
-        timeEnd: calendarData.timeEnd,
-        memo: (calendarData as CalendarRightCreateDto).memo || ' ',
+        userId: userId,
+        groupId: groupId,
+        title: calendarCreateDto.dutyName,
+        dateStart: new Date(dayjs(calendarCreateDto.dateStart).format('YYYY-MM-DD')),
+        dateEnd: new Date(dayjs(calendarCreateDto.dateEnd).format('YYYY-MM-DD')),
+        timeStart: new Date(calendarCreateDto.timeStart),
+        timeEnd: new Date(calendarCreateDto.timeEnd),
+        memo: calendarCreateDto.memo || '',
       },
     })
 
-    // Your logic here, e.g., send a notification, update UI, etc.
-    return newCalendar
+    const data: CalendarCreateResponseDto = {
+        userId: event.userId,
+        groupId: event.groupId,
+        title: event.title,
+        dateStart: dayjs(event.dateStart).format('YYYY-MM-DD'),
+        dateEnd: dayjs(event.dateEnd).format('YYYY-MM-DD'),
+        timeStart: event.timeStart,
+        timeEnd: event.timeEnd,
+        memo: event.memo,
+    }
+    return data;
   } catch (error) {
-    console.error('Error creating calendar event', error)
+    console.error('error :: service/calendar/createCalendar', error)
     throw error
   }
 }
-
 
 // 일정 조율 생성
 const createScheduleReady = async (calendarData: ScheduleReadyCreateDto) => {
@@ -72,7 +116,6 @@ const createScheduleReady = async (calendarData: ScheduleReadyCreateDto) => {
   }
 }
 
-
 // 시간표 생성
 const createScheduling = async (calendarData: SchedulingCreateDto) => {
   try {
@@ -80,14 +123,14 @@ const createScheduling = async (calendarData: SchedulingCreateDto) => {
     const daysDifference = differenceInDays(calendarData.dateEnd, calendarData.dateStart)
 
     // 배열 생성
-    const schedules:Scheduling[] = []
+    const schedules: Scheduling[] = []
 
     // Iterate over the date range and create a schedule for each day
     for (let i = 0; i <= daysDifference; i++) {
       const currentDate = new Date(calendarData.dateStart)
       currentDate.setDate(currentDate.getDate() + i)
 
-      const newScheduling:Scheduling = await prisma.scheduling.create({
+      const newScheduling: Scheduling = await prisma.scheduling.create({
         data: {
           userId: calendarData.userId,
           groupId: calendarData.groupId,
@@ -106,8 +149,6 @@ const createScheduling = async (calendarData: SchedulingCreateDto) => {
   }
 }
 
-
-
 // 일정 보여주기
 const showCalendar = async (groupId: string) => {
   try {
@@ -116,14 +157,13 @@ const showCalendar = async (groupId: string) => {
       where: {
         groupId: groupId,
       },
-    });
-    return calendarEvents;
+    })
+    return calendarEvents
   } catch (error) {
-    console.error('Error retrieving calendar events', error);
-    throw error;
+    console.error('Error retrieving calendar events', error)
+    throw error
   }
-};
-
+}
 
 // 일정 수정
 const updateCalendar = async (eventId: number, updateData: CalendarBaseDto) => {
@@ -154,7 +194,6 @@ const updateCalendar = async (eventId: number, updateData: CalendarBaseDto) => {
   }
 }
 
-
 // 일정 삭제
 const deleteCalendar = async (eventId: number) => {
   try {
@@ -176,22 +215,20 @@ const deleteCalendar = async (eventId: number) => {
   }
 }
 
-
 // 이번주 날짜 반환
 const getCurrentWeekDates = () => {
-  const currentDate = new Date();
-  const startDate = startOfWeek(currentDate, { weekStartsOn: 1 }); // Assuming Monday is the start of the week
-  const endDate = endOfWeek(currentDate, { weekStartsOn: 1 });
+  const currentDate = new Date()
+  const startDate = startOfWeek(currentDate, { weekStartsOn: 1 }) // Assuming Monday is the start of the week
+  const endDate = endOfWeek(currentDate, { weekStartsOn: 1 })
 
-  return { startDate, endDate };
-};
-
+  return { startDate, endDate }
+}
 
 // 이번주 날짜로 일정 반환
 const searchThisWeeksDuty = async (groupId: string) => {
   try {
     // Get the start and end dates of the current week
-    const { startDate, endDate } = getCurrentWeekDates();
+    const { startDate, endDate } = getCurrentWeekDates()
 
     // Get all calendar events for the group within the current week
     const calendarEventsThisWeek = await prisma.calendar.findMany({
@@ -204,18 +241,18 @@ const searchThisWeeksDuty = async (groupId: string) => {
           lte: endDate,
         },
       },
-    });
+    })
 
-    return calendarEventsThisWeek;
+    return calendarEventsThisWeek
   } catch (error) {
-    console.error('Error searching this week\'s duty', error);
-    throw error;
+    console.error("Error searching this week's duty", error)
+    throw error
   }
-};
-
-
+}
 
 export {
+  findUserById,
+  findGroupById,
   findCalendarEventById,
   createCalendar,
   createScheduleReady,

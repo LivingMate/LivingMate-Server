@@ -4,7 +4,7 @@ const util = {
       message,
       data,
     }),
-    error: (code: number, message: string) => ({
+    fail: (code: number, message: string) => ({
       code,
       message,
     }),

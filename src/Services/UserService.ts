@@ -133,5 +133,6 @@ export{
     findUserById,
     findGroupIdByUserId,
     findUserByIdAndUpdate,
-    getUserProfile
+    getUserProfile,
+    addUserToGroup
 }
