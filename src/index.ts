@@ -1,23 +1,23 @@
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient;
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient()
 // import { Router } from 'express';
-import message from './modules/message';
-import express, { Express, Request, Response, NextFunction } from "express";
-import {FeedRouter} from './Routers/FeedRouter';
-import { CalendarRouter } from './Routers/CalendarRouter';
-import {BudgetRouter} from './Routers/BudgetRouter';
-const app = express();
+import message from './modules/message'
+import express, { Express, Request, Response, NextFunction } from 'express'
+import { FeedRouter } from './Routers/FeedRouter'
+//import { CalendarRouter } from './Routers/CalendarRouter';
+//import {BudgetRouter} from './Routers/BudgetRouter';
+const app = express()
 
-app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
 
-app.set("port", process.env.PORT || 3000); //  서버 포트
-app.set("host", process.env.HOST || "0.0.0.0"); // 서버 아이피
+app.set('port', process.env.PORT || 3000) //  서버 포트
+app.set('host', process.env.HOST || '0.0.0.0') // 서버 아이피
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Typescript + Node.js + Express Server");
-});
- 
+app.get('/', (req: Request, res: Response) => {
+  res.send('Typescript + Node.js + Express Server')
+})
+
 // app.get('/feeds', async (req, res) => {
 //    try {
 //      const items = await prisma.feed.findMany();
@@ -36,33 +36,27 @@ app.get("/", (req: Request, res: Response) => {
 //    }
 //  });
 
-app.use(FeedRouter);
-app.use(CalendarRouter);
-app.use(BudgetRouter);
+app.use(FeedRouter)
+//app.use(CalendarRouter);
+//sapp.use(BudgetRouter);
 
 app.listen(3000, () => {
-   console.log('서버가 3000번 포트에서 실행 중') })
-
-
+  console.log('서버가 3000번 포트에서 실행 중')
+})
 
 interface ErrorType {
-   message: string;
-   status: number;
+  message: string
+  status: number
 }
- 
-app.use(function(
-   err: ErrorType,
-   req: Request,
-   res: Response,
-   next: NextFunction
-  ) {
-   res.locals.message = err.message;
-   res.locals.error = req.app.get('env') === 'production' ? err : {};
- 
-   // render the error page
-   res.status(err.status || 500);
-   res.render('error');
- });
+
+app.use(function (err: ErrorType, req: Request, res: Response, next: NextFunction) {
+  res.locals.message = err.message
+  res.locals.error = req.app.get('env') === 'production' ? err : {}
+
+  // render the error page
+  res.status(err.status || 500)
+  res.render('error')
+})
 
 /*
 ...

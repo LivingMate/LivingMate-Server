@@ -1,17 +1,18 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-//import { AuthController } from '../Controllers';
-const passport_1 = __importDefault(require("passport"));
-const express_1 = require("express");
-const router = (0, express_1.Router)();
-router.get('/google', passport_1.default.authenticate('google', { scope: ['profile', 'email'] }));
-router.get('/google/callback', passport_1.default.authenticate('google', { successRedirect: '/',
-    failureRedirect: '/auth/login',
-    failureFlash: true
-}));
+// import express from 'express';
+// import { body } from 'express-validator';
+// //import { AuthController } from '../Controllers';
+// import passport from 'passport'
+// import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+// import { Router, Request, Response } from "express";
+// const router:Router = Router();
+// router.get('/google', passport.authenticate('google', {scope:['profile', 'email']}));
+// router.get('/google/callback',
+// passport.authenticate('google',
+// {successRedirect: '/',
+// failureRedirect: '/auth/login',
+// failureFlash: true
+// }))
 /*{failureRedirect: '/'}),
 (req,res) =>{
     res.redirect('/');},
@@ -23,5 +24,5 @@ router.get('/auth/logout', (req, res) => {
     res.redirect('/auth/login');
  });
  */
-exports.default = router;
+//export default router;
 //# sourceMappingURL=AuthRouter.js.map

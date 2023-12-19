@@ -1,3 +1,3 @@
 
-import { BudgetBaseDto } from '../BudgetBaseDto'
-export interface BudgetBaseResponseDto extends BudgetBaseDto{}
+// import { BudgetBaseDto } from '../BudgetBaseDto'
+// export interface BudgetBaseResponseDto extends BudgetBaseDto{}

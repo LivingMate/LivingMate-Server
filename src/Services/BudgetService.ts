@@ -1,3 +1,5 @@
+/*
+
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 import { BudgetCreateRequestDto } from '../DTOs/Budget/Request/BudgetCreateRequestDto'
@@ -550,3 +552,5 @@ export {
   getAdjustmentsCalc,
   getAdjustments
 }
+
+*/

@@ -1,3 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+// import { BudgetBaseDto } from '../BudgetBaseDto'
+// export interface BudgetUpdateRequestDto extends BudgetBaseDto{}
 //# sourceMappingURL=BudgetUpdateRequestDto.js.map
