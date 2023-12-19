@@ -42,6 +42,7 @@ const findGroupById = async (groupId: string) => {
   if (!group) {
     throw new Error(message.UNAUTHORIZED)
   }
+  return group;
 }
 
 // 일정 찾기

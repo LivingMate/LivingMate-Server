@@ -1,28 +1,148 @@
 import { PrismaClient } from '@prisma/client'
-import { BudgetBaseDto } from '../DTOs/Budget/BudgetBaseDto'
-import { BudgetCreateRequestDto } from '../DTOs/Budget/Request/BudgetCreateRequestDto'
-import { BudgetUpdateRequestDto } from '../DTOs/Budget/Request/BudgetUpdateRequestDto'
 const prisma = new PrismaClient()
+import { BudgetCreateRequestDto } from '../DTOs/Budget/Request/BudgetCreateRequestDto'
+import { BudgetCreateResponseDto } from '../DTOs/Budget/Response/BudgetCreateResponseDto'
+import { BudgetUpdateRequestDto } from '../DTOs/Budget/Request/BudgetUpdateRequestDto'
+import { checkForbiddenGroup } from './GroupService'
+import message from '../modules/message'
+
+// ------------utils-------------
+// 유저 찾기
+const findUserById = async(userId:string) => {
+  const numericUserId = parseInt(userId, 10);
+
+  const user = await prisma.userSpendings.findUnique({
+    where:{
+      id:numericUserId,
+    },
+  });
+
+  if(!user){
+    throw new Error(message.UNAUTHORIZED);
+  }
+  return user;
+}
+
+// 그룹 찾기
+const findGroupById = async (groupId: string) => {
+  const numericGroupId = parseInt(groupId, 10);
+
+  const group = await prisma.userSpendings.findUnique({
+    where: {
+      id: numericGroupId,
+    },
+  });
+
+  if (!group) {
+    throw new Error(message.UNAUTHORIZED)
+  }
+  return group;
+}
+
+// 카테고리 Id로 카테고리 이름 찾기
+const findCategIdByName = async (categoryName: string) => {
+  try {
+    const category = await prisma.category.findUnique({
+      where: {
+        name: categoryName,
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    if (category === null) {
+      // 카테고리가 존재하지 않는 경우
+      return null;
+    }
+
+    return category.id;
+  } catch (error) {
+    console.error('Error in findCategIdByName:', error);
+    throw error;
+  }
+};
+
+
+
+
+
+// 섭카테고리 Id로 섭카테고리 이름 찾기
+const findSubCategIdByName = async(subCategoryName: string) =>
+
+
+
+
 
 //지출내역 등록
-const createBudget = async (BudgetBaseDto: BudgetBaseDto, groupId:string) => {
-  try{
-    const newBudget = await prisma.userSpendings.create({
+// const createBudget = async (BudgetBaseDto: BudgetBaseDto, groupId:string) => {
+//   try{
+//     const newBudget = await prisma.userSpendings.create({
+//       data: {
+//         userId: BudgetBaseDto.userid,
+//         groupId: groupId,
+//         spendingName: BudgetBaseDto.name,
+//         spendings: BudgetBaseDto.spending,
+//         categoryId: BudgetBaseDto.category,
+//         subCategoryId: BudgetBaseDto.subCategory,
+//       },
+//     })
+//     return newBudget;
+//   } catch(error) {
+//     console.error('error :: service/budget/createBudget', error)
+//     throw error
+//   }
+// }
+
+
+const createBudget = async (
+  userId: string, 
+  groupId:string, 
+  budgetCreateRequestDto: BudgetCreateRequestDto
+  ):Promise<BudgetCreateResponseDto> => {
+  try {
+    const user = await findUserById(userId);
+    const group = await findGroupById(groupId);
+    await checkForbiddenGroup(user.groupId, groupId);
+
+    const event = await prisma.calendar.create({
       data: {
-        userId: BudgetBaseDto.userid,
+        id: calendarCreateDto.calendarId,
+        userId: userId,
         groupId: groupId,
-        spendingName: BudgetBaseDto.name,
-        spendings: BudgetBaseDto.spending,
-        categoryId: BudgetBaseDto.category,
-        subCategoryId: BudgetBaseDto.subCategory,
+        title: calendarCreateDto.dutyName,
+        dateStart: new Date(dayjs(calendarCreateDto.dateStart).format('YYYY-MM-DD')),
+        dateEnd: new Date(dayjs(calendarCreateDto.dateEnd).format('YYYY-MM-DD')),
+        timeStart: new Date(dayjs(calendarCreateDto.timeStart).format('HH:mm:ss')),
+        timeEnd: new Date(dayjs(calendarCreateDto.timeEnd).format('HH:mm:ss')),
+        term: calendarCreateDto.routine,
+        memo: calendarCreateDto.memo || '',
       },
     })
-    return newBudget;
-  } catch(error) {
-    console.error('error :: service/budget/createBudget', error)
+
+    const data: CalendarCreateResponseDto = {
+        calendarId: event.id,
+        userId: event.userId,
+        groupId: event.groupId,
+        dutyName: event.title,
+        dateStart: dayjs(event.dateStart).format('YYYY-MM-DD'),
+        dateEnd: dayjs(event.dateEnd).format('YYYY-MM-DD'),
+        timeStart: dayjs(event.timeStart).format('HH:mm:ss'), // String으로 변환
+        timeEnd: dayjs(event.timeEnd).format('HH:mm:ss'),
+        routine: event.term ?? 0,
+        memo: event.memo,
+    }
+    return data;
+  } catch (error) {
+    console.error('error :: service/calendar/createCalendar', error)
     throw error
   }
 }
+
+
+
+
+
 
 //지출내역 보여주기
 const showBudget = async (groupId: string) => {
