@@ -1,5 +1,3 @@
-import { ScheduleReadyCreateDto } from './ScheduleReadyCreateDto'
+import { ScheduleCreateDto } from './ScheduleCreateDto'
 
-export interface SchedulingCreateDto extends ScheduleReadyCreateDto{
-    
-}
+export interface SchedulingCreateDto extends ScheduleCreateDto {}

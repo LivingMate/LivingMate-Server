@@ -3,26 +3,26 @@ import { Result, ValidationError, validationResult } from 'express-validator'
 import * as CalendarService from '../Services/CalendarService'
 import { CalendarCreateDto } from '../DTOs/Calendar/Request/CalendarCreateDto'
 import { CalendarBaseDto } from '../DTOs/Calendar/CalendarBaseDto'
-import { ScheduleReadyCreateDto } from '../DTOs/Calendar/Request/ScheduleReadyCreateDto'
+import { ScheduleReadyCreateDto } from '../DTOs/Calendar/Request/ScheduleCreateDto'
 import { SchedulingCreateDto } from '../DTOs/Calendar/Request/SchedulingCreateDto'
 import statusCode from '../modules/statusCode'
 import message from '../modules/message'
 import util from '../modules/util'
 
-
 // POST
 const createCalendarEvent = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
-  const errors: Result<ValidationError> = validationResult(req);
-  if(!errors.isEmpty()){
-    return res.status(statusCode.BAD_REQUEST)
-              .send(util.fail(statusCode.BAD_REQUEST, message.BAD_REQUEST, errors.array()));
+  const errors: Result<ValidationError> = validationResult(req)
+  if (!errors.isEmpty()) {
+    return res
+      .status(statusCode.BAD_REQUEST)
+      .send(util.fail(statusCode.BAD_REQUEST, message.BAD_REQUEST, errors.array()))
   }
-  const userId: string = req.body.user._id;
-  const calendarCreateDto: CalendarCreateDto = req.body;
-  const { groupId } = req.params;
+  const userId: string = req.body.user._id
+  const calendarCreateDto: CalendarCreateDto = req.body
+  const { groupId } = req.params
 
   try {
-    const data = await CalendarService.createCalendar(userId, groupId, calendarCreateDto);
+    const data = await CalendarService.createCalendar(userId, groupId, calendarCreateDto)
     res.status(201).json(newCalendarEvent)
   } catch (error) {
     console.error('Error creating calendar event', error)

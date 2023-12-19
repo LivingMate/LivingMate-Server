@@ -3,6 +3,6 @@ export interface BudgetBaseDto{
     groupid: string;
     name: string;
     spending: number; //지출금액
-    category: number;
-    subCategory: number;
+    category: string;
+    subCategory: string;
 }

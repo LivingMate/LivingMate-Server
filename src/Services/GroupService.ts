@@ -31,21 +31,12 @@ const findGroupById = async (groupId: string) => {
 }
 
 // 유효한 그룹인지 확인
-const checkForbiddenGroup = async (userGroupId: string, GroupId: string) => {
-  try {
-    const userGroup = await prisma.group.findUnique({
-      where: {
-        id: userGroupId,
-      },
-    })
-
-    if (!userGroup || userGroup.id !== GroupId) {
-      throw new Error('Forbidden Room')
-    }
-  } catch (error) {
-    throw error
+const checkForbiddenGroup = async (userGroupId: string, groupId: string) => {
+  if(userGroupId !== groupId){
+    throw new Error('Forbidden Group')
   }
-}
+} 
+
 
 // join된 그룹인지 확인하기
 const checkJoinedGroupId = async (groupId: string) => {

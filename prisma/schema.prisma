@@ -53,6 +53,7 @@ model Group {
   UserSpendings      UserSpendings[]
   Calculator         Calculator[]
   Adjustment         Adjustment[]
+  SubCategory        SubCategory[]
 }
 
 model Feed {
@@ -159,12 +160,12 @@ model Calculator {
 }
 
 model Adjustment {
-  id          Int     @id @default(autoincrement())
-  group       Group   @relation(fields: [groupId], references: [id])
+  id          Int      @id @default(autoincrement())
+  group       Group    @relation(fields: [groupId], references: [id])
   groupId     String
-  minusUser   User?   @relation(fields: [minusUserId], references: [id], name: "minusUser")
+  minusUser   User?    @relation(fields: [minusUserId], references: [id], name: "minusUser")
   minusUserId String?
-  plusUser    User?   @relation(fields: [plusUserId], references: [id], name: "plusUser")
+  plusUser    User?    @relation(fields: [plusUserId], references: [id], name: "plusUser")
   plusUserId  String?
   change      Int
   createdAt   DateTime @default(now())
@@ -180,6 +181,8 @@ model Category {
 model SubCategory {
   // 필요성을 잘 모르겠지만,, 혹시 몰라서 만들어봄
   id        Int             @id @default(autoincrement())
+  group     Group           @relation(fields: [groupId], references: [id])
+  groupId   String
   name      String
   spendings UserSpendings[]
 }

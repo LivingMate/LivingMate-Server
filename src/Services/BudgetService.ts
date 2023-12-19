@@ -6,28 +6,38 @@ const prisma = new PrismaClient()
 
 //지출내역 등록
 const createBudget = async (BudgetBaseDto: BudgetBaseDto, groupId:string) => {
-  const newBudget = await prisma.userSpendings.create({
-    data: {
-      userId: BudgetBaseDto.userid,
-      groupId: groupId,
-      spendingName: BudgetBaseDto.name,
-      spendings: BudgetBaseDto.spending,
-      categoryId: BudgetBaseDto.category,
-      subCategoryId: BudgetBaseDto.subCategory,
-    },
-  })
-  return newBudget;
+  try{
+    const newBudget = await prisma.userSpendings.create({
+      data: {
+        userId: BudgetBaseDto.userid,
+        groupId: groupId,
+        spendingName: BudgetBaseDto.name,
+        spendings: BudgetBaseDto.spending,
+        categoryId: BudgetBaseDto.category,
+        subCategoryId: BudgetBaseDto.subCategory,
+      },
+    })
+    return newBudget;
+  } catch(error) {
+    console.error('error :: service/budget/createBudget', error)
+    throw error
+  }
 }
 
 //지출내역 보여주기
 const showBudget = async (groupId: string) => {
-  const Budgets = await prisma.userSpendings.findMany({
-    take: 10,
-    where: {
-      groupId: groupId,
-    },
-  })
-  return Budgets
+  try{
+    const Budgets = await prisma.userSpendings.findMany({
+      take: 10,
+      where: {
+        groupId: groupId,
+      },
+    })
+    return Budgets
+  } catch(error) {
+    console.error('error :: service/budget/showBudget', error)
+    throw error
+  }
 }
 
 
@@ -44,52 +54,60 @@ const updateBudgetContent = async (budgetId: number, BudgetUpdateRequestDto: Bud
         subCategoryId: BudgetUpdateRequestDto.subCategory,
       },
     })
+    return updatedBudget;
   } catch (error) {
-    throw new Error('Error updating Budget Contents')
+    throw new Error('error :: service/budget/updateBudgetContent')
   }
 }
 
 //지출내역 삭제
 const deleteBudget = async (BudgetId: number) => {
-  const deletedBudget = await prisma.userSpendings.delete({
-    where: {
-      id: BudgetId,
-    },
-  })
-  return 0
+  try{
+    await prisma.userSpendings.delete({
+      where: {
+        id: BudgetId,
+      },
+    })
+    return 0
+  } catch (error) {
+    throw new Error('error :: service/budget/deleteBudget')
+  }
 }
 //showBudget에 따라서 + 이런저런 사정에 따라서 파라미터로 받는게 GroupId가 될 수도 있고 DTO가 될 수도 있구나..
 // 그러면 수정 해줘야해...
 
 //지출내역 검색
 const searchBudget = async (groupId: string, searchKey: string) => {
-  const searchedBudget = await prisma.userSpendings.findMany({
-    where: {
-      groupId: groupId,
-      spendingName: {
-        contains: searchKey,
+  try{
+    const searchedBudget = await prisma.userSpendings.findMany({
+      where: {
+        groupId: groupId,
+        spendingName: {
+          contains: searchKey,
+        },
       },
-    },
-  })
+    })
 
-  const results = searchedBudget.map((budget) => {
-    return {
-      id: budget.id,
-      name: budget.spendingName,
-      spending: budget.spendings,
-      createdAt: budget.createdAt,
-      userId: budget.userId,
-      category: budget.categoryId,
-      subcategory: budget.subCategoryId
-    }
-  })
-
-  return results
+    const results = searchedBudget.map((budget) => {
+      return {
+        id: budget.id,
+        name: budget.spendingName,
+        spending: budget.spendings,
+        createdAt: budget.createdAt,
+        userId: budget.userId,
+        category: budget.categoryId,
+        subcategory: budget.subCategoryId
+      }
+    })
+    return results
+  } catch (error) {
+  throw new Error('error :: service/budget/searchBudget')
+  }
 }
 
 
-// 서브카테고리 추가+삭제
-const updateSubCategory = async(budgetId: number, subCategoryId:number)=>{
+// 서브카테고리 수정
+const updateSubCategory = async(budgetId: number, subCategory:string)=>{
   if(!subCategoryId){
     throw new Error('no such category found: updateSubCategory')
   }
@@ -106,9 +124,11 @@ const updateSubCategory = async(budgetId: number, subCategoryId:number)=>{
   return newBudget;
 }
 
+// 서브카테고리 삭제
+
 
 // 서브카테고리 새로 만들기
-const updateNewSubCategory = async(groupId:number, name:string)=>{
+const createSubCategory = async(groupId:number, name:string)=>{
   const newSubCategory = await prisma.subCategory.create({
     data:{
       name: name,

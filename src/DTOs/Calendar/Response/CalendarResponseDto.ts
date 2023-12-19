@@ -1,12 +1,12 @@
-import { CalendarBaseDto } from "../CalendarBaseDto";
-
-export interface CalendarResponseDto extends CalendarBaseDto{
+export interface CalendarResponseDto {
   calendarId: number;
   dutyName: string;
   userId: string;  
   groupId: string;
-  dateStart: Date;
-  dateEnd: Date;
+  dateStart: string;
+  dateEnd: string;
   timeStart: string;
   timeEnd: string;
+  routine: number
+  memo?: string
 }
