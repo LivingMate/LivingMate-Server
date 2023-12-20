@@ -1,6 +1,4 @@
-/*
-
-import { PrismaClient } from '@prisma/client'
+import { Category, PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 import { BudgetCreateRequestDto } from '../DTOs/Budget/Request/BudgetCreateRequestDto'
 import { BudgetCreateResponseDto } from '../DTOs/Budget/Response/BudgetCreateResponseDto'
@@ -42,51 +40,47 @@ const findGroupById = async (groupId: string) => {
   return group;
 }
 
+
 // 카테고리 이름으로 카테고리 id 찾기
-const findCategIdByName = async (categoryName: string) => {
+async function findCategIdByName(categoryName:string) {
   try {
     const category = await prisma.category.findUnique({
       where: {
-        categoryName,
-      },
-      select: {
-        id: true,
+        name: categoryName,
       },
     });
 
-    if (category === null) {
-      return null;
+    if (category) {
+      return category.id;
+    } else {
+      return -1;
     }
-
-    return category.id;
   } catch (error) {
-    console.error('error :: service/budget/findCategIdByName', error);
+    console.error('Error in findCategIdByName:', error);
     throw error;
   }
-};
+}
 
 // 섭카테고리 이름으로 섭카테고리 id 찾기
-const findSubCategIdByName = async (subCategoryName: string) => {
+async function findSubCategIdByName(subCategoryName:string) {
   try {
     const subCategory = await prisma.subCategory.findUnique({
       where: {
-        subCategoryName,
-      },
-      select: {
-        id: true,
+        name: subCategoryName,
       },
     });
 
-    if (subCategory === null) {
-      return null;
+    if (subCategory) {
+      return subCategory.id;
+    } else {
+      return -1;
     }
-
-    return subCategory.id;
   } catch (error) {
-    console.error('error :: service/budget/findSubCategIdByName', error);
+    console.error('Error in findSubCategIdByName:', error);
     throw error;
   }
-};
+}
+
 
 // userId로 userColor 찾기
 const findUserColorByUserId =async (userId:string) => {
@@ -95,106 +89,77 @@ const findUserColorByUserId =async (userId:string) => {
       where:{
         id:userId,
       },
-      select:{
-        userColor:true,
-      },
-    });
-    if (data == null){
-      return null;
+    })
+      
+    if (data) {
+      return data.userColor;
+    } else {
+      return "error";
     }
-    return data.userColor;
+    
   } catch (error) {
     console.error('error :: service/budget/findUserColorByUserId', error);
     throw error;
   }
 }
 
+
 // id를 name으로 반환
-type ModelType = 'Category' | 'SubCategory';
-
-const changeIdToName = async (
-  modelType: ModelType, 
-  modelId: number
-  ): Promise<string | null> => {
+async function changeCategIdToName(categoryId:number) {
   try {
-    let modelName: string = '';
-    let result: string | null = null;
+    const result = await prisma.category.findUnique({
+      where: {
+        id: categoryId,
+      },
+    });
 
-    if (modelType === 'Category') {
-      modelName = 'Category';
-      const category = await prisma.category.findUnique({
-        where: {
-          id: modelId,
-        },
-        select: {
-          categoryName: true,
-        },
-      });
-
-      if (category) {
-        result = category.categoryName;
-      }
-
-    } else if (modelType === 'SubCategory') {
-      modelName = 'SubCategory';
-      const subCategory = await prisma.subCategory.findUnique({
-        where: {
-          id: modelId,
-        },
-        select: {
-          subCategoryName: true,
-        },
-      });
-
-      if (subCategory) {
-        result = subCategory.subCategoryName;
-      }
+    if (result) {
+      return result.name;
+    } else {
+      return "error";
     }
-
-    if (result === null) {
-      console.error(`No ${modelName} found with id: ${modelId}`);
-    }
-
-    return result;
   } catch (error) {
-    console.error(`Error in changeIdToName for ${modelType}:`, error);
+    console.error('Error in changeCategIdByName:', error);
     throw error;
   }
-};
+}
+
+// subId를 name으로 반환
+async function changeSubCategIdToName(subCategoryId:number) {
+  try {
+    const result = await prisma.subCategory.findUnique({
+      where: {
+        id: subCategoryId,
+      },
+    });
+
+    if (result) {
+      return result.name;
+    } else {
+      return "error";
+    }
+  } catch (error) {
+    console.error('Error in changeSubCategIdByName:', error);
+    throw error;
+  }
+}
+
+
 
 
 // -------------real service----------------
-//지출내역 등록
-// const createBudget = async (BudgetBaseDto: BudgetBaseDto, groupId:string) => {
-//   try{
-//     const newBudget = await prisma.userSpendings.create({
-//       data: {
-//         userId: BudgetBaseDto.userid,
-//         groupId: groupId,
-//         spendingName: BudgetBaseDto.name,
-//         spendings: BudgetBaseDto.spending,
-//         categoryId: BudgetBaseDto.category,
-//         subCategoryId: BudgetBaseDto.subCategory,
-//       },
-//     })
-//     return newBudget;
-//   } catch(error) {
-//     console.error('error :: service/budget/createBudget', error)
-//     throw error
-//   }
-// }
-
-
+// 지출 등록
 const createBudget = async (
   userId: string, 
-  groupId:string, 
+  groupId: string, 
   budgetCreateRequestDto: BudgetCreateRequestDto
-  ):Promise<BudgetCreateResponseDto> => {
+): Promise<BudgetCreateResponseDto> => {
   try {
     const user = await findUserById(userId);
     const group = await findGroupById(groupId);
     const reqCategoryId = await findCategIdByName(budgetCreateRequestDto.category);
     const reqSubCategoryId = await findSubCategIdByName(budgetCreateRequestDto.subCategory);
+    const resUserColor = await findUserColorByUserId(userId);
     await checkForbiddenGroup(user.groupId, groupId);
 
     const event = await prisma.userSpendings.create({
@@ -205,26 +170,31 @@ const createBudget = async (
         spendings: budgetCreateRequestDto.spendings,
         categoryId: reqCategoryId,
         subCategoryId: reqSubCategoryId,
+        createdAt: budgetCreateRequestDto.createdAt,
       },
-    })
+    });
+
+    // categoryId와 subCategoryId 변환
+    const resCategory = await changeCategIdToName(event.categoryId);
+    const resSubCategory = await changeSubCategIdToName(event.subCategoryId);
 
     const data: BudgetCreateResponseDto = {
-        calendarId: event.id,
-        groupId: event.groupId,
-        dutyName: event.title,
-        dateStart: dayjs(event.dateStart).format('YYYY-MM-DD'),
-        dateEnd: dayjs(event.dateEnd).format('YYYY-MM-DD'),
-        timeStart: dayjs(event.timeStart).format('HH:mm:ss'), // String으로 변환
-        timeEnd: dayjs(event.timeEnd).format('HH:mm:ss'),
-        routine: event.term ?? 0,
-        memo: event.memo,
-    }
+      budgetId: event.id,
+      spendingName: event.spendingName,
+      spendings: event.spendings,
+      category: resCategory,
+      subCategory: resSubCategory,
+      userColor: resUserColor,
+      createdAt: event.createdAt,
+    };
+
     return data;
   } catch (error) {
-    console.error('error :: service/calendar/createCalendar', error)
-    throw error
+    console.error('error :: service/calendar/createCalendar', error);
+    throw error;
   }
-}
+};
+
 
 
 
@@ -537,7 +507,8 @@ export {
   findCategIdByName,
   findSubCategIdByName,
   findUserColorByUserId,
-  changeIdToName,
+  changeCategIdToName,
+  changeSubCategIdToName,
   searchBudget,
   createBudget,
   showBudget,
@@ -552,5 +523,3 @@ export {
   getAdjustmentsCalc,
   getAdjustments
 }
-
-*/

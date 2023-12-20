@@ -141,7 +141,7 @@ model UserSpendings {
   groupId       String
   spendings     Float       @default(0)
   category      Category    @relation(fields: [categoryId], references: [id])
-  categoryId    Int         @default(0)
+  categoryId    Int
   subCategory   SubCategory @relation(fields: [subCategoryId], references: [id])
   subCategoryId Int
   createdAt     DateTime    @default(now())
@@ -176,6 +176,8 @@ model Category {
   id        Int             @id @default(autoincrement())
   name      String
   spendings UserSpendings[]
+
+  @@unique([name])
 }
 
 model SubCategory {
@@ -185,4 +187,6 @@ model SubCategory {
   groupId   String
   name      String
   spendings UserSpendings[]
+
+  @@unique([name])
 }

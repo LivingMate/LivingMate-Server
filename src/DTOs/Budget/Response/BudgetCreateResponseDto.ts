@@ -1,6 +1,8 @@
 import { BudgetCreateRequestDto } from "../Request/BudgetCreateRequestDto";
 
 export interface BudgetCreateResponseDto extends BudgetCreateRequestDto{
-    calendarId: number;
+    budgetId: number;
+    category: string;
+    subCategory: string;
     userColor: string;
 }
