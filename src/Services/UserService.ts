@@ -107,6 +107,34 @@ const findUserByIdAndUpdate = async (userId:string, userUpdateRequestDto:UserUpd
     return updatedUser;
 };
 
+//유저 아이디로 유저 이름 찾기 
+async function getUserNameByUserId(userId:string) {
+    try {
+      const result = await prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+  
+      if (result) {
+        return result.userName;
+      } else {
+        return "error";
+      }
+    } catch (error) {
+      console.error('Error in getUserNameByUserId:', error);
+      throw error;
+    }
+}
+
+
+
+
+
+
+
+
+
 //+ 그룹 참여하는 서비스
 const addUserToGroup = async(signupDTO:SignupDto, groupId:string)=>{
     //1. createUser with signupDTO
@@ -134,5 +162,6 @@ export{
     findGroupIdByUserId,
     findUserByIdAndUpdate,
     getUserProfile,
-    addUserToGroup
+    addUserToGroup,
+    getUserNameByUserId
 }

@@ -4,6 +4,7 @@ import { BudgetCreateRequestDto } from '../DTOs/Budget/Request/BudgetCreateReque
 import { BudgetCreateResponseDto } from '../DTOs/Budget/Response/BudgetCreateResponseDto'
 import { BudgetUpdateRequestDto } from '../DTOs/Budget/Request/BudgetUpdateRequestDto'
 import { checkForbiddenGroup } from './GroupService'
+import {getUserNameByUserId} from './UserService'
 import message from '../modules/message'
 
 
@@ -169,28 +170,27 @@ const createBudget = async (
         spendingName: budgetCreateRequestDto.spendingName,
         spendings: budgetCreateRequestDto.spendings,
         categoryId: reqCategoryId,
-        subCategoryId: reqSubCategoryId,
-        createdAt: budgetCreateRequestDto.createdAt,
+        subCategoryId: reqSubCategoryId
       },
     });
 
     // categoryId와 subCategoryId 변환
     const resCategory = await changeCategIdToName(event.categoryId);
     const resSubCategory = await changeSubCategIdToName(event.subCategoryId);
+    const resUserName = await getUserNameByUserId(userId);
 
     const data: BudgetCreateResponseDto = {
-      budgetId: event.id,
       spendingName: event.spendingName,
       spendings: event.spendings,
       category: resCategory,
       subCategory: resSubCategory,
       userColor: resUserColor,
-      createdAt: event.createdAt,
+      userName: resUserName
     };
 
     return data;
   } catch (error) {
-    console.error('error :: service/calendar/createCalendar', error);
+    console.error('error :: service/budget/createBudget', error);
     throw error;
   }
 };

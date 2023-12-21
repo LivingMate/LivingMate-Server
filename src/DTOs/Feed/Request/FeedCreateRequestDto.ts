@@ -1,2 +1,4 @@
 import { FeedBaseDto } from "../FeedBaseDto";
-export interface FeedCreateRequestDto extends FeedBaseDto{}
+export interface FeedCreateRequestDto extends FeedBaseDto{
+    
+}
