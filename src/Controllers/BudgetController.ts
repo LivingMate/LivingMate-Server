@@ -1,8 +1,7 @@
 
-// import { NextFunction, Request, Response } from 'express'
-// import { validationResult, Result, ValidationError } from 'express-validator'
-// import * as BudgetService from '../Services/BudgetService'
-// import { BudgetBaseDto } from '../DTOs/Budget/BudgetBaseDto';
+import { NextFunction, Request, Response } from 'express'
+import { validationResult, Result, ValidationError } from 'express-validator'
+import * as BudgetService from '../Services/BudgetService'
 
 
 // /*
@@ -64,28 +63,28 @@
 // */
 
 
-// /*
-// post
-// /budget
-// */
-//    const createBudget = async (
-//     req: Request,
-//     res: Response,
-//     next: NextFunction
-//   ): Promise<void | Response> => {
-//     const groupId: string = req.params.groupId; 
-//     const BudgetBaseDTO: BudgetBaseDto =  req.body.data;
+/*
+post
+/budget
+*/
+   const createBudget = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void | Response> => {
+    const groupId: string = req.params.groupId; 
+    const BudgetBaseDTO: BudgetBaseDto =  req.body.data;
   
-//     try {
-//       const data = await BudgetService.createBudget(BudgetBaseDTO, groupId);
+    try {
+      const data = await BudgetService.createBudget(BudgetBaseDTO, groupId);
   
-//       return res
-//         .send(data);
-//     } catch (error) {
-//       res.status(500).json({ error: 'Error Creating Budget: Controller' });
-//     }
+      return res
+        .send(data);
+    } catch (error) {
+      res.status(500).json({ error: 'Error Creating Budget: Controller' });
+    }
 
-// };
+};
 
 // /*
 // delete
