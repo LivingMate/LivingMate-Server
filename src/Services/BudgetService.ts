@@ -4,6 +4,7 @@ import { BudgetCreateRequestDto } from '../DTOs/Budget/Request/BudgetCreateReque
 import { BudgetCreateResponseDto } from '../DTOs/Budget/Response/BudgetCreateResponseDto'
 import { BudgetUpdateRequestDto } from '../DTOs/Budget/Request/BudgetUpdateRequestDto'
 import { checkForbiddenGroup } from './GroupService'
+import {getUserNameByUserId} from './UserService'
 import message from '../modules/message'
 
 // ------------utils-------------
@@ -165,7 +166,7 @@ const createBudget = async (
       },
     })
 
-    categoryId와 subCategoryId 변환
+    // categoryId와 subCategoryId 변환
     const resCategory = await changeCategIdToName(event.categoryId)
     const resSubCategory = await changeSubCategIdToName(event.subCategoryId)
     const resUserColor = await findUserColorByUserId(event.userId)
@@ -182,7 +183,29 @@ const createBudget = async (
 
     return after;
   } catch (error) {
-    console.error('error :: service/budget/createBudget', error)
+    console.error('error :: service/budget/createBudget', error);
+    throw error;
+  }
+};
+
+
+
+
+
+
+
+//지출내역 보여주기
+const showBudget = async (groupId: string) => {
+  try{
+    const Budgets = await prisma.userSpendings.findMany({
+      take: 10,
+      where: {
+        groupId: groupId,
+      },
+    })
+    return Budgets
+  } catch(error) {
+    console.error('error :: service/budget/showBudget', error)
     throw error
   }
 }

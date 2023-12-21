@@ -1,7 +1,7 @@
 export interface BudgetCreateRequestDto{
     spendings: number;
     spendingName: string;
-    category: number;
-    subCategory: number;
-    createdAt: Date;
+    category: string;
+    subCategory: string;
+    userName: string;
 }

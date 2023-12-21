@@ -64,7 +64,7 @@ model Feed {
   groupId   String
   text      String   @default("")
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now())
   pin       Boolean  @default(false)
 }
 
