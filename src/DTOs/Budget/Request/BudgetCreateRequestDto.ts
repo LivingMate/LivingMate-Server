@@ -3,4 +3,5 @@ export interface BudgetCreateRequestDto{
     spendingName: string;
     category: string;
     subCategory: string;
+    userName: string;
 }

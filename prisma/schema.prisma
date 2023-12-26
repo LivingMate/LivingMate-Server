@@ -18,8 +18,8 @@ model User {
   sex             Boolean
   age             Int
   createdAt       DateTime             @default(now())
-  group           Group?               @relation(fields: [groupId], references: [id])
-  groupId         String?
+  group           Group                @relation(fields: [groupId], references: [id])
+  groupId         String
   fcmToken        String?
   Feed            Feed[]
   SingleSender    NotificationSingle[] @relation("sender")
@@ -36,7 +36,7 @@ model User {
 }
 
 model Group {
-  id                 String               @id @default("")
+  id                 String               @id @default(cuid())
   groupName          String               @db.VarChar(255)
   groupOwner         String
   groupCode          String?
@@ -173,20 +173,23 @@ model Adjustment {
 
 model Category {
   // 가계부 카테고리별 금액 확인할때 필요할것같아서 만들어봤음
-  id        Int             @id @default(autoincrement())
-  name      String
-  spendings UserSpendings[]
+  id          Int             @id @default(autoincrement())
+  name        String
+  spendings   UserSpendings[]
+  SubCategory SubCategory[]
 
   @@unique([name])
 }
 
 model SubCategory {
   // 필요성을 잘 모르겠지만,, 혹시 몰라서 만들어봄
-  id        Int             @id @default(autoincrement())
-  group     Group           @relation(fields: [groupId], references: [id])
-  groupId   String
-  name      String
-  spendings UserSpendings[]
+  id         Int             @id @default(autoincrement())
+  group      Group           @relation(fields: [groupId], references: [id])
+  groupId    String
+  category   Category        @relation(fields: [categoryId], references: [id])
+  categoryId Int
+  name       String
+  spendings  UserSpendings[]
 
   @@unique([name])
 }

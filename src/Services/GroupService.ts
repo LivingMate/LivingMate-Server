@@ -90,20 +90,20 @@ const leaveGroup = async (userId: string, groupId: string): Promise<void> => {
       where: {
         id: userId,
       },
-    })
+    });
 
     if (!user) {
-      throw new Error('User not found')
+      throw new Error('User not found');
     }
 
     const group = await prisma.group.findUnique({
       where: {
         id: groupId,
       },
-    })
+    });
 
     if (!group) {
-      throw new Error('Group not found')
+      throw new Error('Group not found');
     }
 
     // user가 나가는지 groupOwner가 나가는지
@@ -113,7 +113,7 @@ const leaveGroup = async (userId: string, groupId: string): Promise<void> => {
         where: {
           id: groupId,
         },
-      })
+      });
     } else {
       // 일반 user가 나가면 그룹 탈퇴로 적용
       await prisma.user.update({
@@ -121,16 +121,17 @@ const leaveGroup = async (userId: string, groupId: string): Promise<void> => {
           id: userId,
         },
         data: {
-          groupId: null,
+          groupId: undefined, // 또는 원하는 값으로 갱신
         },
-      })
+      });
     }
   } catch (error) {
-    throw error
+    throw error;
   } finally {
-    await prisma.$disconnect()
+    await prisma.$disconnect();
   }
-}
+};
+
 
 const findGroupNameByGroupId = async (groupId: string) => {
   const groupName = await prisma.group.findUnique({
