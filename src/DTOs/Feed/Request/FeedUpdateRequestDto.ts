@@ -1,3 +1,5 @@
 import { FeedBaseDto } from '../FeedBaseDto';
 
-export interface FeedUpdateRequestDto extends FeedBaseDto{}
+export interface FeedUpdateRequestDto extends FeedBaseDto{
+    feedId: number;
+}

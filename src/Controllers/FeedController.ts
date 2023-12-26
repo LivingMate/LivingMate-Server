@@ -42,13 +42,15 @@ const createFeed = async (req: Request, res: Response, next: NextFunction): Prom
     throw new Error('Error at Controller: createFeed')
   }
 
-  const userId: string = req.body.user._id
-  const feedCreateDto: FeedCreateRequestDto = req.body
+  const userId: string = req.params.userId;
+  const groupId: string = req.params.groupId;
+  const data: string = req.body;
+  //const feedCreateDto: FeedCreateRequestDto = req.body
   //const { roomId } = req.params;
 
   try {
     //const data =
-    await FeedService.createFeed(feedCreateDto)
+    await FeedService.createFeed(userId, groupId, data);
 
     return res.status(200).send('Feed Created!')
     //   util.success(statusCode.CREATED, message.CREATE_EVENT_SUCCESS, data)

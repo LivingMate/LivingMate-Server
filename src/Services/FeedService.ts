@@ -9,12 +9,13 @@ import * as UserService from './UserService'
 
 //신규 피드 등록
 //FeedBaseResponseDto
-const createFeed = async(userId:string, groupId: string, FeedCreateRequestDto:FeedCreateRequestDto)=>{
+const createFeed = async(userId:string, groupId: string, feedContent: string)=>{
     const newFeed = await prisma.feed.create({
         data:{
             userId: userId,
             groupId:groupId,
-            text:FeedCreateRequestDto.feedContent,
+            //text:FeedCreateRequestDto.feedContent,
+            text: feedContent
         }
     });
     return newFeed;

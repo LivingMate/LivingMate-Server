@@ -282,10 +282,10 @@ const searchBudget = async (groupId: string, searchKey: string) => {
   }
 }
 
-
+/*
 // 서브카테고리 수정
 const updateSubCategory = async(budgetId: number, subCategory:string)=>{
-  if(!subCategoryId){
+  if(!subCategory){
     throw new Error('no such category found: updateSubCategory')
   }
 
@@ -294,16 +294,17 @@ const updateSubCategory = async(budgetId: number, subCategory:string)=>{
       id : budgetId,
     },
     data:{
-      subCategoryId: subCategoryId,
+      subCategoryId: subCategory,
     }
   })
 
   return newBudget;
 }
+*/
 
 // 서브카테고리 삭제
 
-
+/*
 // 서브카테고리 새로 만들기
 const createSubCategory = async(groupId:number, name:string)=>{
   const newSubCategory = await prisma.subCategory.create({
@@ -313,7 +314,7 @@ const createSubCategory = async(groupId:number, name:string)=>{
   })
   return newSubCategory;
 }
-
+*/
 
 
 
@@ -516,8 +517,8 @@ export {
   deleteBudget,
   getGroupMemberSpending,
   getDayReturn,
-  updateSubCategory,
-  updateNewSubCategory,
+  //updateSubCategory,
+  //updateNewSubCategory,
   takeFromAdjustments,
   sendToAdjustments,
   getAdjustmentsCalc,
