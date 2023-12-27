@@ -160,33 +160,35 @@ const createBudget = async (
         groupId: groupId,
         spendingName: budgetCreateRequestDto.spendingName,
         spendings: budgetCreateRequestDto.spendings,
-        categoryId: budgetCreateRequestDto.category,
-        subCategoryId: budgetCreateRequestDto.category,
-        createdAt: budgetCreateRequestDto.createdAt,
+        categoryId: reqCategoryId,
+        subCategoryId: reqSubCategoryId,
       },
     })
 
     // categoryId와 subCategoryId 변환
-    const resCategory = await changeCategIdToName(event.categoryId)
-    const resSubCategory = await changeSubCategIdToName(event.subCategoryId)
-    const resUserColor = await findUserColorByUserId(event.userId)
+    const resCategory = await changeCategIdToName(event.categoryId);
+    const resSubCategory = await changeSubCategIdToName(event.subCategoryId);
+    const resUserColor = await findUserColorByUserId(event.userId);
+    const resUserName = await getUserNameByUserId(event.userId);
 
-    const after: BudgetCreateResponseDto = {
-      budgetId: event.id,
+    const createdBudget: BudgetCreateResponseDto = {
       spendingName: event.spendingName,
       spendings: event.spendings,
       category: resCategory,
       subCategory: resSubCategory,
       userColor: resUserColor,
+      userName: resUserName,
       createdAt: event.createdAt,
     }
 
-    return after;
+    return createdBudget;
+
   } catch (error) {
     console.error('error :: service/budget/createBudget', error);
     throw error;
   }
 };
+
 
 
 
@@ -510,7 +512,7 @@ const getAdjustments = async(groupId: string)=>{
 
 
 
-*/
+
 export {
   findUserById,
   findGroupById,
@@ -521,8 +523,8 @@ export {
   changeSubCategIdToName,
   createBudget,
   showBudget,
-  updateBudgetContent,
-  deleteBudget,
+  //updateBudgetContent,
+  //deleteBudget,
   getGroupMemberSpending,
   getDayReturn,
   //updateSubCategory,
