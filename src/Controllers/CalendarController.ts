@@ -15,42 +15,43 @@ const createCalendarEvent = async (req: Request, res: Response, next: NextFuncti
   if (!errors.isEmpty()) {
     return res
       .status(statusCode.BAD_REQUEST)
-      .send(util.fail(statusCode.BAD_REQUEST, message.BAD_REQUEST, errors.array()))
+      .send(util.fail(statusCode.BAD_REQUEST, message.BAD_REQUEST))
   }
-  const userId: string = req.body.user._id
+  // const userId: string = req.body.user._id
+  const { userId } = req.params
   const calendarCreateDto: CalendarCreateDto = req.body
   const { groupId } = req.params
 
   try {
     const data = await CalendarService.createCalendar(userId, groupId, calendarCreateDto)
-    res.status(201).json(newCalendarEvent)
+    res.status(201).json(data)
   } catch (error) {
     console.error('Error creating calendar event', error)
     res.status(500).json({ error: 'Internal Server Error' })
   }
 }
 
-const createScheduleReadyEvent = async (req: Request, res: Response) => {
-  try {
-    const calendarData = req.body
-    const newScheduleReadyEvent = await CalendarService.createScheduleReady(calendarData)
-    res.status(201).json(newScheduleReadyEvent)
-  } catch (error) {
-    console.error('Error creating schedule-ready event', error)
-    res.status(500).json({ error: 'Internal Server Error' })
-  }
-}
+// const createScheduleReadyEvent = async (req: Request, res: Response) => {
+//   try {
+//     const calendarData = req.body
+//     const newScheduleReadyEvent = await CalendarService.createScheduleReady(calendarData)
+//     res.status(201).json(newScheduleReadyEvent)
+//   } catch (error) {
+//     console.error('Error creating schedule-ready event', error)
+//     res.status(500).json({ error: 'Internal Server Error' })
+//   }
+// }
 
-const createSchedulingEvent = async (req: Request, res: Response) => {
-  try {
-    const calendarData = req.body
-    const newSchedulingEvent = await CalendarService.createScheduling(calendarData)
-    res.status(201).json(newSchedulingEvent)
-  } catch (error) {
-    console.error('Error creating scheduling events', error)
-    res.status(500).json({ error: 'Internal Server Error' })
-  }
-}
+// const createSchedulingEvent = async (req: Request, res: Response) => {
+//   try {
+//     const calendarData = req.body
+//     const newSchedulingEvent = await CalendarService.createScheduling(calendarData)
+//     res.status(201).json(newSchedulingEvent)
+//   } catch (error) {
+//     console.error('Error creating scheduling events', error)
+//     res.status(500).json({ error: 'Internal Server Error' })
+//   }
+// }
 
 // // FETCH
 // const updateCalendarEvent = async (req: Request, res: Response) => {
@@ -101,12 +102,12 @@ const createSchedulingEvent = async (req: Request, res: Response) => {
 //   }
 // }
 
-// export {
-//   createCalendarEvent,
+export {
+  createCalendarEvent,
 //   createScheduleReadyEvent,
 //   createSchedulingEvent,
 //   updateCalendarEvent,
 //   deleteCalendarEvent,
 //   getThisWeeksDuty,
 //   showCalendar,
-// }
+}
