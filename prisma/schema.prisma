@@ -27,7 +27,7 @@ model User {
   MultiSender     NotificationMulti[]  @relation("sender")
   MultiReciever   NotificationMulti[]  @relation("reciever")
   Calendar        Calendar[]
-  Scheduling      Scheduling[]
+  AvailableDay    AvailableDay[]
   UserSpendings   UserSpendings[]
   Calculator      Calculator[]
   AdjustmentMinus Adjustment[]         @relation("minusUser")
@@ -106,48 +106,32 @@ model Calendar {
 }
 
 model Scheduling {
-  id        Int             @id @default(autoincrement())
-  user      User            @relation(fields: [userId], references: [id])
-  userId    String
-  group     Group           @relation(fields: [groupId], references: [id])
-  groupId   String
-  title     String
-  oneDay    DateTime        @db.Date
-  available AvailableTimes[]
+  id           Int            @id @default(autoincrement())
+  group        Group          @relation(fields: [groupId], references: [id])
+  groupId      String
+  title        String
+  createdAt    DateTime       @default(now())
+  Option       Option[]
+  AvailableDay AvailableDay[]
 }
 
-model AvailableTimes {
+model Option {
+  id           Int            @id @default(autoincrement())
+  scheduling   Scheduling     @relation(fields: [schedulingId], references: [id])
+  schedulingId Int
+  dateOption   DateTime
+  AvailableDay AvailableDay[]
+}
+
+model AvailableDay {
   id           Int        @id @default(autoincrement())
+  user         User       @relation(fields: [userId], references: [id])
+  userId       String
   scheduling   Scheduling @relation(fields: [schedulingId], references: [id])
   schedulingId Int
-  value        Int
+  option       Option     @relation(fields: [optionId], references: [id])
+  optionId     Int
 }
-
-// model ScheduleReady {
-//   // ScheduleReady의 id는 밑에 CalendarSchedule때문에 String형으로 받았음
-//   // 만약 이게 틀린거면 지우고, int형으로 바꾸기
-//   id        Int      @id @default(autoincrement())
-//   user      User     @relation(fields: [userId], references: [id])
-//   userId    String // 배열로 받아야 함
-//   group     Group    @relation(fields: [groupId], references: [id])
-//   groupId   String
-//   title     String   @db.VarChar(255)
-//   dateStart DateTime @db.Date
-//   dateEnd   DateTime @db.Date
-//   timeStart DateTime @db.Time()
-//   timeEnd   DateTime @db.Time()
-// }
-
-// model Scheduling {
-//   id        Int      @id @default(autoincrement())
-//   user      User     @relation(fields: [userId], references: [id])
-//   userId    String
-//   group     Group    @relation(fields: [groupId], references: [id])
-//   groupId   String
-//   day       Int
-//   timeStart DateTime @db.Time()
-//   timeEnd   DateTime @db.Time()
-// }
 
 model UserSpendings {
   id            Int         @id @default(autoincrement())
