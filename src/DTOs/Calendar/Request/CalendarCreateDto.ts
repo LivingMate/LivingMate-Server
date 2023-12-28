@@ -7,6 +7,6 @@ export interface CalendarCreateDto {
   dateEnd: string;
   timeStart: string;
   timeEnd: string;
-  routine: number
+  term: number
   memo?: string
 }

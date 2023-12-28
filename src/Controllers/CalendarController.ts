@@ -24,6 +24,7 @@ const createCalendarEvent = async (req: Request, res: Response, next: NextFuncti
 
   try {
     const data = await CalendarService.createCalendar(userId, groupId, calendarCreateDto)
+    console.log(data)
     res.status(201).json(data)
   } catch (error) {
     console.error('Error creating calendar event', error)
@@ -90,17 +91,17 @@ const createCalendarEvent = async (req: Request, res: Response, next: NextFuncti
 //   }
 // }
 
-// const showCalendar = async (req: Request, res: Response) => {
-//   try {
-//     const groupId: string = req.params.groupId
-//     const calendarEvents = await CalendarService.showCalendar(groupId)
-//     res.status(200).json(calendarEvents)
-//     console.log(calendarEvents)
-//   } catch (error) {
-//     console.error('Error retrieving calendar events', error)
-//     res.status(500).json({ error: 'Internal Server Error' })
-//   }
-// }
+const showCalendar = async (req: Request, res: Response) => {
+  try {
+    const groupId: string = req.params.groupId
+    const calendarEvents = await CalendarService.showCalendar(groupId)
+    res.status(200).json(calendarEvents)
+    console.log(calendarEvents)
+  } catch (error) {
+    console.error('Error retrieving calendar events', error)
+    res.status(500).json({ error: 'Internal Server Error' })
+  }
+}
 
 export {
   createCalendarEvent,
@@ -109,5 +110,5 @@ export {
 //   updateCalendarEvent,
 //   deleteCalendarEvent,
 //   getThisWeeksDuty,
-//   showCalendar,
+  showCalendar,
 }

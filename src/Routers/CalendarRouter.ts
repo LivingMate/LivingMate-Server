@@ -5,7 +5,7 @@ import * as CalendarController from '../Controllers/CalendarController'
 const CalendarRouter = express.Router();
 
 
-// CalendarRouter.get('/calendar/:groupId', CalendarController.showCalendar)
+CalendarRouter.get('/calendar/:groupId', CalendarController.showCalendar)
 CalendarRouter.post('/calendar/:groupId/:userId', CalendarController.createCalendarEvent)
 // CalendarRouter.patch('/calendar/:calendarId', CalendarController.updateCalendarEvent)
 // CalendarRouter.delete('/calendar/:calendarId', CalendarController.deleteCalendarEvent)
