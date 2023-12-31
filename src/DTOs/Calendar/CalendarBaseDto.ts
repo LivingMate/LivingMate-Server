@@ -1,6 +1,6 @@
 export interface CalendarBaseDto {
   calendarId: number;
-  dutyName: string;
+  title: string;
   userId: string;  
   groupId: string;
   dateStart: Date;

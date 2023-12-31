@@ -1,34 +1,36 @@
-// import { Request, Response, NextFunction } from 'express'
-// import { Result, ValidationError, validationResult } from 'express-validator'
-// import * as CalendarService from '../Services/CalendarService'
-// import { CalendarCreateDto } from '../DTOs/Calendar/Request/CalendarCreateDto'
-// import { CalendarBaseDto } from '../DTOs/Calendar/CalendarBaseDto'
-// import { ScheduleReadyCreateDto } from '../DTOs/Calendar/Request/ScheduleCreateDto'
-// import { SchedulingCreateDto } from '../DTOs/Calendar/Request/SchedulingCreateDto'
-// import statusCode from '../modules/statusCode'
-// import message from '../modules/message'
-// import util from '../modules/util'
+import { Request, Response, NextFunction } from 'express'
+import { Result, ValidationError, validationResult } from 'express-validator'
+import * as CalendarService from '../Services/CalendarService'
+import { CalendarCreateDto } from '../DTOs/Calendar/Request/CalendarCreateDto'
+import { CalendarBaseDto } from '../DTOs/Calendar/CalendarBaseDto'
+import { ScheduleCreateDto } from '../DTOs/Calendar/Request/ScheduleCreateDto'
+import { SchedulingCreateDto } from '../DTOs/Calendar/Request/SchedulingCreateDto'
+import statusCode from '../modules/statusCode'
+import message from '../modules/message'
+import util from '../modules/util'
 
-// // POST
-// const createCalendarEvent = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
-//   const errors: Result<ValidationError> = validationResult(req)
-//   if (!errors.isEmpty()) {
-//     return res
-//       .status(statusCode.BAD_REQUEST)
-//       .send(util.fail(statusCode.BAD_REQUEST, message.BAD_REQUEST, errors.array()))
-//   }
-//   const userId: string = req.body.user._id
-//   const calendarCreateDto: CalendarCreateDto = req.body
-//   const { groupId } = req.params
+// POST
+const createCalendarEvent = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+  const errors: Result<ValidationError> = validationResult(req)
+  if (!errors.isEmpty()) {
+    return res
+      .status(statusCode.BAD_REQUEST)
+      .send(util.fail(statusCode.BAD_REQUEST, message.BAD_REQUEST))
+  }
+  // const userId: string = req.body.user._id
+  const { userId } = req.params
+  const calendarCreateDto: CalendarCreateDto = req.body
+  const { groupId } = req.params
 
-//   try {
-//     const data = await CalendarService.createCalendar(userId, groupId, calendarCreateDto)
-//     res.status(201).json(newCalendarEvent)
-//   } catch (error) {
-//     console.error('Error creating calendar event', error)
-//     res.status(500).json({ error: 'Internal Server Error' })
-//   }
-// }
+  try {
+    const data = await CalendarService.createCalendar(userId, groupId, calendarCreateDto)
+    console.log(data)
+    res.status(201).json(data)
+  } catch (error) {
+    console.error('Error creating calendar event', error)
+    res.status(500).json({ error: 'Internal Server Error' })
+  }
+}
 
 // const createScheduleReadyEvent = async (req: Request, res: Response) => {
 //   try {
@@ -89,24 +91,24 @@
 //   }
 // }
 
-// const showCalendar = async (req: Request, res: Response) => {
-//   try {
-//     const groupId: string = req.params.groupId
-//     const calendarEvents = await CalendarService.showCalendar(groupId)
-//     res.status(200).json(calendarEvents)
-//     console.log(calendarEvents)
-//   } catch (error) {
-//     console.error('Error retrieving calendar events', error)
-//     res.status(500).json({ error: 'Internal Server Error' })
-//   }
-// }
+const showCalendar = async (req: Request, res: Response) => {
+  try {
+    const groupId: string = req.params.groupId
+    const calendarEvents = await CalendarService.showCalendar(groupId)
+    res.status(200).json(calendarEvents)
+    console.log(calendarEvents)
+  } catch (error) {
+    console.error('Error retrieving calendar events', error)
+    res.status(500).json({ error: 'Internal Server Error' })
+  }
+}
 
-// export {
-//   createCalendarEvent,
+export {
+  createCalendarEvent,
 //   createScheduleReadyEvent,
 //   createSchedulingEvent,
 //   updateCalendarEvent,
 //   deleteCalendarEvent,
 //   getThisWeeksDuty,
-//   showCalendar,
-// }
+  showCalendar,
+}
