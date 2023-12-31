@@ -18,7 +18,7 @@ const showBudget = async (
     next: NextFunction
   ): Promise<void | Response> => {
     //const groupId: string = req.params.groupId; 
-    const { groupId } = req.params;
+    const  groupId  = req.params.groupId; //작동 안 하면 이거때문임. { } 이거 고쳤음. params 이거랑 
   
     try {
       const data = await BudgetService.showBudget(groupId);
@@ -45,7 +45,7 @@ const getBudgetSearch = async (
   next: NextFunction
   ): Promise<void | Response> => {
     const groupId: string = req.params.groupId; 
-    const searchKey: string = req.body.searchKey;
+    const searchKey: string = req.params.searchKey;
     
     try {
       const data = await BudgetService.searchBudget(groupId,searchKey);
@@ -92,7 +92,7 @@ post
 
 /*
 delete
-/feed
+/budget
 */
 
 const deleteBudget = async (
@@ -100,7 +100,8 @@ const deleteBudget = async (
   res: Response,
   next: NextFunction
 ): Promise<void | Response> => {
-  const budgetId = req.body.data;
+  const StrbudgetId = req.params.budgetId;
+  const budgetId = parseInt(StrbudgetId);
   try{
     await BudgetService.deleteBudget(budgetId);
     res.status(200).send();
@@ -110,10 +111,10 @@ const deleteBudget = async (
 }
 
 
-// /*
-// updateBudget
-// /budget/:budgetId
-// */
+/*
+updateBudget
+/budget/:budgetId
+*/
 const updateBudget = async (
   req: Request,
   res: Response,
@@ -133,30 +134,59 @@ const updateBudget = async (
 
 
 /*
-updateNewCategory
+createNewSubCategory
 /budget
 */
-// const updateBudgetCategory = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction
-// ): Promise<void | Response> => {
-//   const groupId = req.params.groupId;
-//   const subCategoryName = req.body.data
+const createsubCategory = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void | Response> => {
+  const groupId = req.params.groupId;
+  const subCategoryName = req.body.name;
+  const StrcategoryId = req.params.categoryId;
+  const categoryId = parseInt(StrcategoryId);
   
-//   try{
-//     await BudgetService.updateNewSubCategory(groupId, subCategoryName);
-//     res.status(200).send();
-//   }catch(error){
-//     res.status(500).json({ error: 'Error Updating Budget Content: Controller' });
-//   }
-// }
+  try{
+    await BudgetService.createSubCategory(groupId, categoryId, subCategoryName);
+    res.status(200).send();
+  }catch(error){
+    res.status(500).json({ error: 'Error Updating Budget Content: Controller' });
+  }
+}
+
+
+/*
+showSubCategory
+*/
+
+const showSubCategories = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void | Response> => {
+  const  groupId  = req.params.groupId;
+  const  categoryName  = req.params.categoryName;
+  
+  try {
+    const data = await BudgetService.showSubCategory(groupId, categoryName);
+
+    return res
+      .send(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Error Fetching SubCategory Data: Controller' });
+  }
+};
+
+
+
 
 export{
-  //updateBudgetCategory,
+  createsubCategory,
   updateBudget,
   deleteBudget,
   createBudget,
   getBudgetSearch,
-  showBudget
+  showBudget,
+  showSubCategories
 }

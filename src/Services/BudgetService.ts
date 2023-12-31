@@ -140,6 +140,9 @@ async function changeSubCategIdToName(subCategoryId: number) {
   }
 }
 
+
+
+
 // -------------real service----------------
 // 지출 등록
 const createBudget = async (
@@ -203,7 +206,6 @@ const showBudget = async (groupId: string) => {
         groupId: groupId,
       },
     })
-    //return Budgets;
 
     let BudgetsToShow: BudgetCreateResponseDto[] = [];
 
@@ -303,21 +305,30 @@ const searchBudget = async (groupId: string, searchKey: string) => {
       },
     })
 
-    return searchedBudget;
+    let BudgetsToShow: BudgetCreateResponseDto[] = [];
 
-    // const results = searchedBudget.map((budget) => {
-    //   let userName = getUserNameByUserId(budget.userId);
+    await Promise.all(
+    searchedBudget.map(async (budget) =>{
 
-    //   return {
-    //     name: userName,
-    //     spending: budget.spendings,
-    //     createdAt: budget.createdAt,
-    //     userId: budget.userId,
-    //     category: budget.categoryId,
-    //     subcategory: budget.subCategoryId
-    //   }
-    // })
-    // return results;
+      let resCategory =  await changeCategIdToName(budget.categoryId);
+      let resSubCategory = await changeSubCategIdToName(budget.subCategoryId);
+      let resUserColor =  await findUserColorByUserId(budget.userId);
+      let resUserName =  await getUserNameByUserId(budget.userId);
+
+      BudgetsToShow.push({
+      id: budget.id,
+      spendingName: budget.spendingName,
+      spendings: budget.spendings,
+      category: resCategory,
+      subCategory: resSubCategory,
+      userColor: resUserColor,
+      userName: resUserName,
+      createdAt: budget.createdAt,
+    });
+    }
+    ))
+
+    return BudgetsToShow;
 
   } catch (error) {
   throw new Error('error :: service/budget/searchBudget');
@@ -325,68 +336,52 @@ const searchBudget = async (groupId: string, searchKey: string) => {
 }
 
 
-// 서브카테고리 수정
-const updateSubCategory = async(budgetId: number, subCategory:string)=>{
-  if(!subCategory){
-    throw new Error('no such category found: updateSubCategory');
-  }
-  const subCategoryId = await findSubCategIdByName(subCategory);
-  const newBudget = await prisma.userSpendings.update({
-    where:{
-      id : budgetId,
-    },
-    data:{
-      subCategoryId: subCategoryId,
-    }
-  });
-
-  //return newBudget;
-  const UserName = await getUserNameByUserId(newBudget.userId);
-  const UserColor = await findUserColorByUserId(newBudget.userId);
-  const resCategory = await changeCategIdToName(newBudget.categoryId);
-  const resSubCategory = await changeSubCategIdToName(newBudget.subCategoryId);
-  const budgetToReturn : BudgetCreateResponseDto={
-    userColor: UserColor,
-    userName: UserName,
-    createdAt: newBudget.createdAt,
-    spendings: newBudget.spendings,
-    spendingName: newBudget.spendingName,
-    id: newBudget.id,
-    category: resCategory,
-    subCategory: resSubCategory
-  };
-  return budgetToReturn;
-}
-
-
-/*
 // 서브카테고리 새로 만들기
-const createSubCategory = async(groupId:number, name:string)=>{
+const createSubCategory = async(groupId:string, categoryId:number, name:string)=>{
   const newSubCategory = await prisma.subCategory.create({
     data:{
       name: name,
+      groupId : groupId,
+      categoryId: categoryId
     }
   })
   return newSubCategory;
 }
-*/
 
+//카테고리 보여주기 -> 만들 필요 있나??
 
+//서브카테고리 보여주기 
+const showSubCategory = async(groupId:string, categoryName: string)=>{
+  
+  const categoryId = await findCategIdByName(categoryName);
+  const SubCategories = await prisma.subCategory.findMany({
+    select:{
+      name: true,
+    },
+    where:{
+      groupId : groupId,
+      categoryId: categoryId
+    }
+  });
+
+  return SubCategories;
+}
 
 //정산 파트1: 지출 합산 내역 반환
 const getGroupMemberSpending = async (groupId: string) => {
   const GroupSpending = await prisma.userSpendings.groupBy({
     by: ['groupId'],
+    where:{
+      groupId : groupId,
+      isDone: false
+    },
     _sum: {
       spendings: true,
     },
     _avg: {
       spendings: true,
-    },
-    where: {
-      isDone: false,
-    },
-  }) //그룹 썸 구하기
+    }
+  }) //그룹 썸 구하기 -> groupId 랑 같은거 !! 라고 지정해줘야 할 것 같음. 
 
   for (const group of GroupSpending) {
     const groupId = group.groupId
@@ -509,7 +504,7 @@ const takeFromAdjustments = async(groupId: string)=>{
   return Adjustment;
 }
 //userId 별로 보여줘야 함
-// show Category
+
 
 //adjustment 지우기 -> 정산 완료 눌렀을 때 사용할 것.. 
 const deleteAdjustment = async(groupId: string)=>{
@@ -569,5 +564,42 @@ export {
   sendToAdjustments,
   getAdjustmentsCalc,
   getAdjustments,
-  searchBudget
+  searchBudget,
+  createSubCategory,
+  showSubCategory
 }
+
+
+
+// 서브카테고리 수정
+// const updateSubCategory = async(budgetId: number, subCategory:string)=>{
+//   if(!subCategory){
+//     throw new Error('no such category found: updateSubCategory');
+//   }
+//   const subCategoryId = await findSubCategIdByName(subCategory);
+//   const newBudget = await prisma.userSpendings.update({
+//     where:{
+//       id : budgetId,
+//     },
+//     data:{
+//       subCategoryId: subCategoryId,
+//     }
+//   });
+
+//   //return newBudget;
+//   const UserName = await getUserNameByUserId(newBudget.userId);
+//   const UserColor = await findUserColorByUserId(newBudget.userId);
+//   const resCategory = await changeCategIdToName(newBudget.categoryId);
+//   const resSubCategory = await changeSubCategIdToName(newBudget.subCategoryId);
+//   const budgetToReturn : BudgetCreateResponseDto={
+//     userColor: UserColor,
+//     userName: UserName,
+//     createdAt: newBudget.createdAt,
+//     spendings: newBudget.spendings,
+//     spendingName: newBudget.spendingName,
+//     id: newBudget.id,
+//     category: resCategory,
+//     subCategory: resSubCategory
+//   };
+//   return budgetToReturn;
+// }
