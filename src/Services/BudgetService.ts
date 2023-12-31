@@ -101,7 +101,7 @@ const findUserColorByUserId = async (userId: string) => {
 }
 
 // id를 name으로 반환
-async function changeCategIdToName(categoryId: number) {
+const changeCategIdToName =  async (categoryId: number)=>{
   try {
     const result = await prisma.category.findUnique({
       where: {
@@ -203,24 +203,32 @@ const showBudget = async (groupId: string) => {
         groupId: groupId,
       },
     })
-    return Budgets;
+    //return Budgets;
 
-    // let BudgetsToShow: BudgetCreateResponseDto[] = [];
-    // BudgetsToShow =  Budgets.map((budget)=>{
+    let BudgetsToShow: BudgetCreateResponseDto[] = [];
 
-    //   let resCategory = await changeCategIdToName(budget.categoryId);
-    //   let resSubCategory = await changeSubCategIdToName(budget.subCategoryId);
-    //   let resUserColor = await findUserColorByUserId(budget.userId);
-    //   let resUserName = await getUserNameByUserId(budget.userId);
-  
-    //   spendingName: budget.spendingName,
-    //   spendings: budget.spendings,
-    //   category: resCategory,
-    //   subCategory: resSubCategory,
-    //   userColor: resUserColor,
-    //   userName: resUserName,
-    //   createdAt: budget.createdAt,
-    // })
+    await Promise.all(
+    Budgets.map(async (budget) =>{
+
+      let resCategory =  await changeCategIdToName(budget.categoryId);
+      let resSubCategory = await changeSubCategIdToName(budget.subCategoryId);
+      let resUserColor =  await findUserColorByUserId(budget.userId);
+      let resUserName =  await getUserNameByUserId(budget.userId);
+
+      BudgetsToShow.push({
+      id: budget.id,
+      spendingName: budget.spendingName,
+      spendings: budget.spendings,
+      category: resCategory,
+      subCategory: resSubCategory,
+      userColor: resUserColor,
+      userName: resUserName,
+      createdAt: budget.createdAt,
+    });
+    }
+    ))
+
+    return BudgetsToShow;
 
   } catch(error) {
     console.error('error :: service/budget/showBudget', error)
@@ -240,11 +248,12 @@ const updateBudget = async (budgetId: number, BudgetUpdateRequestDto: BudgetUpda
       data: {
         spendingName : BudgetUpdateRequestDto.spendingName,
         spendings: BudgetUpdateRequestDto.spending,
-        categoryId: BudgetUpdateRequestDto.category,
-        subCategoryId: BudgetUpdateRequestDto.subCategory,
+        categoryId: await findCategIdByName(BudgetUpdateRequestDto.category),
+        subCategoryId: await findSubCategIdByName(BudgetUpdateRequestDto.subCategory),
       },
     })
     //return updatedBudget;
+
     const UserName = await getUserNameByUserId(updatedBudget.userId);
     const UserColor = await findUserColorByUserId(updatedBudget.userId);
     const resCategory = await changeCategIdToName(updatedBudget.categoryId);

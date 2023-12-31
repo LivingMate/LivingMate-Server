@@ -17,7 +17,8 @@ const showBudget = async (
     res: Response,
     next: NextFunction
   ): Promise<void | Response> => {
-    const groupId: string = req.params.groupId; 
+    //const groupId: string = req.params.groupId; 
+    const { groupId } = req.params;
   
     try {
       const data = await BudgetService.showBudget(groupId);
@@ -118,9 +119,9 @@ const updateBudget = async (
   res: Response,
   next: NextFunction
 ): Promise<void | Response> => {
-  const IntbudgetId = req.params.budgetId;
-  const budgetId = parseInt(IntbudgetId);
-  const BudgetUpdateRequestDto = req.body.data
+  const StrbudgetId = req.params.budgetId;
+  const budgetId = parseInt(StrbudgetId);
+  const BudgetUpdateRequestDto = req.body;
   
   try{
     await BudgetService.updateBudget(budgetId, BudgetUpdateRequestDto);
