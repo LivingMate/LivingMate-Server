@@ -60,12 +60,14 @@ const createFeed = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     if (!errors.isEmpty()) {
         throw new Error('Error at Controller: createFeed');
     }
-    const userId = req.body.user._id;
-    const feedCreateDto = req.body;
+    const userId = req.params.userId;
+    const groupId = req.params.groupId;
+    const data = req.body;
+    //const feedCreateDto: FeedCreateRequestDto = req.body
     //const { roomId } = req.params;
     try {
         //const data =
-        yield FeedService.createFeed(feedCreateDto);
+        yield FeedService.createFeed(userId, groupId, data);
         return res.status(200).send('Feed Created!');
         //   util.success(statusCode.CREATED, message.CREATE_EVENT_SUCCESS, data)
         // );
@@ -98,9 +100,9 @@ const updateFeed = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
 });
 exports.updateFeed = updateFeed;
 /*
- delete
- /feeds/:feedId
- */
+  delete
+  /feeds/:feedId
+  */
 const deleteFeed = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
@@ -109,9 +111,7 @@ const deleteFeed = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     const feedId = parseInt(req.params.feedId);
     try {
         yield FeedService.deleteFeed(feedId);
-        return res
-            .status(200)
-            .send('Feed Deleted!');
+        return res.status(200).send('Feed Deleted!');
         //   util.success(statusCode.CREATED, message.CREATE_EVENT_SUCCESS, data)
         // );
     }

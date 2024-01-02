@@ -28,8 +28,6 @@ const express_1 = require("express");
 const FeedController = __importStar(require("../Controllers/FeedController"));
 const FeedRouter = (0, express_1.Router)();
 exports.FeedRouter = FeedRouter;
-FeedRouter.get('/feed/:groupId', FeedController.showFeed);
-FeedRouter.post('/feed', FeedController.createFeed);
-FeedRouter.patch('/feed/:feedId', FeedController.updateFeed);
-FeedRouter.delete('/feed/:feedId', FeedController.deleteFeed);
+// FeedRouter.get('/feed/:groupId',FeedController.showFeed);
+FeedRouter.post('/feed/:groupId', FeedController.createFeed);
 //# sourceMappingURL=FeedRouter.js.map

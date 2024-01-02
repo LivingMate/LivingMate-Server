@@ -7,8 +7,8 @@ const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const express_1 = __importDefault(require("express"));
 const FeedRouter_1 = require("./Routers/FeedRouter");
-//import { CalendarRouter } from './Routers/CalendarRouter';
-//import {BudgetRouter} from './Routers/BudgetRouter';
+const CalendarRouter_1 = require("./Routers/CalendarRouter");
+// import {BudgetRouter} from './Routers/BudgetRouter';
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
@@ -34,8 +34,8 @@ app.get('/', (req, res) => {
 //    }
 //  });
 app.use(FeedRouter_1.FeedRouter);
-//app.use(CalendarRouter);
-//sapp.use(BudgetRouter);
+app.use(CalendarRouter_1.CalendarRouter);
+// app.use(BudgetRouter);
 app.listen(3000, () => {
     console.log('서버가 3000번 포트에서 실행 중');
 });

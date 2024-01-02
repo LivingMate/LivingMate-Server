@@ -32,7 +32,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addUserToGroup = exports.getUserProfile = exports.findUserByIdAndUpdate = exports.findGroupIdByUserId = exports.findUserById = exports.createUser = void 0;
+exports.getUserNameByUserId = exports.addUserToGroup = exports.getUserProfile = exports.findUserByIdAndUpdate = exports.findGroupIdByUserId = exports.findUserById = exports.createUser = void 0;
 const client_1 = require("@prisma/client");
 const GroupService = __importStar(require("./GroupService"));
 const prisma = new client_1.PrismaClient;
@@ -120,6 +120,29 @@ const findUserByIdAndUpdate = (userId, userUpdateRequestDto) => __awaiter(void 0
     return updatedUser;
 });
 exports.findUserByIdAndUpdate = findUserByIdAndUpdate;
+//유저 아이디로 유저 이름 찾기 
+function getUserNameByUserId(userId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const result = yield prisma.user.findUnique({
+                where: {
+                    id: userId,
+                },
+            });
+            if (result) {
+                return result.userName;
+            }
+            else {
+                return "error";
+            }
+        }
+        catch (error) {
+            console.error('Error in getUserNameByUserId:', error);
+            throw error;
+        }
+    });
+}
+exports.getUserNameByUserId = getUserNameByUserId;
 //+ 그룹 참여하는 서비스
 const addUserToGroup = (signupDTO, groupId) => __awaiter(void 0, void 0, void 0, function* () {
     //1. createUser with signupDTO

@@ -13,12 +13,14 @@ exports.updateFeedContent = exports.showFeed = exports.pinFeed = exports.findFee
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient;
 //신규 피드 등록
-const createFeed = (FeedCreateRequestDto) => __awaiter(void 0, void 0, void 0, function* () {
+//FeedBaseResponseDto
+const createFeed = (userId, groupId, feedContent) => __awaiter(void 0, void 0, void 0, function* () {
     const newFeed = yield prisma.feed.create({
         data: {
-            userId: FeedCreateRequestDto.userId,
-            groupId: FeedCreateRequestDto.groupId,
-            text: FeedCreateRequestDto.feedContent,
+            userId: userId,
+            groupId: groupId,
+            //text:FeedCreateRequestDto.feedContent,
+            text: feedContent
         }
     });
     return newFeed;

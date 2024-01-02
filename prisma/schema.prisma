@@ -47,6 +47,7 @@ model Group {
   NotificationSingle NotificationSingle[]
   NotificationMulti  NotificationMulti[]
   Calendar           Calendar[]
+  ExistCalendar      ExistCalendar[]
   Scheduling         Scheduling[]
   UserSpendings      UserSpendings[]
   Calculator         Calculator[]
@@ -102,20 +103,29 @@ model Calendar {
   timeStart DateTime @db.Time()
   timeEnd   DateTime @db.Time()
   memo      String   @db.Text
-  term      Int? //주기를 매일:0 매주:1 매달:2 매년:3 이런식으로 받는건? // 주기가 있다면 서비스로 해결 따로 db 안필요함
+  term      Int //주기를 매일:0 매주:1 매달:2 매년:3 이런식으로 받는건? // 주기가 있다면 서비스로 해결 따로 db 안필요함
+}
+
+model ExistCalendar {
+  id        Int      @id @default(autoincrement())
+  group     Group    @relation(fields: [groupId], references: [id])
+  groupId   String
+  term      Int
+  title     String
+  dateStart DateTime @db.Date
 }
 
 model Scheduling {
-  id           Int            @id @default(autoincrement())
-  group        Group          @relation(fields: [groupId], references: [id])
-  groupId      String
-  title        String
-  createdAt    DateTime       @default(now())
-  Option       Option[]
-  AvailableDay AvailableDay[]
+  id            Int             @id @default(autoincrement())
+  group         Group           @relation(fields: [groupId], references: [id])
+  groupId       String
+  title         String
+  used          Boolean
+  ExistSchedule ExistSchedule[]
+  AvailableDay  AvailableDay[]
 }
 
-model Option {
+model ExistSchedule {
   id           Int            @id @default(autoincrement())
   scheduling   Scheduling     @relation(fields: [schedulingId], references: [id])
   schedulingId Int
@@ -124,13 +134,13 @@ model Option {
 }
 
 model AvailableDay {
-  id           Int        @id @default(autoincrement())
-  user         User       @relation(fields: [userId], references: [id])
-  userId       String
-  scheduling   Scheduling @relation(fields: [schedulingId], references: [id])
-  schedulingId Int
-  option       Option     @relation(fields: [optionId], references: [id])
-  optionId     Int
+  id              Int           @id @default(autoincrement())
+  user            User          @relation(fields: [userId], references: [id])
+  userId          String
+  scheduling      Scheduling    @relation(fields: [schedulingId], references: [id])
+  schedulingId    Int
+  ExistSchedule   ExistSchedule @relation(fields: [existScheduleId], references: [id])
+  existScheduleId Int
 }
 
 model UserSpendings {

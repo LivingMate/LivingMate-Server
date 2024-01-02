@@ -124,7 +124,7 @@ const leaveGroup = (userId, groupId) => __awaiter(void 0, void 0, void 0, functi
                     id: userId,
                 },
                 data: {
-                    groupId: null,
+                    groupId: undefined, // 또는 원하는 값으로 갱신
                 },
             });
         }

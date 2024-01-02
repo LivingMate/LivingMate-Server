@@ -1,3 +1,6 @@
-import { CalendarBaseDto } from '../CalendarBaseDto'
-
-export interface ScheduleCreateDto extends CalendarBaseDto {}
+export interface ScheduleCreateDto {
+  scheduleId: number
+  groupId: string
+  title: string
+  used: boolean
+}
