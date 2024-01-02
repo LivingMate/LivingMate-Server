@@ -5,7 +5,7 @@ import message from './modules/message'
 import express, { Express, Request, Response, NextFunction } from 'express'
 import { FeedRouter } from './Routers/FeedRouter'
 import { CalendarRouter } from './Routers/CalendarRouter';
-// import {BudgetRouter} from './Routers/BudgetRouter';
+import {BudgetRouter} from './Routers/BudgetRouter';
 const app = express()
 
 app.use(express.json())
@@ -38,7 +38,7 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use(FeedRouter);
 app.use(CalendarRouter);
-// app.use(BudgetRouter);
+app.use(BudgetRouter);
 
 app.listen(3000, () => {
   console.log('서버가 3000번 포트에서 실행 중')

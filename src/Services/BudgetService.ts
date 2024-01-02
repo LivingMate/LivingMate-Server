@@ -101,7 +101,7 @@ const findUserColorByUserId = async (userId: string) => {
 }
 
 // id를 name으로 반환
-async function changeCategIdToName(categoryId: number) {
+const changeCategIdToName =  async (categoryId: number)=>{
   try {
     const result = await prisma.category.findUnique({
       where: {
@@ -140,6 +140,9 @@ async function changeSubCategIdToName(subCategoryId: number) {
   }
 }
 
+
+
+
 // -------------real service----------------
 // 지출 등록
 const createBudget = async (
@@ -172,6 +175,7 @@ const createBudget = async (
     const resUserName = await getUserNameByUserId(event.userId);
 
     const createdBudget: BudgetCreateResponseDto = {
+      id: event.id,
       spendingName: event.spendingName,
       spendings: event.spendings,
       category: resCategory,
@@ -193,9 +197,6 @@ const createBudget = async (
 
 
 
-
-
-
 //지출내역 보여주기
 const showBudget = async (groupId: string) => {
   try{
@@ -205,44 +206,73 @@ const showBudget = async (groupId: string) => {
         groupId: groupId,
       },
     })
-    return Budgets
+
+    let BudgetsToShow: BudgetCreateResponseDto[] = [];
+
+    await Promise.all(
+    Budgets.map(async (budget) =>{
+
+      let resCategory =  await changeCategIdToName(budget.categoryId);
+      let resSubCategory = await changeSubCategIdToName(budget.subCategoryId);
+      let resUserColor =  await findUserColorByUserId(budget.userId);
+      let resUserName =  await getUserNameByUserId(budget.userId);
+
+      BudgetsToShow.push({
+      id: budget.id,
+      spendingName: budget.spendingName,
+      spendings: budget.spendings,
+      category: resCategory,
+      subCategory: resSubCategory,
+      userColor: resUserColor,
+      userName: resUserName,
+      createdAt: budget.createdAt,
+    });
+    }
+    ))
+
+    return BudgetsToShow;
+
   } catch(error) {
     console.error('error :: service/budget/showBudget', error)
-    throw error
+    throw error;
   }
 }
 
-// //지출내역 보여주기
-// const showBudget = async (groupId: string) => {
-//   try{
-//     const Budgets = await prisma.userSpendings.findMany({
-//       take: 10,
-//       where: {
-//         groupId: groupId,
-//       },
-//     })
-//     return Budgets
-//   } catch(error) {
-//     console.error('error :: service/budget/showBudget', error)
-//     throw error
-//   }
-// }
 
-/*
+
 //지출내역 수정
-const updateBudgetContent = async (budgetId: number, BudgetUpdateRequestDto: BudgetUpdateRequestDto) => {
+const updateBudget = async (budgetId: number, BudgetUpdateRequestDto: BudgetUpdateRequestDto) => {
   try {
     const updatedBudget = await prisma.userSpendings.update({
       where: {
         id: budgetId,
       },
       data: {
+        spendingName : BudgetUpdateRequestDto.spendingName,
         spendings: BudgetUpdateRequestDto.spending,
-        categoryId: BudgetUpdateRequestDto.category,
-        subCategoryId: BudgetUpdateRequestDto.subCategory,
+        categoryId: await findCategIdByName(BudgetUpdateRequestDto.category),
+        subCategoryId: await findSubCategIdByName(BudgetUpdateRequestDto.subCategory),
       },
     })
-    return updatedBudget;
+    //return updatedBudget;
+
+    const UserName = await getUserNameByUserId(updatedBudget.userId);
+    const UserColor = await findUserColorByUserId(updatedBudget.userId);
+    const resCategory = await changeCategIdToName(updatedBudget.categoryId);
+    const resSubCategory = await changeSubCategIdToName(updatedBudget.subCategoryId);
+
+    const budgetToReturn : BudgetCreateResponseDto={
+    userColor: UserColor,
+    userName: UserName,
+    createdAt: updatedBudget.createdAt,
+    spendings: updatedBudget.spendings,
+    spendingName: updatedBudget.spendingName,
+    id: updatedBudget.id,
+    category: resCategory,
+    subCategory: resSubCategory
+  };
+  return budgetToReturn;
+
   } catch (error) {
     throw new Error('error :: service/budget/updateBudgetContent')
   }
@@ -256,13 +286,12 @@ const deleteBudget = async (BudgetId: number) => {
         id: BudgetId,
       },
     })
-    return 0
+    return 0;
   } catch (error) {
     throw new Error('error :: service/budget/deleteBudget')
   }
 }
-//showBudget에 따라서 + 이런저런 사정에 따라서 파라미터로 받는게 GroupId가 될 수도 있고 DTO가 될 수도 있구나..
-// 그러면 수정 해줘야해...
+
 
 //지출내역 검색
 const searchBudget = async (groupId: string, searchKey: string) => {
@@ -276,73 +305,83 @@ const searchBudget = async (groupId: string, searchKey: string) => {
       },
     })
 
-    const results = searchedBudget.map((budget) => {
-      return {
-        id: budget.id,
-        name: budget.spendingName,
-        spending: budget.spendings,
-        createdAt: budget.createdAt,
-        userId: budget.userId,
-        category: budget.categoryId,
-        subcategory: budget.subCategoryId
-      }
-    })
-    return results
-  } catch (error) {
-  throw new Error('error :: service/budget/searchBudget')
-  }
-}
+    let BudgetsToShow: BudgetCreateResponseDto[] = [];
 
-/*
-// 서브카테고리 수정
-const updateSubCategory = async(budgetId: number, subCategory:string)=>{
-  if(!subCategory){
-    throw new Error('no such category found: updateSubCategory')
-  }
+    await Promise.all(
+    searchedBudget.map(async (budget) =>{
 
-  const newBudget = await prisma.userSpendings.update({
-    where:{
-      id : budgetId,
-    },
-    data:{
-      subCategoryId: subCategory,
+      let resCategory =  await changeCategIdToName(budget.categoryId);
+      let resSubCategory = await changeSubCategIdToName(budget.subCategoryId);
+      let resUserColor =  await findUserColorByUserId(budget.userId);
+      let resUserName =  await getUserNameByUserId(budget.userId);
+
+      BudgetsToShow.push({
+      id: budget.id,
+      spendingName: budget.spendingName,
+      spendings: budget.spendings,
+      category: resCategory,
+      subCategory: resSubCategory,
+      userColor: resUserColor,
+      userName: resUserName,
+      createdAt: budget.createdAt,
+    });
     }
-  })
+    ))
 
-  return newBudget;
+    return BudgetsToShow;
+
+  } catch (error) {
+  throw new Error('error :: service/budget/searchBudget');
+  }
 }
-*/
 
-// 서브카테고리 삭제
 
-/*
 // 서브카테고리 새로 만들기
-const createSubCategory = async(groupId:number, name:string)=>{
+const createSubCategory = async(groupId:string, categoryId:number, name:string)=>{
   const newSubCategory = await prisma.subCategory.create({
     data:{
       name: name,
+      groupId : groupId,
+      categoryId: categoryId
     }
   })
   return newSubCategory;
 }
-*/
 
+//카테고리 보여주기 -> 만들 필요 있나??
 
+//서브카테고리 보여주기 
+const showSubCategory = async(groupId:string, categoryName: string)=>{
+  
+  const categoryId = await findCategIdByName(categoryName);
+  const SubCategories = await prisma.subCategory.findMany({
+    select:{
+      name: true,
+    },
+    where:{
+      groupId : groupId,
+      categoryId: categoryId
+    }
+  });
+
+  return SubCategories;
+}
 
 //정산 파트1: 지출 합산 내역 반환
 const getGroupMemberSpending = async (groupId: string) => {
   const GroupSpending = await prisma.userSpendings.groupBy({
     by: ['groupId'],
+    where:{
+      groupId : groupId,
+      isDone: false
+    },
     _sum: {
       spendings: true,
     },
     _avg: {
       spendings: true,
-    },
-    where: {
-      isDone: false,
-    },
-  }) //그룹 썸 구하기
+    }
+  }) //그룹 썸 구하기 -> groupId 랑 같은거 !! 라고 지정해줘야 할 것 같음. 
 
   for (const group of GroupSpending) {
     const groupId = group.groupId
@@ -413,8 +452,6 @@ const getAdjustmentsCalc = async (groupId: string)=> {
 
   while(!isNaN(Positives[0].userSpending) && !isNaN(Negatives[0].userSpending)){
 
-    //Positives = Positives.filter(obj => obj.userSpending != null);
-    //Negatives = Negatives.filter(obj => obj.userSpending != null);
 
     if(Positives[0].userSpending > Negatives[0].userSpending){
       sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Negatives[0].userSpending);
@@ -452,12 +489,6 @@ const sendToAdjustments = async(groupId: string, fromId:string, toId:string, cha
   })
 
 }
-//근데 여기서 2번 이상 레코드로 적힌 애들 중에 뭐가 진짜 마지막 계산 결과인지를 알아내지? => 두 번 이상 안 적히나?
-// Distinction으로 묶어내고.. 그런데 distinction으로 묶을 기준을 알기 어려움. 무슨 말이냐면.. 어디부터 어디까지가 distinction id 1로 쳐 질건데?
-// 아니면 한 그룹에서 정산을 이어서 여러번 하지 않을 확률이 높다는 걸 가지고 같은 날짜에 이루어진 transaction만 뽑아내는 방법도 있음
-// 이거 괜찮을 것 같아. 그리고 "정산은 하루에 1회만 가능합니다." 라고 못박아두자 
-
-//정산 완료를 누르면 adjustment 지워버리기...
 
 const takeFromAdjustments = async(groupId: string)=>{
   const Adjustment = await prisma.adjustment.findMany({
@@ -473,7 +504,7 @@ const takeFromAdjustments = async(groupId: string)=>{
   return Adjustment;
 }
 //userId 별로 보여줘야 함
-// show Category
+
 
 //adjustment 지우기 -> 정산 완료 눌렀을 때 사용할 것.. 
 const deleteAdjustment = async(groupId: string)=>{
@@ -523,8 +554,8 @@ export {
   changeSubCategIdToName,
   createBudget,
   showBudget,
-  //updateBudgetContent,
-  //deleteBudget,
+  updateBudget,
+  deleteBudget,
   getGroupMemberSpending,
   getDayReturn,
   //updateSubCategory,
@@ -532,5 +563,43 @@ export {
   takeFromAdjustments,
   sendToAdjustments,
   getAdjustmentsCalc,
-  getAdjustments
+  getAdjustments,
+  searchBudget,
+  createSubCategory,
+  showSubCategory
 }
+
+
+
+// 서브카테고리 수정
+// const updateSubCategory = async(budgetId: number, subCategory:string)=>{
+//   if(!subCategory){
+//     throw new Error('no such category found: updateSubCategory');
+//   }
+//   const subCategoryId = await findSubCategIdByName(subCategory);
+//   const newBudget = await prisma.userSpendings.update({
+//     where:{
+//       id : budgetId,
+//     },
+//     data:{
+//       subCategoryId: subCategoryId,
+//     }
+//   });
+
+//   //return newBudget;
+//   const UserName = await getUserNameByUserId(newBudget.userId);
+//   const UserColor = await findUserColorByUserId(newBudget.userId);
+//   const resCategory = await changeCategIdToName(newBudget.categoryId);
+//   const resSubCategory = await changeSubCategIdToName(newBudget.subCategoryId);
+//   const budgetToReturn : BudgetCreateResponseDto={
+//     userColor: UserColor,
+//     userName: UserName,
+//     createdAt: newBudget.createdAt,
+//     spendings: newBudget.spendings,
+//     spendingName: newBudget.spendingName,
+//     id: newBudget.id,
+//     category: resCategory,
+//     subCategory: resSubCategory
+//   };
+//   return budgetToReturn;
+// }
