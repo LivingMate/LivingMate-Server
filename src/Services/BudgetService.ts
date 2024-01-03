@@ -336,7 +336,7 @@ const searchBudget = async (groupId: string, searchKey: string) => {
 }
 
 
-// 서브카테고리 새로 만들기
+// 서브카테고리 새로 만들기 // categoryName-<id
 const createSubCategory = async(groupId:string, categoryId:number, name:string)=>{
   const newSubCategory = await prisma.subCategory.create({
     data:{
@@ -367,7 +367,11 @@ const showSubCategory = async(groupId:string, categoryName: string)=>{
   return SubCategories;
 }
 
-//정산 파트1: 지출 합산 내역 반환
+
+
+
+//정산파트1 최종함수//
+//각 지출액 - 그룹 평균 지출액 값 반환
 const getGroupMemberSpending = async (groupId: string) => {
   const GroupSpending = await prisma.userSpendings.groupBy({
     by: ['groupId'],
@@ -378,31 +382,59 @@ const getGroupMemberSpending = async (groupId: string) => {
     _sum: {
       spendings: true,
     },
-    _avg: {
-      spendings: true,
-    }
-  }) //그룹 썸 구하기 -> groupId 랑 같은거 !! 라고 지정해줘야 할 것 같음. 
+    // having:{
+    //   groupId: groupId
+    // }
+   })
 
-  for (const group of GroupSpending) {
-    const groupId = group.groupId
-    const groupSum = group._sum.spendings
-    const groupAvg = group._avg.spendings
+   for (const group of GroupSpending) {
+    const groupId = group.groupId;
+    const groupSum = group._sum.spendings;
+    if (!groupSum){
+      throw new Error('groupSum Error: Null');
+    }
+    const memberNum = await getMemberNumber(groupId);
+    if(!memberNum){
+      throw new Error('memberNum Error: Null');
+    }
+    const groupAvg = Math.round(groupSum/memberNum);
 
     let groupMemberSpendings: { userId: string; userSpending: number}[] = []
     groupMemberSpendings = await getUserSpending(groupId)
 
     groupMemberSpendings.forEach((member) => {
       if (member.userSpending == null || groupAvg == null) {
-        throw new Error('Null Error: getGroupSpending')
+        throw new Error('Null Error: getGroupMemberSpending')
       }
       member.userSpending -= groupAvg
     })
-    return groupMemberSpendings    //각 지출액 - 그룹 평균 지출액 값 반환함
+    console.log("각 지출액 - 그룹 평균 지출액:", groupMemberSpendings);
+    return groupMemberSpendings    
   }
 }
 
+const getMemberNumber = async (groupId: string)=>{
+  const memberNum = await prisma.user.groupBy({
+    by: ['groupId'],
+    where:{
+      groupId : groupId
+    },
+    _count:{
+      _all: true
+    }
+  })
 
-const getUserSpending = async (groupId: string): Promise<{ userId: string; userSpending: number}[]> => {
+  let memberNumInt;
+  memberNum.forEach((member)=>{
+    memberNumInt = member._count._all;
+  })
+
+  return memberNumInt;
+}
+
+
+//각 유저의 지출액 합 
+const getUserSpending = async (groupId: string): Promise<{ userId: string; userSpending: number}[]>=>{
   const userSpendings = await prisma.userSpendings.groupBy({
     by: ['userId'],
     _sum: {
@@ -431,10 +463,14 @@ const getUserSpending = async (groupId: string): Promise<{ userId: string; userS
 }
 
 
-//정산 파트2 : 누가 누구한테 얼마나 주면 될까요?
+
+
+
+
+//정산파트2//
 const getAdjustmentsCalc = async (groupId: string)=> {
   const GroupMemberSpendingsAfter = await getGroupMemberSpending(groupId);
-  //{userId,userSpending-AvgGroupSpending}[] 모양
+  
 
   if(!GroupMemberSpendingsAfter){
     throw new Error("No Spendings found: getAdjustments")
@@ -449,37 +485,52 @@ const getAdjustmentsCalc = async (groupId: string)=> {
 
   Positives = Positives.sort((a,b)=>b.userSpending - a.userSpending);
   Negatives = Negatives.sort((a,b)=>b.userSpending - a.userSpending); //내림차순 정렬 완료
+  console.log("내림차순 정렬 후 처음pos: ", Positives)
+  console.log("내림차순 정렬 후 처음neg: ",Negatives)
 
-  while(!isNaN(Positives[0].userSpending) && !isNaN(Negatives[0].userSpending)){
+  
+  while(Positives.length != 0 && Negatives.length != 0){
 
-
-    if(Positives[0].userSpending > Negatives[0].userSpending){
-      sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Negatives[0].userSpending);
-      Positives[0].userSpending += Negatives[0].userSpending;
-      Negatives[0].userSpending = NaN; 
+    if((Math.abs(Positives[0].userSpending))<= 10 || Math.abs((Negatives[0].userSpending))<=10){
+      //sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Positives[0].userSpending);
+        Negatives[0].userSpending = NaN;
+        Positives[0].userSpending = NaN;
     }
-
-    else if(Positives[0].userSpending < Negatives[0].userSpending){
-      sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Positives[0].userSpending);
-      Negatives[0].userSpending += Positives[0].userSpending;
-      Positives[0].userSpending = NaN;
-    }
-
     else{
-      sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Positives[0].userSpending);
-      Negatives[0].userSpending = NaN;
-      Positives[0].userSpending = NaN;
-    }
+      if(Math.abs(Positives[0].userSpending) > Math.abs(Negatives[0].userSpending)){
+        sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Math.abs(Negatives[0].userSpending));
+        Positives[0].userSpending += Negatives[0].userSpending;
+        Negatives[0].userSpending = NaN; 
+      }
 
-    Positives = Positives.sort((a,b)=>b.userSpending - a.userSpending);
-    Negatives = Negatives.sort((a,b)=>b.userSpending - a.userSpending); 
+      else if(Math.abs(Positives[0].userSpending) < Math.abs(Negatives[0].userSpending)){
+        sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Positives[0].userSpending);
+        Negatives[0].userSpending += Positives[0].userSpending;
+        Positives[0].userSpending = NaN;
+      }
+
+      // else if(Math.abs(Positives[0].userSpending) == Math.abs(Negatives[0].userSpending)){
+      //   sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Positives[0].userSpending);
+      //   Negatives[0].userSpending = NaN;
+      //   Positives[0].userSpending = NaN;
+      // }
+      Positives = Positives.filter(obj => !isNaN(obj.userSpending));
+      Negatives = Negatives.filter(obj=>!isNaN(obj.userSpending));
+
+      Positives = Positives.sort((a,b)=>b.userSpending - a.userSpending);
+      Negatives = Negatives.sort((a,b)=>b.userSpending - a.userSpending); 
+      
+      console.log("whilepos",Positives)
+      console.log("whileneg", Negatives)
+    }
   }
   return 0;
 }
 
 
 const sendToAdjustments = async(groupId: string, fromId:string, toId:string, change:number)=>{
-  const Adjustment = await prisma.adjustment.create({
+  //const Adjustment = 
+  await prisma.adjustment.create({
     data:{
       groupId: groupId,
       plusUserId: toId,
@@ -489,6 +540,8 @@ const sendToAdjustments = async(groupId: string, fromId:string, toId:string, cha
   })
 
 }
+
+getAdjustmentsCalc('aaaaab');
 
 const takeFromAdjustments = async(groupId: string)=>{
   const Adjustment = await prisma.adjustment.findMany({
@@ -557,13 +610,13 @@ export {
   updateBudget,
   deleteBudget,
   getGroupMemberSpending,
-  getDayReturn,
+  //getDayReturn,
   //updateSubCategory,
   //updateNewSubCategory,
-  takeFromAdjustments,
-  sendToAdjustments,
-  getAdjustmentsCalc,
-  getAdjustments,
+  //takeFromAdjustments,
+  //sendToAdjustments,
+  //getAdjustmentsCalc,
+  //getAdjustments,
   searchBudget,
   createSubCategory,
   showSubCategory
