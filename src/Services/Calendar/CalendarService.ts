@@ -1,4 +1,4 @@
-import { PrismaClient, Scheduling } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 import dayjs from 'dayjs'
 import * as CalendarServiceUtils from './CalendarServiceUtils'
@@ -140,8 +140,8 @@ const createCalendar = async (
         userId: event.userId,
         groupId: event.groupId,
         title: event.title,
-        userColor : resUserColor,
-        userName : resUserName,
+        userColor: resUserColor,
+        userName: resUserName,
         dateStart: dayjs(event.dateStart).format('YYYY-MM-DD'),
         dateEnd: dayjs(event.dateEnd).format('YYYY-MM-DD'),
         timeStart: dayjs(event.timeStart).format('HH:MM:SS'),
@@ -291,7 +291,27 @@ const updateCalendar = async (
       },
     })
 
-    return updatedEvent
+    // return updatedEvent
+
+    const UserName = await UserService.getUserNameByUserId(updatedEvent.userId)
+    const UserColor = await UserService.findUserColorByUserId(updatedEvent.userId)
+
+    const eventToReturn: CalendarUpdateResponseDto = {
+      calendarId: updatedEvent.id,
+      userId: userId,
+      groupId: groupId,
+      title: updatedEvent.title,
+      userColor: UserColor,
+      userName: UserName,
+      dateStart: dayjs(updatedEvent.dateStart).format('YYYY-MM-DD'),
+      dateEnd: dayjs(updatedEvent.dateEnd).format('YYYY-MM-DD'),
+      timeStart: dayjs(updatedEvent.timeStart).format('HH:MM:SS'),
+      timeEnd: dayjs(updatedEvent.timeEnd).format('HH:MM:SS'),
+      term: updatedEvent.term,
+      memo: updatedEvent.memo,
+    }
+
+    return eventToReturn
   } catch (error) {
     console.error('error :: service/calendar/updateCalendar', error)
     throw error
