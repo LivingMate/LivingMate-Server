@@ -1,14 +1,8 @@
 import { PrismaClient, Scheduling } from '@prisma/client'
 const prisma = new PrismaClient()
 import dayjs from 'dayjs'
-import { CalendarCreateDto } from '../../DTOs/Calendar/Request/CalendarCreateDto'
-import { CalendarCreateResponseDto } from '../../DTOs/Calendar/Response/CalendarCreateResponseDto'
-import { ScheduleCreateDto } from '../../DTOs/Calendar/Request/ScheduleCreateDto'
-import { ScheduleCreateResponseDto } from '../../DTOs/Calendar/Response/ScheduleCreateResponseDto'
 import { CalendarUpdateDto } from '../../DTOs/Calendar/Request/CalendarUpdateDto'
 import { CalendarUpdateResponseDto } from '../../DTOs/Calendar/Response/CalendarUpdateResponseDto'
-import { SchedulingCreateDto } from '../../DTOs/Calendar/Request/SchedulingCreateDto'
-import { SchedulingCreateResponseDto } from '../../DTOs/Calendar/Response/SchedulingCreateResponseDto'
 import { differenceInDays, startOfWeek, endOfWeek } from 'date-fns'
 
 const findCalendarEventById = async (eventId: number) => {

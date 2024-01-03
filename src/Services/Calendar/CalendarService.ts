@@ -12,7 +12,6 @@ import { SchedulingCreateDto } from '../../DTOs/Calendar/Request/SchedulingCreat
 import { SchedulingCreateResponseDto } from '../../DTOs/Calendar/Response/SchedulingCreateResponseDto'
 import { findUserById } from '../UserService'
 import { findGroupById, checkForbiddenGroup } from '../GroupService'
-import { differenceInDays, startOfWeek, endOfWeek } from 'date-fns'
 import message from '../../modules/message'
 
 // 주기 생성을 위한 서비스
