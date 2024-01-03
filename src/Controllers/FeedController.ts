@@ -2,8 +2,8 @@ import { NextFunction, Request, Response } from 'express'
 import { validationResult, Result, ValidationError } from 'express-validator'
 import * as FeedService from '../Services/FeedService'
 import { isPostfixUnaryExpression } from 'typescript'
-import { FeedCreateRequestDto } from '../DTOs/Feed/Request/FeedCreateRequestDto'
-import { FeedUpdateRequestDto } from '../DTOs/Feed/Request/FeedUpdateRequestDto'
+import { FeedCreateRequestDto } from '../DTOs/Feed/Request/FeedCreateDto'
+import { FeedUpdateRequestDto } from '../DTOs/Feed/Request/FeedUpdateDto'
 import * as CalendarService from '../Services/Calendar/CalendarService'
 
 /*

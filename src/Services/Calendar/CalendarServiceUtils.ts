@@ -5,6 +5,7 @@ import { CalendarUpdateDto } from '../../DTOs/Calendar/Request/CalendarUpdateDto
 import { CalendarUpdateResponseDto } from '../../DTOs/Calendar/Response/CalendarUpdateResponseDto'
 import { differenceInDays, startOfWeek, endOfWeek } from 'date-fns'
 
+
 const findCalendarEventById = async (eventId: number) => {
   try {
     const event = await prisma.calendar.findUnique({
