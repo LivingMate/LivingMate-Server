@@ -25,25 +25,6 @@ const findFeedEventById = async (eventId: number) => {
     }
   }
 
-  const findUserColorByUserId = async (userId: string) => {
-    try {
-      const data = await prisma.user.findUnique({
-        where: {
-          id: userId,
-        },
-      })
-  
-      if (data) {
-        return data.userColor
-      } else {
-        return 'error'
-      }
-    } catch (error) {
-      console.error('error :: service/feed/findUserColorByUserId', error)
-      throw error
-    }
-  }
-
 // ------- real service -------
 //신규 피드 등록
 const createFeed = async (
@@ -63,7 +44,7 @@ const createFeed = async (
     })
 
     const resUserName = await UserService.getUserNameByUserId(event.userId);
-    const resUserColor = await findUserColorByUserId(event.userId);
+    const resUserColor = await UserService.findUserColorByUserId(event.userId);
 
     const data: FeedCreateResponseDto = {
       feedId: event.id,
@@ -82,18 +63,6 @@ const createFeed = async (
   }
 }
 
-//피드 보여주기 : 객체 타입의 배열로 반환됨! 우선 위의 10개만 반환되게 했음.  //
-const showFeed = async (GroupId: string) => {
-  const Feeds = await prisma.feed.findMany({
-    where: {
-      groupId: GroupId,
-    },
-    orderBy: {
-      id: 'desc',
-    },
-  })
-  return Feeds
-}
 
 //피드내용 수정
 const updateFeedContent = async (
@@ -161,7 +130,19 @@ const deleteFeed = async (FeedId: number) => {
   }
 }
 
-//공동일정 조율
+
+//피드 보여주기 : 객체 타입의 배열로 반환됨! 우선 위의 10개만 반환되게 했음.  //
+const showFeed = async (GroupId: string) => {
+    const Feeds = await prisma.feed.findMany({
+      where: {
+        groupId: GroupId,
+      },
+      orderBy: {
+        id: 'desc',
+      },
+    })
+    return Feeds
+  }
 
 //피드 찾기
 const findFeedByFeedId = async (FeedId: number) => {
