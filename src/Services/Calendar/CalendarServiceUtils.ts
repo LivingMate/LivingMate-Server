@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import { CalendarUpdateDto } from '../../DTOs/Calendar/Request/CalendarUpdateDto'
 import { CalendarUpdateResponseDto } from '../../DTOs/Calendar/Response/CalendarUpdateResponseDto'
 import { differenceInDays, startOfWeek, endOfWeek } from 'date-fns'
-
+import * as UserService from '../UserService'
 
 const findCalendarEventById = async (eventId: number) => {
   try {
@@ -91,11 +91,16 @@ const updateRepeatCalendar = async (
         },
       })
 
+      const resUserColor = await UserService.findUserColorByUserId(event.userId)
+      const resUserName = await UserService.getUserNameByUserId(event.userId)
+
       const data: CalendarUpdateResponseDto = {
         calendarId: event.id,
         userId: event.userId,
         groupId: event.groupId,
         title: event.title,
+        userColor : resUserColor,
+        userName : resUserName,
         dateStart: dayjs(event.dateStart).format('YYYY-MM-DD'),
         dateEnd: dayjs(event.dateEnd).format('YYYY-MM-DD'),
         timeStart: dayjs(event.timeStart).format('HH:MM:SS'),

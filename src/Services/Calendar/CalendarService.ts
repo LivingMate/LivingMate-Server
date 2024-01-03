@@ -10,8 +10,8 @@ import { CalendarUpdateDto } from '../../DTOs/Calendar/Request/CalendarUpdateDto
 import { CalendarUpdateResponseDto } from '../../DTOs/Calendar/Response/CalendarUpdateResponseDto'
 import { SchedulingCreateDto } from '../../DTOs/Calendar/Request/SchedulingCreateDto'
 import { SchedulingCreateResponseDto } from '../../DTOs/Calendar/Response/SchedulingCreateResponseDto'
-import { findUserById } from '../UserService'
-import { findGroupById, checkForbiddenGroup } from '../GroupService'
+import * as UserService from '../UserService'
+import * as GroupService from '../GroupService'
 import message from '../../modules/message'
 
 // 주기 생성을 위한 서비스
@@ -42,11 +42,16 @@ const createRepeatCalendar = async (
         },
       })
 
+      const resUserColor = await UserService.findUserColorByUserId(event.userId)
+      const resUserName = await UserService.getUserNameByUserId(event.userId)
+
       const data: CalendarCreateResponseDto = {
         calendarId: event.id,
         userId: event.userId,
         groupId: event.groupId,
         title: event.title,
+        userColor: resUserColor,
+        userName: resUserName,
         dateStart: dayjs(event.dateStart).format('YYYY-MM-DD'),
         dateEnd: dayjs(event.dateEnd).format('YYYY-MM-DD'),
         timeStart: dayjs(event.timeStart).format('HH:MM:SS'),
@@ -93,9 +98,9 @@ const createCalendar = async (
   calendarCreateDto: CalendarCreateDto,
 ): Promise<CalendarCreateResponseDto[]> => {
   try {
-    const user = await findUserById(userId)
-    const group = await findGroupById(groupId)
-    await checkForbiddenGroup(user.groupId, groupId)
+    const user = await UserService.findUserById(userId)
+    const group = await GroupService.findGroupById(groupId)
+    await GroupService.checkForbiddenGroup(user.groupId, groupId)
 
     let createdEvents: CalendarCreateResponseDto[] = []
 
@@ -127,11 +132,16 @@ const createCalendar = async (
         },
       })
 
+      const resUserColor = await UserService.findUserColorByUserId(event.userId)
+      const resUserName = await UserService.getUserNameByUserId(event.userId)
+
       const data: CalendarCreateResponseDto = {
         calendarId: event.id,
         userId: event.userId,
         groupId: event.groupId,
         title: event.title,
+        userColor : resUserColor,
+        userName : resUserName,
         dateStart: dayjs(event.dateStart).format('YYYY-MM-DD'),
         dateEnd: dayjs(event.dateEnd).format('YYYY-MM-DD'),
         timeStart: dayjs(event.timeStart).format('HH:MM:SS'),
@@ -157,7 +167,7 @@ const createSchedule = async (
   scheduleCreateDto: ScheduleCreateDto,
 ): Promise<ScheduleCreateResponseDto> => {
   try {
-    const group = await findGroupById(groupId)
+    const group = await GroupService.findGroupById(groupId)
     // await checkExistSchedule(scheduleCreateDto.scheduleId)
     // 존재하는 스케줄인지 확인하려는거였는데 에러 발생 -> 수정 필요
 
@@ -218,8 +228,8 @@ const updateCalendar = async (
   calendarUpdateDto: CalendarUpdateDto,
 ) => {
   try {
-    const user = await findUserById(userId)
-    const group = await findGroupById(groupId)
+    const user = await UserService.findUserById(userId)
+    const group = await GroupService.findGroupById(groupId)
     const existingEvent = await CalendarServiceUtils.findCalendarEventById(eventId)
     if (!existingEvent) {
       throw new Error(message.NOT_FOUND_CAL)
@@ -289,9 +299,9 @@ const updateCalendar = async (
 }
 
 // 일정 삭제
-const deleteCalendar = async (userId:string, groupId: string, eventId: number) => {
+const deleteCalendar = async (userId: string, groupId: string, eventId: number) => {
   try {
-    const group = await findGroupById(groupId)
+    const group = await GroupService.findGroupById(groupId)
     const existingEvent = await CalendarServiceUtils.findCalendarEventById(eventId)
     if (!existingEvent) {
       throw new Error(message.NOT_FOUND_CAL)

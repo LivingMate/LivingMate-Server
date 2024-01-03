@@ -2,20 +2,9 @@ import { Group, PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 import { SignupDto } from '../DTOs/Auth/Requests/SignupDto'
 import { GroupResponseDto } from '../DTOs/Group/Responses/GroupResponseDto'
+import * as UserService from './UserService'
 import { group } from 'console'
 
-// userId로 user 찾기
-const findUserById = async (userId: string) => {
-  const user = await prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
-  })
-  if (!user) {
-    throw new Error('No user found with the given userId')
-  }
-  return user
-}
 
 // groupId로 group찾기
 const findGroupById = async (groupId: string) => {
@@ -58,7 +47,7 @@ const checkJoinedGroupId = async (groupId: string) => {
 // createGroup
 const createGroup = async (userId: string): Promise<GroupResponseDto> => {
   try {
-    const user = await findUserById(userId)
+    const user = await UserService.findUserById(userId)
 
     await checkJoinedGroupId(user?.groupId || '')
 
@@ -222,7 +211,6 @@ const getGroup = async (userId: string): Promise<string | null> => {
 
 
 export {
-  findUserById,
   findGroupById,
   checkForbiddenGroup,
   checkJoinedGroupId,
