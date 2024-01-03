@@ -491,7 +491,7 @@ const getAdjustmentsCalc = async (groupId: string)=> {
   
   while(Positives.length != 0 && Negatives.length != 0){
 
-    if((Math.abs(Positives[0].userSpending))<= 10 || Math.abs((Negatives[0].userSpending))<=10){
+    if((Math.abs(Positives[0].userSpending))<= 100 || Math.abs((Negatives[0].userSpending))<=100){
       //sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Positives[0].userSpending);
         Negatives[0].userSpending = NaN;
         Positives[0].userSpending = NaN;
@@ -509,11 +509,11 @@ const getAdjustmentsCalc = async (groupId: string)=> {
         Positives[0].userSpending = NaN;
       }
 
-      // else if(Math.abs(Positives[0].userSpending) == Math.abs(Negatives[0].userSpending)){
-      //   sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Positives[0].userSpending);
-      //   Negatives[0].userSpending = NaN;
-      //   Positives[0].userSpending = NaN;
-      // }
+      else if(Math.abs(Positives[0].userSpending) == Math.abs(Negatives[0].userSpending)){
+        sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Positives[0].userSpending);
+        Negatives[0].userSpending = NaN;
+        Positives[0].userSpending = NaN;
+      }
       Positives = Positives.filter(obj => !isNaN(obj.userSpending));
       Negatives = Negatives.filter(obj=>!isNaN(obj.userSpending));
 
