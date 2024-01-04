@@ -46,6 +46,18 @@ const getBudgetSearch = async (req: Request, res: Response, next: NextFunction):
 // get
 // 정산
 // */
+const getFinalAdjustment = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+  const groupId: string = req.params.groupId
+  
+  try {
+    const data = await BudgetService.finalAdjustment(groupId);
+
+    return res.send(data)
+  } catch (error) {
+    res.status(500).json({ error: 'Error getting FinalAdjustment: Controller' })
+  }
+}
+
 
 /*
 post
@@ -133,4 +145,4 @@ const showSubCategories = async (req: Request, res: Response, next: NextFunction
   }
 }
 
-export { createsubCategory, updateBudget, deleteBudget, createBudget, getBudgetSearch, showBudget, showSubCategories }
+export { createsubCategory, updateBudget, deleteBudget, createBudget, getBudgetSearch, showBudget, showSubCategories, getFinalAdjustment }

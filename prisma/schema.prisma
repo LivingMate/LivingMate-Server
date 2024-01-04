@@ -158,7 +158,7 @@ model UserSpendings {
   category      Category    @relation(fields: [categoryId], references: [id])
   categoryId    Int
   subCategory   SubCategory @relation(fields: [subCategoryId], references: [id])
-  subCategoryId Int
+  subCategoryId Int         
   createdAt     DateTime    @default(now())
   spendingName  String
   isDone        Boolean     @default(false)
