@@ -256,7 +256,7 @@ const getGroupMemberSpending = async (groupId: string) => {
       }
       member.userSpending -= groupAvg
     })
-    console.log('각 지출액 - 그룹 평균 지출액:', groupMemberSpendings)
+    //console.log('각 지출액 - 그룹 평균 지출액:', groupMemberSpendings)
     return groupMemberSpendings
   }
 }
@@ -326,8 +326,8 @@ const getAdjustmentsCalc = async (groupId: string) => {
 
   Positives = Positives.sort((a, b) => b.userSpending - a.userSpending)
   Negatives = Negatives.sort((a, b) => b.userSpending - a.userSpending) //내림차순 정렬 완료
-  console.log('내림차순 정렬 후 처음pos: ', Positives)
-  console.log('내림차순 정렬 후 처음neg: ', Negatives)
+  // console.log('내림차순 정렬 후 처음pos: ', Positives)
+  // console.log('내림차순 정렬 후 처음neg: ', Negatives)
 
   while (Positives.length != 0 && Negatives.length != 0) {
     if (Math.abs(Positives[0].userSpending) <= 10 || Math.abs(Negatives[0].userSpending) <= 10) {
@@ -339,6 +339,7 @@ const getAdjustmentsCalc = async (groupId: string) => {
         sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Math.abs(Negatives[0].userSpending))
         Positives[0].userSpending += Negatives[0].userSpending
         Negatives[0].userSpending = NaN
+
       } else if (Math.abs(Positives[0].userSpending) < Math.abs(Negatives[0].userSpending)) {
         sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Positives[0].userSpending)
         Negatives[0].userSpending += Positives[0].userSpending
@@ -356,8 +357,8 @@ const getAdjustmentsCalc = async (groupId: string) => {
       Positives = Positives.sort((a, b) => b.userSpending - a.userSpending)
       Negatives = Negatives.sort((a, b) => b.userSpending - a.userSpending)
 
-      console.log('whilepos', Positives)
-      console.log('whileneg', Negatives)
+      // console.log('whilepos', Positives)
+      // console.log('whileneg', Negatives)
     }
   }
   return 0
@@ -375,8 +376,6 @@ const sendToAdjustments = async (groupId: string, fromId: string, toId: string, 
   })
 }
 
-getAdjustmentsCalc('aaaaab')
-
 const takeFromAdjustments = async (groupId: string) => {
   const Adjustment = await prisma.adjustment.findMany({
     select: {
@@ -388,19 +387,43 @@ const takeFromAdjustments = async (groupId: string) => {
       groupId: groupId,
     },
   })
-  return Adjustment
-}
-//userId 별로 보여줘야 함
+  //return Adjustment
 
-//adjustment 지우기 -> 정산 완료 눌렀을 때 사용할 것..
-const deleteAdjustment = async (groupId: string) => {
-  const AdjustmentDeletion = await prisma.adjustment.deleteMany({
-    where: {
-      groupId: groupId,
-    },
-  })
-  return 0
+  const AdjustmentToReturn: {plusUserName:string; plusUserColor:string; minusUserName:string; minusUserColor:string; change:number }[] =[];
+
+  await Promise.all(
+
+    
+    Adjustment.map(async (record) => {
+
+      if(!record.plusUserId || !record.minusUserId){
+            throw new Error('Null Error: Adjustment to Return')
+      }
+
+      let plusUserName = await UserService.getUserNameByUserId(record.plusUserId)
+      let plusUserColor = await UserService.findUserColorByUserId(record.plusUserId)
+      let minusUserName = await UserService.getUserNameByUserId(record.minusUserId)
+      let minusUserColor = await UserService.findUserColorByUserId(record.plusUserId)
+      let change = record.change
+
+      AdjustmentToReturn.push({
+        plusUserName, plusUserColor,minusUserName,minusUserColor,change
+      })
+    }),
+  )
+  return AdjustmentToReturn;
 }
+
+
+//adjustment 지우기 -> 정산 완료 눌렀을 때 사용할 것..-> isDone을 주자.. 
+// const deleteAdjustment = async (groupId: string) => {
+//   await prisma.adjustment.deleteMany({
+//     where: {
+//       groupId: groupId,
+//     },
+//   })
+//   return 0
+// }
 
 //정산 마이너 기능 (날짜 반환)
 const getDayReturn = async (groupId: string) => {
@@ -415,16 +438,43 @@ const getDayReturn = async (groupId: string) => {
   if (!lastday) {
     throw new Error('Error in retrieving date: dayreturn')
   }
-
-  return lastday
+  return lastday.createdAt;
+}
+const isDone = async (groupId: string) =>{
+  await prisma.userSpendings.updateMany({
+    where:{
+      groupId : groupId,
+      isDone : false
+    },
+    data:{
+      isDone: true
+    }
+})
 }
 
 const getAdjustments = async (groupId: string) => {
   const AdjustedResult = await takeFromAdjustments(groupId)
   const LastCalculatedDate = await getDayReturn(groupId)
 
+  await isDone(groupId);
+
   return { LastCalculatedDate, AdjustedResult }
 }
+
+
+
+
+
+const finalAdjustment = async(groupId: string) =>{
+  let final1 = await getAdjustmentsCalc(groupId)
+  let final = await getAdjustments(groupId);
+  
+  console.log(final1, final)
+  
+}
+//finalAdjustment('aaaaab')
+
+
 
 export {
   createBudget,
@@ -442,6 +492,7 @@ export {
   searchBudget,
   createSubCategory,
   showSubCategory,
+  finalAdjustment
 }
 
 // 서브카테고리 수정
