@@ -64,6 +64,7 @@ const checkExistSchedule = async (eventId: number) => {
   }
 }
 
+// 반복 일정 업뎃
 const updateRepeatCalendar = async (
   userId: string,
   groupId: string,

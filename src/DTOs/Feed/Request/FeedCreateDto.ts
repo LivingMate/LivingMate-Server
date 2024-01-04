@@ -3,6 +3,5 @@ export interface FeedCreateDto{
     userId : string,
     groupId : string,
     text : string,
-    date : Date,
-    pin : boolean,
+    date : Date
 }

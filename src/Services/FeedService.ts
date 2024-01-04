@@ -7,23 +7,22 @@ import { FeedUpdateResponseDto } from '../DTOs/Feed/Response/FeedUpdateResponseD
 import * as UserService from './UserService'
 import message from '../modules/message'
 
-
 // -------utils--------
 // 존재하는 feedId인지 찾기
 const findFeedEventById = async (eventId: number) => {
-    try {
-      const event = await prisma.feed.findUnique({
-        where: {
-          id: eventId,
-        },
-      })
-  
-      return event
-    } catch (error) {
-      console.error('error :: service/feed/feedService/findFeedEventById', error)
-      throw error
-    }
+  try {
+    const event = await prisma.feed.findUnique({
+      where: {
+        id: eventId,
+      },
+    })
+
+    return event
+  } catch (error) {
+    console.error('error :: service/feed/feedService/findFeedEventById', error)
+    throw error
   }
+}
 
 // ------- real service -------
 //신규 피드 등록
@@ -39,12 +38,11 @@ const createFeed = async (
         groupId: groupId,
         text: feedCreateDto.text,
         createdAt: feedCreateDto.date,
-        pin: feedCreateDto.pin,
       },
     })
 
-    const resUserName = await UserService.getUserNameByUserId(event.userId);
-    const resUserColor = await UserService.findUserColorByUserId(event.userId);
+    const resUserName = await UserService.getUserNameByUserId(event.userId)
+    const resUserColor = await UserService.findUserColorByUserId(event.userId)
 
     const data: FeedCreateResponseDto = {
       feedId: event.id,
@@ -54,7 +52,6 @@ const createFeed = async (
       groupId: event.groupId,
       text: event.text,
       date: event.createdAt,
-      pin: event.pin,
     }
     return data
   } catch (error) {
@@ -63,13 +60,8 @@ const createFeed = async (
   }
 }
 
-
 //피드내용 수정
-const updateFeedContent = async (
-    userId: string, 
-    groupId: string, 
-    eventId: number,
-    feedUpdateDto: FeedUpdateDto) => {
+const updateFeedContent = async (userId: string, groupId: string, eventId: number, feedUpdateDto: FeedUpdateDto) => {
   try {
     const existingEvent = await findFeedEventById(eventId)
     if (!existingEvent) {
@@ -85,11 +77,22 @@ const updateFeedContent = async (
         groupId: groupId,
         text: feedUpdateDto.text,
         createdAt: feedUpdateDto.date,
-        pin: feedUpdateDto.pin,
       },
     })
 
-    return updatedEvent
+    const resUserName = await UserService.getUserNameByUserId(updatedEvent.userId)
+    const resUserColor = await UserService.findUserColorByUserId(updatedEvent.userId)
+
+    const budgetToReturn: FeedUpdateResponseDto = {
+      feedId: updatedEvent.id,
+      userId: userId,
+      userName: resUserName,
+      userColor: resUserColor,
+      groupId: groupId,
+      text: updatedEvent.text,
+      date: updatedEvent.createdAt,
+    }
+    return budgetToReturn
   } catch (error) {
     console.error('error :: service/calendar/updateCalendar', error)
     throw error
@@ -130,19 +133,18 @@ const deleteFeed = async (FeedId: number) => {
   }
 }
 
-
 //피드 보여주기 : 객체 타입의 배열로 반환됨! 우선 위의 10개만 반환되게 했음.  //
 const showFeed = async (GroupId: string) => {
-    const Feeds = await prisma.feed.findMany({
-      where: {
-        groupId: GroupId,
-      },
-      orderBy: {
-        id: 'desc',
-      },
-    })
-    return Feeds
-  }
+  const Feeds = await prisma.feed.findMany({
+    where: {
+      groupId: GroupId,
+    },
+    orderBy: {
+      id: 'desc',
+    },
+  })
+  return Feeds
+}
 
 //피드 찾기
 const findFeedByFeedId = async (FeedId: number) => {
