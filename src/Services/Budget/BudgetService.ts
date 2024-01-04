@@ -375,7 +375,7 @@ const sendToAdjustments = async (groupId: string, fromId: string, toId: string, 
   })
 }
 
-getAdjustmentsCalc('aaaaab')
+
 
 const takeFromAdjustments = async (groupId: string) => {
   const Adjustment = await prisma.adjustment.findMany({
@@ -438,7 +438,7 @@ export {
   //takeFromAdjustments,
   //sendToAdjustments,
   //getAdjustmentsCalc,
-  //getAdjustments,
+  getAdjustments,
   searchBudget,
   createSubCategory,
   showSubCategory,

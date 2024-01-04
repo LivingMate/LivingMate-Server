@@ -24,8 +24,8 @@ const createRepeatCalendar = async (
   try {
     const createdEvents: CalendarCreateResponseDto[] = []
 
-    const startDate = new Date(dayjs(calendarCreateDto.dateStart).format('YYYY-MM-DD'))
-    const endDate = new Date(dayjs(calendarCreateDto.dateEnd).format('YYYY-MM-DD'))
+    const startDate = new Date(dayjs(calendarCreateDto.dateStart).format('YYYY-MM-DD HH:mm:ss'))
+    const endDate = new Date(dayjs(calendarCreateDto.dateEnd).format('YYYY-MM-DD HH:mm:ss'))
 
     for (let i = 0; i < recurrenceCount; i++) {
       const event = await prisma.calendar.create({
@@ -35,8 +35,6 @@ const createRepeatCalendar = async (
           title: calendarCreateDto.title,
           dateStart: new Date(startDate),
           dateEnd: new Date(endDate),
-          timeStart: new Date(dayjs(calendarCreateDto.timeStart).format('YYYY-MM-DD')),
-          timeEnd: new Date(dayjs(calendarCreateDto.timeEnd).format('YYYY-MM-DD')),
           term: calendarCreateDto.term,
           memo: calendarCreateDto.memo || '',
         },
@@ -52,10 +50,8 @@ const createRepeatCalendar = async (
         title: event.title,
         userColor: resUserColor,
         userName: resUserName,
-        dateStart: dayjs(event.dateStart).format('YYYY-MM-DD'),
-        dateEnd: dayjs(event.dateEnd).format('YYYY-MM-DD'),
-        timeStart: dayjs(event.timeStart).format('HH:MM:SS'),
-        timeEnd: dayjs(event.timeEnd).format('HH:MM:SS'),
+        dateStart: dayjs(event.dateStart).format('YYYY-MM-DD HH:mm:ss'),
+        dateEnd: dayjs(event.dateEnd).format('YYYY-MM-DD HH:mm:ss'),
         term: event.term,
         memo: event.memo,
       }
@@ -91,6 +87,7 @@ const createRepeatCalendar = async (
   }
 }
 
+
 // 일정등록하는 부분(바로등록용)
 const createCalendar = async (
   userId: string,
@@ -123,10 +120,8 @@ const createCalendar = async (
           userId: userId,
           groupId: groupId,
           title: calendarCreateDto.title,
-          dateStart: new Date(dayjs(calendarCreateDto.dateStart).format('YYYY-MM-DD')),
-          dateEnd: new Date(dayjs(calendarCreateDto.dateEnd).format('YYYY-MM-DD')),
-          timeStart: new Date(dayjs(calendarCreateDto.timeStart).format('YYYY-MM-DD')),
-          timeEnd: new Date(dayjs(calendarCreateDto.timeEnd).format('YYYY-MM-DD')),
+          dateStart: new Date(dayjs(calendarCreateDto.dateStart).format('YYYY-MM-DD HH:mm:ss')),
+          dateEnd: new Date(dayjs(calendarCreateDto.dateEnd).format('YYYY-MM-DD HH:mm:ss')),
           term: calendarCreateDto.term,
           memo: calendarCreateDto.memo || '',
         },
@@ -142,10 +137,8 @@ const createCalendar = async (
         title: event.title,
         userColor: resUserColor,
         userName: resUserName,
-        dateStart: dayjs(event.dateStart).format('YYYY-MM-DD'),
-        dateEnd: dayjs(event.dateEnd).format('YYYY-MM-DD'),
-        timeStart: dayjs(event.timeStart).format('HH:MM:SS'),
-        timeEnd: dayjs(event.timeEnd).format('HH:MM:SS'),
+        dateStart: dayjs(event.dateStart).format('YYYY-MM-DD HH:mm:ss'),
+        dateEnd: dayjs(event.dateEnd).format('YYYY-MM-DD HH:mm:ss'),
         term: event.term,
         memo: event.memo,
       }
@@ -168,14 +161,12 @@ const createSchedule = async (
 ): Promise<ScheduleCreateResponseDto> => {
   try {
     const group = await GroupService.findGroupById(groupId)
-    // await checkExistSchedule(scheduleCreateDto.scheduleId)
-    // 존재하는 스케줄인지 확인하려는거였는데 에러 발생 -> 수정 필요
 
-    const event = await prisma.scheduling.create({
+    const event = await prisma.schedule.create({
       data: {
         groupId: groupId,
         title: scheduleCreateDto.title,
-        used: scheduleCreateDto.used,
+        used: false,
       },
     })
 
@@ -183,7 +174,7 @@ const createSchedule = async (
       scheduleId: event.id,
       groupId: event.groupId,
       title: event.title,
-      used: event.used,
+      used: false,
     }
 
     return data
@@ -195,13 +186,45 @@ const createSchedule = async (
 
 // 일정 조율 등록2
 // 자기 가능한 날짜 시간 선택쓰
-// const createScheduling = async(
+// const createBossScheduling = async(
 //   userId: string,
 //   groupId: string,
-//   schedulingId: number,
-//   SchedulingCreateDto : SchedulingCreateDto
+//   scheduleId: number,
+//   schedulingCreateDto : SchedulingCreateDto
 // ) : Promise<SchedulingCreateResponseDto> => {
+//   try {
+//     const group = await GroupService.findGroupById(groupId)
 
+//     const existSchedule = await prisma.existSchedule.create({
+//       data: {
+//         groupId: groupId,
+//         scheduleId: scheduleId,
+//         optionDate: schedulingCreateDto.date,
+//         optionTime: schedulingCreateDto.time
+//       },
+//     })
+
+//     const availabelDay = await prisma.availableDay.create({
+//       data: {
+//         userId: userId,
+//         scheduleId: scheduleId,
+//         existScheduleId: existSchedule.id,
+        
+//       }
+//     })
+
+//     // const data: ScheduleCreateResponseDto = {
+//     //   scheduleId: event.id,
+//     //   groupId: event.groupId,
+//     //   title: event.title,
+//     //   used: false,
+//     // }
+
+//     return data
+//   } catch (error) {
+//     console.error('error :: service/calendar/createSchedule', error)
+//     throw error
+//   }
 // }
 
 // 일정 보여주기
@@ -282,10 +305,8 @@ const updateCalendar = async (
       },
       data: {
         title: calendarUpdateDto.title,
-        dateStart: new Date(dayjs(calendarUpdateDto.dateStart).format('YYYY-MM-DD')),
-        dateEnd: new Date(dayjs(calendarUpdateDto.dateEnd).format('YYYY-MM-DD')),
-        timeStart: new Date(dayjs(calendarUpdateDto.timeStart).format('YYYY-MM-DD')),
-        timeEnd: new Date(dayjs(calendarUpdateDto.timeEnd).format('YYYY-MM-DD')),
+        dateStart: new Date(dayjs(calendarUpdateDto.dateStart).format('YYYY-MM-DD HH:mm:ss')),
+        dateEnd: new Date(dayjs(calendarUpdateDto.dateEnd).format('YYYY-MM-DD HH:mm:ss')),
         term: calendarUpdateDto.term,
         memo: calendarUpdateDto.memo,
       },
@@ -303,10 +324,8 @@ const updateCalendar = async (
       title: updatedEvent.title,
       userColor: UserColor,
       userName: UserName,
-      dateStart: dayjs(updatedEvent.dateStart).format('YYYY-MM-DD'),
-      dateEnd: dayjs(updatedEvent.dateEnd).format('YYYY-MM-DD'),
-      timeStart: dayjs(updatedEvent.timeStart).format('HH:MM:SS'),
-      timeEnd: dayjs(updatedEvent.timeEnd).format('HH:MM:SS'),
+      dateStart: dayjs(updatedEvent.dateStart).format('YYYY-MM-DD HH:mm:ss'),
+      dateEnd: dayjs(updatedEvent.dateEnd).format('YYYY-MM-DD HH:mm:ss'),
       term: updatedEvent.term,
       memo: updatedEvent.memo,
     }
@@ -379,7 +398,7 @@ export {
   createCalendar,
   createRepeatCalendar,
   createSchedule,
-  // createScheduling,
+  // createBossScheduling,
   showCalendar,
   updateCalendar,
   deleteCalendar,

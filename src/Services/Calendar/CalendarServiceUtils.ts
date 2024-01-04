@@ -1,10 +1,11 @@
-import { PrismaClient, Scheduling } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 import dayjs from 'dayjs'
 import { CalendarUpdateDto } from '../../DTOs/Calendar/Request/CalendarUpdateDto'
 import { CalendarUpdateResponseDto } from '../../DTOs/Calendar/Response/CalendarUpdateResponseDto'
 import { differenceInDays, startOfWeek, endOfWeek } from 'date-fns'
 import * as UserService from '../UserService'
+import { CalendarCreateDto } from '../../DTOs/Calendar/Request/CalendarCreateDto'
 
 const findCalendarEventById = async (eventId: number) => {
   try {
@@ -50,7 +51,7 @@ const makeCalendarEventExist = async (eventId: number) => {
 // 스케줄이 존재하는지 확인
 const checkExistSchedule = async (eventId: number) => {
   try {
-    const event = await prisma.scheduling.findUnique({
+    const event = await prisma.schedule.findUnique({
       where: {
         id: eventId,
       },
@@ -74,8 +75,8 @@ const updateRepeatCalendar = async (
   try {
     const createdEvents: CalendarUpdateResponseDto[] = []
 
-    const startDate = new Date(dayjs(calendarUpdateDto.dateStart).format('YYYY-MM-DD'))
-    const endDate = new Date(dayjs(calendarUpdateDto.dateEnd).format('YYYY-MM-DD'))
+    const startDate = new Date(dayjs(calendarUpdateDto.dateStart).format('YYYY-MM-DD HH:mm:ss'))
+    const endDate = new Date(dayjs(calendarUpdateDto.dateEnd).format('YYYY-MM-DD HH:mm:ss'))
 
     for (let i = 0; i < recurrenceCount; i++) {
       const event = await prisma.calendar.create({
@@ -85,8 +86,6 @@ const updateRepeatCalendar = async (
           title: calendarUpdateDto.title,
           dateStart: new Date(startDate),
           dateEnd: new Date(endDate),
-          timeStart: new Date(dayjs(calendarUpdateDto.timeStart).format('YYYY-MM-DD')),
-          timeEnd: new Date(dayjs(calendarUpdateDto.timeEnd).format('YYYY-MM-DD')),
           term: calendarUpdateDto.term,
           memo: calendarUpdateDto.memo || '',
         },
@@ -102,10 +101,8 @@ const updateRepeatCalendar = async (
         title: event.title,
         userColor : resUserColor,
         userName : resUserName,
-        dateStart: dayjs(event.dateStart).format('YYYY-MM-DD'),
-        dateEnd: dayjs(event.dateEnd).format('YYYY-MM-DD'),
-        timeStart: dayjs(event.timeStart).format('HH:MM:SS'),
-        timeEnd: dayjs(event.timeEnd).format('HH:MM:SS'),
+        dateStart: dayjs(event.dateStart).format('YYYY-MM-DD HH:mm:ss'),
+        dateEnd: dayjs(event.dateEnd).format('YYYY-MM-DD HH:mm:ss'),
         term: event.term,
         memo: event.memo,
       }
@@ -184,6 +181,22 @@ const getCurrentWeekDates = () => {
     throw error
   }
 }
+
+// //참여자가 여러명인 경우
+// const multipleParticipants = async(
+//   participants: string[], calendarId: number
+// )=>{
+//     for(const record of participants){
+//       let UID = UserService.findUserIdbyName(record);
+//       await prisma.participants.create(
+//         data:{
+//           userId: UID, 
+//           number: calendarId
+//         };
+//     }
+// }
+
+
 
 export {
   findCalendarEventById,
