@@ -2,7 +2,6 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 import { FeedCreateRequestDto } from '../DTOs/Feed/Request/FeedCreateRequestDto'
 import { FeedCreateResponseDto } from '../DTOs/Feed/Response/FeedCreateResponseDto'
-import { FeedUpdateRequestDto } from '../DTOs/Feed/Request/FeedUpdateRequestDto'
 import { FeedUpdateResponseDto } from '../DTOs/Feed/Response/FeedUpdateResponseDto'
 import * as UserService from './UserService'
 import message from '../modules/message'
@@ -92,7 +91,7 @@ const updateFeedContent = async (//userId: string, groupId: string,
     return budgetToReturn;
 
   } catch (error) {
-    console.error('error :: service/calendar/updateCalendar', error)
+    console.error('error :: service/feed/updatefeed', error)
     throw error
   }
 }
