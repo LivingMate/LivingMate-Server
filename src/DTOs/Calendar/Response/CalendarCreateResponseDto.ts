@@ -1,4 +1,4 @@
-import { CalendarCreateDto } from '../Request/CalendarCreateDto'
+import { CalendarCreateDto } from '../Request/CalendarCreateDto';
 
 export interface CalendarCreateResponseDto extends CalendarCreateDto{
     userName: string,

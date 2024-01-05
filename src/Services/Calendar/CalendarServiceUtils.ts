@@ -65,78 +65,79 @@ const checkExistSchedule = async (eventId: number) => {
   }
 }
 
-// 반복 일정 업뎃
-const updateRepeatCalendar = async (
-  userId: string,
-  groupId: string,
-  calendarUpdateDto: CalendarUpdateDto,
-  recurrenceCount: number,
-): Promise<CalendarUpdateResponseDto[]> => {
-  try {
-    const createdEvents: CalendarUpdateResponseDto[] = []
+// // 반복 일정 업뎃
+// const updateRepeatCalendar = async (
+//   userId: string,
+//   groupId: string,
+//   calendarUpdateDto: CalendarUpdateDto,
+//   recurrenceCount: number,
+// ): Promise<CalendarUpdateResponseDto[]> => {
+//   try {
+//     const createdEvents: CalendarUpdateResponseDto[] = []
 
-    const startDate = new Date(dayjs(calendarUpdateDto.dateStart).format('YYYY-MM-DD HH:mm:ss'))
-    const endDate = new Date(dayjs(calendarUpdateDto.dateEnd).format('YYYY-MM-DD HH:mm:ss'))
+//     const startDate = new Date(dayjs(calendarUpdateDto.dateStart).format('YYYY-MM-DD HH:mm:ss'))
+//     const endDate = new Date(dayjs(calendarUpdateDto.dateEnd).format('YYYY-MM-DD HH:mm:ss'))
 
-    for (let i = 0; i < recurrenceCount; i++) {
-      const event = await prisma.calendar.create({
-        data: {
-          userId: userId,
-          groupId: groupId,
-          title: calendarUpdateDto.title,
-          dateStart: new Date(startDate),
-          dateEnd: new Date(endDate),
-          term: calendarUpdateDto.term,
-          memo: calendarUpdateDto.memo || '',
-        },
-      })
+//     for (let i = 0; i < recurrenceCount; i++) {
+//       const event = await prisma.calendar.create({
+//         data: {
+//           userId: userId,
+//           groupId: groupId,
+//           title: calendarUpdateDto.title,
+//           dateStart: new Date(startDate),
+//           dateEnd: new Date(endDate),
+//           term: calendarUpdateDto.term,
+//           memo: calendarUpdateDto.memo || '',
+//         },
+//       })
 
-      const resUserColor = await UserService.findUserColorByUserId(event.userId)
-      const resUserName = await UserService.getUserNameByUserId(event.userId)
+//       const resUserColor = await UserService.findUserColorByUserId(event.userId)
+//       const resUserName = await UserService.getUserNameByUserId(event.userId)
 
-      const data: CalendarUpdateResponseDto = {
-        calendarId: event.id,
-        userId: event.userId,
-        groupId: event.groupId,
-        title: event.title,
-        userColor : resUserColor,
-        userName : resUserName,
-        dateStart: dayjs(event.dateStart).format('YYYY-MM-DD HH:mm:ss'),
-        dateEnd: dayjs(event.dateEnd).format('YYYY-MM-DD HH:mm:ss'),
-        term: event.term,
-        memo: event.memo,
-      }
+//       const data: CalendarUpdateResponseDto = {
+//         calendarId: event.id,
+//         userId: event.userId,
+//         groupId: event.groupId,
+//         title: event.title,
+//         userColor : resUserColor,
+//         userName : resUserName,
+//         dateStart: dayjs(event.dateStart).format('YYYY-MM-DD HH:mm:ss'),
+//         dateEnd: dayjs(event.dateEnd).format('YYYY-MM-DD HH:mm:ss'),
+//         term: event.term,
+//         memo: event.memo,
+//         participants: 
+//       }
 
-      createdEvents.push(data)
+//       createdEvents.push(data)
 
-      switch (calendarUpdateDto.term) {
-        case 1: // 매일
-          startDate.setDate(startDate.getDate() + 1)
-          endDate.setDate(endDate.getDate() + 1)
-          break
-        case 2: // 매주
-          startDate.setDate(startDate.getDate() + 7)
-          endDate.setDate(endDate.getDate() + 7)
-          break
-        case 3: // 매달
-          startDate.setMonth(startDate.getMonth() + 1)
-          endDate.setMonth(endDate.getMonth() + 1)
-          break
-        case 4: // 매년
-          startDate.setFullYear(startDate.getFullYear() + 1)
-          endDate.setFullYear(endDate.getFullYear() + 1)
-          break
-        default:
-          break
-      }
-    }
+//       switch (calendarUpdateDto.term) {
+//         case 1: // 매일
+//           startDate.setDate(startDate.getDate() + 1)
+//           endDate.setDate(endDate.getDate() + 1)
+//           break
+//         case 2: // 매주
+//           startDate.setDate(startDate.getDate() + 7)
+//           endDate.setDate(endDate.getDate() + 7)
+//           break
+//         case 3: // 매달
+//           startDate.setMonth(startDate.getMonth() + 1)
+//           endDate.setMonth(endDate.getMonth() + 1)
+//           break
+//         case 4: // 매년
+//           startDate.setFullYear(startDate.getFullYear() + 1)
+//           endDate.setFullYear(endDate.getFullYear() + 1)
+//           break
+//         default:
+//           break
+//       }
+//     }
 
-    return createdEvents
-  } catch (error) {
-    console.error('error :: service/calendar/CalendarServiceUtils/updateRepeatCalendar', error)
-    throw error
-  }
-}
+//     return createdEvents
+//   } catch (error) {
+//     console.error('error :: service/calendar/CalendarServiceUtils/updateRepeatCalendar', error)
+//     throw error
+//   }
+// }
 
 // CalendarServiceUtils.deleteRepeatSchedules 함수 예시
 // CalendarServiceUtils.deleteRepeatSchedules 함수 예시
@@ -182,19 +183,65 @@ const getCurrentWeekDates = () => {
   }
 }
 
-// //참여자가 여러명인 경우
-// const multipleParticipants = async(
-//   participants: string[], calendarId: number
-// )=>{
-//     for(const record of participants){
-//       let UID = UserService.findUserIdbyName(record);
-//       await prisma.participants.create(
-//         data:{
-//           userId: UID, 
-//           number: calendarId
-//         };
-//     }
-// }
+//참여자가 여러명인 경우
+const multipleParticipants = async (
+  participants: string[],
+  groupId: string,
+  calendarId: number
+) => {
+  const num: number = participants.length;
+
+  try {
+    const createdEvents = [];
+
+    for (let i = 0; i < num; i++) {
+      const event = await prisma.participant.create({
+        data: {
+          userId: participants[i],
+          groupId: groupId,
+          calendarId: calendarId,
+        },
+      });
+
+      createdEvents.push(event);
+    }
+
+    return createdEvents;
+  } catch (error) {
+    console.error('Error creating participants array', error);
+    throw error;
+  }
+};
+
+
+
+
+// 참가자 각각을 배열로 합치기
+const makeArray = async (
+  calendarId: number
+): Promise<string[]> => {
+  try {
+    let arr: string[] = [];
+
+    const participants = await prisma.participant.findMany({
+      where: {
+        calendarId: calendarId,
+      },
+    });
+
+    participants.forEach((participant) => {
+      arr.push(participant.userId);
+    });
+
+    return arr; 
+  } catch (error) {
+    console.error('makeArray에서 오류 발생:', error);
+    throw error;
+  }
+};
+
+
+
 
 
 
@@ -202,7 +249,9 @@ export {
   findCalendarEventById,
   makeCalendarEventExist,
   checkExistSchedule,
-  updateRepeatCalendar,
+  // updateRepeatCalendar,
   deleteRepeatCalendar,
   getCurrentWeekDates,
+  multipleParticipants,
+  makeArray
 }

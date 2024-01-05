@@ -11,28 +11,28 @@ datasource db {
 }
 
 model User {
-  id                  String               @id @default(cuid())
-  userName            String
-  userColor           String
-  email               String               @unique
-  sex                 Boolean
-  age                 Int
-  createdAt           DateTime             @default(now())
-  group               Group                @relation(fields: [groupId], references: [id])
-  groupId             String
-  fcmToken            String?
-  Feed                Feed[]
-  SingleSender        NotificationSingle[] @relation("sender")
-  SingleReciever      NotificationSingle[] @relation("reciever")
-  MultiSender         NotificationMulti[]  @relation("sender")
-  MultiReciever       NotificationMulti[]  @relation("reciever")
-  CalendarUser        Calendar[]           @relation("user")
-  CalendarParticipant Calendar[]           @relation("participant")
-  AvailableDay        AvailableDay[]
-  UserSpendings       UserSpendings[]
-  Calculator          Calculator[]
-  AdjustmentMinus     Adjustment[]         @relation("minusUser")
-  AdjustmentPlus      Adjustment[]         @relation("plusUser")
+  id              String               @id @default(cuid())
+  userName        String               @unique
+  userColor       String
+  email           String               @unique
+  sex             Boolean
+  age             Int
+  createdAt       DateTime             @default(now())
+  group           Group                @relation(fields: [groupId], references: [id])
+  groupId         String
+  fcmToken        String?
+  Feed            Feed[]
+  SingleSender    NotificationSingle[] @relation("sender")
+  SingleReciever  NotificationSingle[] @relation("reciever")
+  MultiSender     NotificationMulti[]  @relation("sender")
+  MultiReciever   NotificationMulti[]  @relation("reciever")
+  CalendarUser    Calendar[]           @relation("user")
+  // CalendarParticipant Calendar[]           @relation("participant")
+  AvailableDay    AvailableDay[]
+  UserSpendings   UserSpendings[]
+  AdjustmentMinus Adjustment[]         @relation("minusUser")
+  AdjustmentPlus  Adjustment[]         @relation("plusUser")
+  Participant     Participant[]
 }
 
 model Group {
@@ -49,10 +49,10 @@ model Group {
   NotificationMulti  NotificationMulti[]
   Calendar           Calendar[]
   ExistCalendar      ExistCalendar[]
+  Participant        Participant[]
   Schedule           Schedule[]
   ExistSchedule      ExistSchedule[]
   UserSpendings      UserSpendings[]
-  Calculator         Calculator[]
   Adjustment         Adjustment[]
   SubCategory        SubCategory[]
 }
@@ -93,19 +93,21 @@ model NotificationMulti {
   recieverId String?
 }
 
+// -----------일정 등록 부분
 model Calendar {
-  id            Int      @id @default(autoincrement())
-  user          User     @relation(fields: [userId], references: [id], name: "user") // 배열로 받아야 함
-  userId        String
-  group         Group    @relation(fields: [groupId], references: [id])
-  groupId       String
-  title         String   @db.VarChar(255)
-  participant   User     @relation(fields: [participantId], references: [id], name: "participant")
-  participantId String
-  dateStart     DateTime @db.Date
-  dateEnd       DateTime @db.Date
-  memo          String   @db.Text
-  term          Int //주기를 매일:0 매주:1 매달:2 매년:3 이런식으로 받는건? // 주기가 있다면 서비스로 해결 따로 db 안필요함
+  id          Int           @id @default(autoincrement())
+  user        User          @relation(fields: [userId], references: [id], name: "user")
+  userId      String
+  group       Group         @relation(fields: [groupId], references: [id])
+  groupId     String
+  title       String        @db.VarChar(255)
+  // participant   User     @relation(fields: [participantId], references: [id], name: "participant")
+  // participantId String
+  dateStart   DateTime      @db.Date
+  dateEnd     DateTime      @db.Date
+  memo        String        @db.Text
+  term        Int //주기를 매일:0 매주:1 매달:2 매년:3 이런식으로 받는건? // 주기가 있다면 서비스로 해결 따로 db 안필요함
+  Participant Participant[]
 }
 
 model ExistCalendar {
@@ -117,6 +119,17 @@ model ExistCalendar {
   dateStart DateTime @db.Date
 }
 
+model Participant {
+  id         Int      @id @default(autoincrement())
+  group      Group    @relation(fields: [groupId], references: [id])
+  groupId    String
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  calendar   Calendar @relation(fields: [calendarId], references: [id])
+  calendarId Int
+}
+
+// -----------일정조율 부분
 model Schedule {
   id            Int             @id @default(autoincrement())
   group         Group           @relation(fields: [groupId], references: [id])
@@ -148,6 +161,7 @@ model AvailableDay {
   existScheduleId Int
 }
 
+// ------------- 정산부분
 model UserSpendings {
   id            Int         @id @default(autoincrement())
   user          User        @relation(fields: [userId], references: [id])
@@ -158,20 +172,10 @@ model UserSpendings {
   category      Category    @relation(fields: [categoryId], references: [id])
   categoryId    Int
   subCategory   SubCategory @relation(fields: [subCategoryId], references: [id])
-  subCategoryId Int         
+  subCategoryId Int
   createdAt     DateTime    @default(now())
   spendingName  String
   isDone        Boolean     @default(false)
-}
-
-model Calculator {
-  id         Int     @id
-  user       User    @relation(fields: [userId], references: [id])
-  userId     String
-  group      Group   @relation(fields: [groupId], references: [id])
-  groupId    String
-  difference Float
-  isMinus    Boolean
 }
 
 model Adjustment {

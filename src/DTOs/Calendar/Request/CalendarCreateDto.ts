@@ -5,6 +5,7 @@ export interface CalendarCreateDto {
   groupId: string;
   dateStart: string;
   dateEnd: string;
-  term: number
-  memo?: string
+  term: number;
+  memo?: string;
+  participants: string[],
 }
