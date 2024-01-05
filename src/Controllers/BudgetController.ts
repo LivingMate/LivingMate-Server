@@ -58,6 +58,17 @@ const getFinalAdjustment = async (req: Request, res: Response, next: NextFunctio
   }
 }
 
+const getAdjforBudget = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+  const groupId: string = req.params.groupId
+  
+  try {
+    const data = await BudgetService.AdjAtBudget(groupId);
+
+    return res.send(data)
+  } catch (error) {
+    res.status(500).json({ error: 'Error getting AdjforBudget: Controller' })
+  }
+}
 
 /*
 post
@@ -103,8 +114,8 @@ const updateBudget = async (req: Request, res: Response, next: NextFunction): Pr
   const BudgetUpdateRequestDto = req.body
 
   try {
-    await BudgetService.updateBudget(budgetId, BudgetUpdateRequestDto)
-    res.status(200).send()
+    const data = await BudgetService.updateBudget(budgetId, BudgetUpdateRequestDto)
+    res.status(200).send(data)
   } catch (error) {
     res.status(500).json({ error: 'Error Updating Budget Content: Controller' })
   }
@@ -121,8 +132,8 @@ const createsubCategory = async (req: Request, res: Response, next: NextFunction
   const categoryId = parseInt(StrcategoryId)
 
   try {
-    await BudgetService.createSubCategory(groupId, categoryId, subCategoryName)
-    res.status(200).send()
+    const data = await BudgetService.createSubCategory(groupId, categoryId, subCategoryName)
+    res.status(200).send(data)
   } catch (error) {
     res.status(500).json({ error: 'Error Updating Budget Content: Controller' })
   }
@@ -145,4 +156,5 @@ const showSubCategories = async (req: Request, res: Response, next: NextFunction
   }
 }
 
-export { createsubCategory, updateBudget, deleteBudget, createBudget, getBudgetSearch, showBudget, showSubCategories, getFinalAdjustment }
+export { createsubCategory, updateBudget, deleteBudget, createBudget, 
+  getBudgetSearch, showBudget, showSubCategories, getFinalAdjustment, getAdjforBudget }
