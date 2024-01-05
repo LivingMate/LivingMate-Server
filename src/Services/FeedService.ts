@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
-import { FeedCreateDto } from '../DTOs/Feed/Request/FeedCreateDto'
+import { FeedCreateRequestDto } from '../DTOs/Feed/Request/FeedCreateRequestDto'
 import { FeedCreateResponseDto } from '../DTOs/Feed/Response/FeedCreateResponseDto'
-import { FeedUpdateDto } from '../DTOs/Feed/Request/FeedUpdateDto'
+import { FeedUpdateRequestDto } from '../DTOs/Feed/Request/FeedUpdateRequestDto'
 import { FeedUpdateResponseDto } from '../DTOs/Feed/Response/FeedUpdateResponseDto'
 import * as UserService from './UserService'
 import message from '../modules/message'
@@ -29,15 +29,14 @@ const findFeedEventById = async (eventId: number) => {
 const createFeed = async (
   userId: string,
   groupId: string,
-  feedCreateDto: FeedCreateDto,
+  feedCreateDto: FeedCreateRequestDto,
 ): Promise<FeedCreateResponseDto> => {
   try {
     const event = await prisma.feed.create({
       data: {
         userId: userId,
         groupId: groupId,
-        text: feedCreateDto.text,
-        createdAt: feedCreateDto.date,
+        content: feedCreateDto.content
       },
     })
 
@@ -50,8 +49,8 @@ const createFeed = async (
       userName: resUserName,
       userColor: resUserColor,
       groupId: event.groupId,
-      text: event.text,
-      date: event.createdAt,
+      content: event.content,
+      createdAt: event.createdAt,
     }
     return data
   } catch (error) {
@@ -61,22 +60,20 @@ const createFeed = async (
 }
 
 //피드내용 수정
-const updateFeedContent = async (userId: string, groupId: string, eventId: number, feedUpdateDto: FeedUpdateDto) => {
+const updateFeedContent = async (//userId: string, groupId: string, 
+  feedId: number, FeedCreateRequestDto: FeedCreateRequestDto) => {
   try {
-    const existingEvent = await findFeedEventById(eventId)
+    const existingEvent = await findFeedEventById(feedId)
     if (!existingEvent) {
       throw new Error(message.NOT_FOUND_CAL)
     }
 
     const updatedEvent = await prisma.feed.update({
       where: {
-        id: eventId,
+        id: feedId,
       },
       data: {
-        userId: userId,
-        groupId: groupId,
-        text: feedUpdateDto.text,
-        createdAt: feedUpdateDto.date,
+        content: FeedCreateRequestDto.content
       },
     })
 
@@ -85,21 +82,22 @@ const updateFeedContent = async (userId: string, groupId: string, eventId: numbe
 
     const budgetToReturn: FeedUpdateResponseDto = {
       feedId: updatedEvent.id,
-      userId: userId,
+      userId: updatedEvent.userId,
       userName: resUserName,
       userColor: resUserColor,
-      groupId: groupId,
-      text: updatedEvent.text,
-      date: updatedEvent.createdAt,
+      groupId: updatedEvent.groupId,
+      content: updatedEvent.content,
+      createdAt: updatedEvent.createdAt,
     }
-    return budgetToReturn
+    return budgetToReturn;
+
   } catch (error) {
     console.error('error :: service/calendar/updateCalendar', error)
     throw error
   }
 }
 
-//피드 고정 -> 이거 업데이트에 한번에 합칠 수도 있는데.... 우선 모르고 걍 만들었으니 놔둬 봄...
+//피드 고정 
 const pinFeed = async (FeedId: number) => {
   const pinnedFeed = await prisma.feed.update({
     where: {
@@ -109,7 +107,7 @@ const pinFeed = async (FeedId: number) => {
       pin: true,
     },
   })
-  return pinnedFeed //리턴값을 어떻게 줘야 할지 모르겠는디.... 얘를 줘야 하나.. 아님 showFeed()를 걸어줘야 하나?
+  return pinnedFeed  
 }
 
 //피드 삭제
@@ -133,7 +131,7 @@ const deleteFeed = async (FeedId: number) => {
   }
 }
 
-//피드 보여주기 : 객체 타입의 배열로 반환됨! 우선 위의 10개만 반환되게 했음.  //
+//피드 보여주기 : 객체 타입의 배열로 반환됨! 
 const showFeed = async (GroupId: string) => {
   const Feeds = await prisma.feed.findMany({
     where: {
@@ -143,7 +141,7 @@ const showFeed = async (GroupId: string) => {
       id: 'desc',
     },
   })
-  return Feeds
+  return Feeds;
 }
 
 //피드 찾기
@@ -156,7 +154,7 @@ const findFeedByFeedId = async (FeedId: number) => {
   if (!Feed) {
     throw new Error('No Feed Found!')
   }
-  return Feed
+  return Feed;
 }
 
 export { createFeed, deleteFeed, findFeedByFeedId, pinFeed, showFeed, updateFeedContent }

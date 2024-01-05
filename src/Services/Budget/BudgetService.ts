@@ -197,10 +197,10 @@ const createSubCategory = async (groupId: string, categoryId: number, name: stri
       categoryId: categoryId,
     },
   })
-  return newSubCategory
+  return newSubCategory;
 }
 
-//카테고리 보여주기 -> 만들 필요 있나??
+
 
 //서브카테고리 보여주기
 const showSubCategory = async (groupId: string, categoryName: string) => {
@@ -215,8 +215,11 @@ const showSubCategory = async (groupId: string, categoryName: string) => {
     },
   })
 
-  return SubCategories
+  return SubCategories;
 }
+
+
+
 
 //정산파트1 최종함수//
 //각 지출액 - 그룹 평균 지출액 값 반환
@@ -306,8 +309,54 @@ const getUserSpending = async (groupId: string): Promise<{ userId: string; userS
     groupMemberSpendingsBefore.push({ userId, userSpending })
   })
 
-  return groupMemberSpendingsBefore
+  return groupMemberSpendingsBefore;
 }
+
+//가계부 내부 정산 반환 함수
+const AdjAtBudget = async(groupId: string) => {
+  const GroupSpending = await prisma.userSpendings.groupBy({
+    by: ['groupId'],
+    where: {
+      groupId: groupId,
+      isDone: false,
+    },
+    _sum: {
+      spendings: true,
+    },
+  })
+
+  for (const group of GroupSpending) {
+    const groupId = group.groupId
+    const groupSum = group._sum.spendings
+    if (!groupSum) {
+      throw new Error('groupSum Error: Null')
+    }
+    const memberNum = await getMemberNumber(groupId)
+    if (!memberNum) {
+      throw new Error('memberNum Error: Null')
+    }
+    const groupAvg = Math.round(groupSum / memberNum);
+
+    let groupMemberSpendings2: { userId: string; userSpending: number }[] = []
+    let groupMemberSpendings: { userId: string; userSpending: number }[] = []
+    groupMemberSpendings = await getUserSpending(groupId);
+    groupMemberSpendings2 = await getUserSpending(groupId);
+
+    groupMemberSpendings.forEach((member) => {
+      if (member.userSpending == null || groupAvg == null) {
+        throw new Error('Null Error: getGroupMemberSpending')
+      }
+      member.userSpending -= groupAvg
+    })
+    
+    return{
+      groupAvg, groupSum, groupMemberSpendings, groupMemberSpendings2
+    }
+  }
+  
+}
+
+
 
 //정산파트2//
 const getAdjustmentsCalc = async (groupId: string) => {
@@ -365,7 +414,7 @@ const getAdjustmentsCalc = async (groupId: string) => {
 }
 
 const sendToAdjustments = async (groupId: string, fromId: string, toId: string, change: number) => {
-  //const Adjustment =
+  
   await prisma.adjustment.create({
     data: {
       groupId: groupId,
@@ -387,7 +436,6 @@ const takeFromAdjustments = async (groupId: string) => {
       groupId: groupId,
     },
   })
-  //return Adjustment
 
   const AdjustmentToReturn: {plusUserName:string; plusUserColor:string; minusUserName:string; minusUserColor:string; change:number }[] =[];
 
@@ -416,6 +464,7 @@ const takeFromAdjustments = async (groupId: string) => {
 
 
 //adjustment 지우기 -> 정산 완료 눌렀을 때 사용할 것..-> isDone을 주자.. 
+
 // const deleteAdjustment = async (groupId: string) => {
 //   await prisma.adjustment.deleteMany({
 //     where: {
@@ -440,6 +489,7 @@ const getDayReturn = async (groupId: string) => {
   }
   return lastday.createdAt;
 }
+
 const isDone = async (groupId: string) =>{
   await prisma.userSpendings.updateMany({
     where:{
@@ -469,10 +519,10 @@ const finalAdjustment = async(groupId: string) =>{
   let final1 = await getAdjustmentsCalc(groupId)
   let final = await getAdjustments(groupId);
   
-  console.log(final1, final)
+  return {final1, final}
   
 }
-//finalAdjustment('aaaaab')
+
 
 
 
@@ -492,38 +542,6 @@ export {
   searchBudget,
   createSubCategory,
   showSubCategory,
-  finalAdjustment
+  finalAdjustment,
+  AdjAtBudget
 }
-
-// 서브카테고리 수정
-// const updateSubCategory = async(budgetId: number, subCategory:string)=>{
-//   if(!subCategory){
-//     throw new Error('no such category found: updateSubCategory');
-//   }
-//   const subCategoryId = await findSubCategIdByName(subCategory);
-//   const newBudget = await prisma.userSpendings.update({
-//     where:{
-//       id : budgetId,
-//     },
-//     data:{
-//       subCategoryId: subCategoryId,
-//     }
-//   });
-
-//   //return newBudget;
-//   const UserName = await UserService.getUserNameByUserId(newBudget.userId);
-//   const UserColor = await findUserColorByUserId(newBudget.userId);
-//   const resCategory = await changeCategIdToName(newBudget.categoryId);
-//   const resSubCategory = await changeSubCategIdToName(newBudget.subCategoryId);
-//   const budgetToReturn : BudgetCreateResponseDto={
-//     userColor: UserColor,
-//     userName: UserName,
-//     createdAt: newBudget.createdAt,
-//     spendings: newBudget.spendings,
-//     spendingName: newBudget.spendingName,
-//     id: newBudget.id,
-//     category: resCategory,
-//     subCategory: resSubCategory
-//   };
-//   return budgetToReturn;
-// }

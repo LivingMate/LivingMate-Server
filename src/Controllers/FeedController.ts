@@ -2,9 +2,11 @@ import { NextFunction, Request, Response } from 'express'
 import { validationResult, Result, ValidationError } from 'express-validator'
 import * as FeedService from '../Services/FeedService'
 import { isPostfixUnaryExpression } from 'typescript'
-import { FeedCreateRequestDto } from '../DTOs/Feed/Request/FeedCreateDto'
-import { FeedUpdateRequestDto } from '../DTOs/Feed/Request/FeedUpdateDto'
+import { FeedCreateRequestDto } from '../DTOs/Feed/Request/FeedCreateRequestDto'
+import { FeedUpdateRequestDto } from '../DTOs/Feed/Request/FeedUpdateRequestDto'
 import * as CalendarService from '../Services/Calendar/CalendarService'
+
+
 
 /*
 get
@@ -37,15 +39,14 @@ const createFeed = async (req: Request, res: Response, next: NextFunction): Prom
 
   const userId: string = req.params.userId
   const groupId: string = req.params.groupId
-  const data: string = req.body
+  const feedcontent = req.body.content
   //const feedCreateDto: FeedCreateRequestDto = req.body
-  //const { roomId } = req.params;
+ 
 
   try {
-    //const data =
-    await FeedService.createFeed(userId, groupId, data)
+    const data = await FeedService.createFeed(userId, groupId, feedcontent)
 
-    return res.status(200).send('Feed Created!')
+    return res.status(200).send(data)
     //   util.success(statusCode.CREATED, message.CREATE_EVENT_SUCCESS, data)
     // );
   } catch (error) {
@@ -65,11 +66,12 @@ const updateFeed = async (req: Request, res: Response, next: NextFunction): Prom
   }
 
   const FeedUpdateRequestDTO: FeedUpdateRequestDto = req.body
-  //const { feedId } = req.params;
+  const strFeedId = req.params.feedId;
+  const feedId = parseInt(strFeedId);
 
   try {
-    await FeedService.updateFeedContent(FeedUpdateRequestDTO)
-    return res.status(200).send('Feed Updated!')
+    const data = await FeedService.updateFeedContent(feedId, FeedUpdateRequestDTO)
+    return res.status(200).send(data);
     //   util.success(statusCode.CREATED, message.CREATE_EVENT_SUCCESS, data)
     // );
   } catch (error) {
