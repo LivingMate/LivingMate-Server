@@ -538,7 +538,7 @@ export {
   //takeFromAdjustments,
   //sendToAdjustments,
   //getAdjustmentsCalc,
-  //getAdjustments,
+  getAdjustments,
   searchBudget,
   createSubCategory,
   showSubCategory,

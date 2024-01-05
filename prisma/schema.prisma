@@ -11,27 +11,28 @@ datasource db {
 }
 
 model User {
-  id              String               @id @default(cuid())
-  userName        String
-  userColor       String
-  email           String               @unique
-  sex             Boolean
-  age             Int
-  createdAt       DateTime             @default(now())
-  group           Group                @relation(fields: [groupId], references: [id])
-  groupId         String
-  fcmToken        String?
-  Feed            Feed[]
-  SingleSender    NotificationSingle[] @relation("sender")
-  SingleReciever  NotificationSingle[] @relation("reciever")
-  MultiSender     NotificationMulti[]  @relation("sender")
-  MultiReciever   NotificationMulti[]  @relation("reciever")
-  Calendar        Calendar[]
-  AvailableDay    AvailableDay[]
-  UserSpendings   UserSpendings[]
-  Calculator      Calculator[]
-  AdjustmentMinus Adjustment[]         @relation("minusUser")
-  AdjustmentPlus  Adjustment[]         @relation("plusUser")
+  id                  String               @id @default(cuid())
+  userName            String
+  userColor           String
+  email               String               @unique
+  sex                 Boolean
+  age                 Int
+  createdAt           DateTime             @default(now())
+  group               Group                @relation(fields: [groupId], references: [id])
+  groupId             String
+  fcmToken            String?
+  Feed                Feed[]
+  SingleSender        NotificationSingle[] @relation("sender")
+  SingleReciever      NotificationSingle[] @relation("reciever")
+  MultiSender         NotificationMulti[]  @relation("sender")
+  MultiReciever       NotificationMulti[]  @relation("reciever")
+  CalendarUser        Calendar[]           @relation("user")
+  CalendarParticipant Calendar[]           @relation("participant")
+  AvailableDay        AvailableDay[]
+  UserSpendings       UserSpendings[]
+  Calculator          Calculator[]
+  AdjustmentMinus     Adjustment[]         @relation("minusUser")
+  AdjustmentPlus      Adjustment[]         @relation("plusUser")
 }
 
 model Group {
@@ -48,7 +49,8 @@ model Group {
   NotificationMulti  NotificationMulti[]
   Calendar           Calendar[]
   ExistCalendar      ExistCalendar[]
-  Scheduling         Scheduling[]
+  Schedule           Schedule[]
+  ExistSchedule      ExistSchedule[]
   UserSpendings      UserSpendings[]
   Calculator         Calculator[]
   Adjustment         Adjustment[]
@@ -92,18 +94,18 @@ model NotificationMulti {
 }
 
 model Calendar {
-  id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id]) // 배열로 받아야 함
-  userId    String
-  group     Group    @relation(fields: [groupId], references: [id])
-  groupId   String
-  title     String   @db.VarChar(255)
-  dateStart DateTime @db.Date
-  dateEnd   DateTime @db.Date
-  timeStart DateTime @db.Time()
-  timeEnd   DateTime @db.Time()
-  memo      String   @db.Text
-  term      Int //주기를 매일:0 매주:1 매달:2 매년:3 이런식으로 받는건? // 주기가 있다면 서비스로 해결 따로 db 안필요함
+  id            Int      @id @default(autoincrement())
+  user          User     @relation(fields: [userId], references: [id], name: "user") // 배열로 받아야 함
+  userId        String
+  group         Group    @relation(fields: [groupId], references: [id])
+  groupId       String
+  title         String   @db.VarChar(255)
+  participant   User     @relation(fields: [participantId], references: [id], name: "participant")
+  participantId String
+  dateStart     DateTime @db.Date
+  dateEnd       DateTime @db.Date
+  memo          String   @db.Text
+  term          Int //주기를 매일:0 매주:1 매달:2 매년:3 이런식으로 받는건? // 주기가 있다면 서비스로 해결 따로 db 안필요함
 }
 
 model ExistCalendar {
@@ -115,7 +117,7 @@ model ExistCalendar {
   dateStart DateTime @db.Date
 }
 
-model Scheduling {
+model Schedule {
   id            Int             @id @default(autoincrement())
   group         Group           @relation(fields: [groupId], references: [id])
   groupId       String
@@ -127,9 +129,12 @@ model Scheduling {
 
 model ExistSchedule {
   id           Int            @id @default(autoincrement())
-  scheduling   Scheduling     @relation(fields: [schedulingId], references: [id])
-  schedulingId Int
-  dateOption   DateTime
+  group        Group          @relation(fields: [groupId], references: [id])
+  groupId      String
+  schedule     Schedule       @relation(fields: [scheduleId], references: [id])
+  scheduleId   Int
+  optionDate   String
+  optionTime   String
   AvailableDay AvailableDay[]
 }
 
@@ -137,8 +142,8 @@ model AvailableDay {
   id              Int           @id @default(autoincrement())
   user            User          @relation(fields: [userId], references: [id])
   userId          String
-  scheduling      Scheduling    @relation(fields: [schedulingId], references: [id])
-  schedulingId    Int
+  schedule        Schedule      @relation(fields: [scheduleId], references: [id])
+  scheduleId      Int
   ExistSchedule   ExistSchedule @relation(fields: [existScheduleId], references: [id])
   existScheduleId Int
 }
