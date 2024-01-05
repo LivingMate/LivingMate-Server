@@ -1,6 +1,10 @@
-import { FeedCreateDto } from '../Request/FeedCreateDto'
+import { FeedCreateRequestDto } from '../Request/FeedCreateRequestDto'
 
-export interface FeedCreateResponseDto extends FeedCreateDto {
+export interface FeedCreateResponseDto extends FeedCreateRequestDto {
+    feedId: number,
+    userId: string,
+    groupId: string,
     userName : string,
     userColor : string,
+    createdAt : Date
 }
