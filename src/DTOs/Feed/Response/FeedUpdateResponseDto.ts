@@ -6,5 +6,6 @@ export interface FeedUpdateResponseDto extends FeedUpdateRequestDto {
     userId: string,
     userName : string,
     userColor : string,
-    createdAt : Date
+    createdAt : Date,
+    pinned: boolean
 }

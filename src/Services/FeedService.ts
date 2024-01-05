@@ -28,14 +28,14 @@ const findFeedEventById = async (eventId: number) => {
 const createFeed = async (
   userId: string,
   groupId: string,
-  feedCreateDto: FeedCreateRequestDto,
+  content: string
 ): Promise<FeedCreateResponseDto> => {
   try {
     const event = await prisma.feed.create({
       data: {
         userId: userId,
         groupId: groupId,
-        content: feedCreateDto.content
+        content: content
       },
     })
 
@@ -50,6 +50,7 @@ const createFeed = async (
       groupId: event.groupId,
       content: event.content,
       createdAt: event.createdAt,
+      pinned: event.pin
     }
     return data
   } catch (error) {
@@ -60,7 +61,7 @@ const createFeed = async (
 
 //피드내용 수정
 const updateFeedContent = async (//userId: string, groupId: string, 
-  feedId: number, FeedCreateRequestDto: FeedCreateRequestDto) => {
+  feedId: number, content:string) => {
   try {
     const existingEvent = await findFeedEventById(feedId)
     if (!existingEvent) {
@@ -72,14 +73,14 @@ const updateFeedContent = async (//userId: string, groupId: string,
         id: feedId,
       },
       data: {
-        content: FeedCreateRequestDto.content
+        content: content
       },
     })
 
     const resUserName = await UserService.getUserNameByUserId(updatedEvent.userId)
     const resUserColor = await UserService.findUserColorByUserId(updatedEvent.userId)
 
-    const budgetToReturn: FeedUpdateResponseDto = {
+    const FeedToReturn: FeedUpdateResponseDto = {
       feedId: updatedEvent.id,
       userId: updatedEvent.userId,
       userName: resUserName,
@@ -87,8 +88,9 @@ const updateFeedContent = async (//userId: string, groupId: string,
       groupId: updatedEvent.groupId,
       content: updatedEvent.content,
       createdAt: updatedEvent.createdAt,
+      pinned: updatedEvent.pin
     }
-    return budgetToReturn;
+    return FeedToReturn;
 
   } catch (error) {
     console.error('error :: service/feed/updatefeed', error)
@@ -106,7 +108,7 @@ const pinFeed = async (FeedId: number) => {
       pin: true,
     },
   })
-  return pinnedFeed  
+  return pinnedFeed;
 }
 
 //피드 삭제
