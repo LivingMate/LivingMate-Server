@@ -3,7 +3,7 @@ import { SignupDto } from '../DTOs/Auth/Requests/SignupDto'
 import { UserUpdateRequestDto } from '../DTOs/User/Request/UserUpdateRequestDto'
 import { UserUpdateResponseDto } from '../DTOs/User/Response/UserUpdateResponseDto'
 import { UserProfileResponseDto } from '../DTOs/User/Response/UserProfileResponseDto'
-import * as GroupService from './GroupService'
+import * as GroupService from './Group/GroupService'
 import message from '../modules/message'
 import { sign } from 'crypto'
 
@@ -13,7 +13,7 @@ const createUser = async (signupDtO: SignupDto) => {
   const user = await prisma.user.create({
     data: {
       userName: signupDtO.userName,
-      groupId: signupDtO.groupId || '', 
+      groupId: signupDtO.groupId || '',
       userColor: 'FFFFFF', //default, just temporary value for now
       email: signupDtO.email,
       sex: signupDtO.sex,
@@ -140,7 +140,6 @@ const findUserColorByUserId = async (userId: string) => {
   }
 }
 
-
 // userName으로 userID 찾기
 const getUserIdbyName = async (userName: string[]) => {
   // userId가 정의되어 있지 않거나 문자열이 아닌 경우 에러 발생
@@ -158,8 +157,6 @@ const getUserIdbyName = async (userName: string[]) => {
   }
   return data.id
 }
-
-
 
 //+ 그룹 참여하는 서비스
 const addUserToGroup = async (signupDTO: SignupDto, groupId: string) => {

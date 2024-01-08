@@ -11,7 +11,7 @@ import { CalendarUpdateResponseDto } from '../../DTOs/Calendar/Response/Calendar
 import { SchedulingCreateDto } from '../../DTOs/Calendar/Request/SchedulingCreateDto'
 import { SchedulingCreateResponseDto } from '../../DTOs/Calendar/Response/SchedulingCreateResponseDto'
 import * as UserService from '../UserService'
-import * as GroupService from '../GroupService'
+import * as GroupServiceUtils from '../Group/GroupServiceUtils'
 import message from '../../modules/message'
 
 // CREATE
@@ -93,8 +93,8 @@ const createRepeatCalendar = async (
 const createCalendar = async (userId: string, groupId: string, calendarCreateDto: CalendarCreateDto) => {
   try {
     const user = await UserService.findUserById(userId)
-    const group = await GroupService.findGroupById(groupId)
-    await GroupService.checkForbiddenGroup(user.groupId, groupId)
+    const group = await GroupServiceUtils.findGroupById(groupId)
+    await GroupServiceUtils.checkForbiddenGroup(user.groupId, groupId)
 
     let createdEvents = []
 
@@ -162,7 +162,7 @@ const createSchedule = async (
   scheduleCreateDto: ScheduleCreateDto,
 ): Promise<ScheduleCreateResponseDto> => {
   try {
-    const group = await GroupService.findGroupById(groupId)
+    const group = await GroupServiceUtils.findGroupById(groupId)
 
     const event = await prisma.schedule.create({
       data: {
@@ -195,7 +195,7 @@ const createSchedule = async (
 //   schedulingCreateDto : SchedulingCreateDto
 // ) : Promise<SchedulingCreateResponseDto> => {
 //   try {
-//     const group = await GroupService.findGroupById(groupId)
+//     const group = await GroupServiceUtils.findGroupById(groupId)
 
 //     const existSchedule = await prisma.existSchedule.create({
 //       data: {
@@ -239,7 +239,7 @@ const updateCalendar = async (
 ) => {
   try {
     const user = await UserService.findUserById(userId)
-    const group = await GroupService.findGroupById(groupId)
+    const group = await GroupServiceUtils.findGroupById(groupId)
     const existingEvent = await CalendarServiceUtils.findCalendarEventById(eventId)
 
     if (!existingEvent) {
@@ -330,7 +330,14 @@ const updateCalendar = async (
     // 반복일정의 첫번째부터 수정시 : 처음부터 다 지우고 처음 이벤트를 update
     // 반복일정의 중간부터 수정시 : 중간부터 지우고 그 이후 이벤트를 update
     if (existingEvent.term && calendarUpdateDto.term) {
-      await CalendarServiceUtils.deleteRepeatCalendar(existingEvent.id, existingEvent.term, userId, groupId, existingEvent.title, existingEvent.memo)
+      await CalendarServiceUtils.deleteRepeatCalendar(
+        existingEvent.id,
+        existingEvent.term,
+        userId,
+        groupId,
+        existingEvent.title,
+        existingEvent.memo,
+      )
 
       let createdEvents: CalendarUpdateResponseDto[] = []
       // 반복 이벤트 생성
@@ -393,7 +400,7 @@ const updateCalendar = async (
 // 일정 삭제
 const deleteCalendar = async (userId: string, groupId: string, eventId: number) => {
   try {
-    const group = await GroupService.findGroupById(groupId)
+    const group = await GroupServiceUtils.findGroupById(groupId)
     const existingEvent = await CalendarServiceUtils.findCalendarEventById(eventId)
     if (!existingEvent) {
       throw new Error(message.NOT_FOUND_CAL)
