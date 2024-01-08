@@ -72,80 +72,80 @@ const createCalendar = async (req: Request, res: Response, next: NextFunction): 
 //   }
 // }
 
-// // FETCH
-// const updateCalendarEvent = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
-//   const errors: Result<ValidationError> = validationResult(req)
-//   if (!errors.isEmpty()) {
-//     return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, message.BAD_REQUEST))
-//   }
+// FETCH
+const updateCalendarEvent = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+  const errors: Result<ValidationError> = validationResult(req)
+  if (!errors.isEmpty()) {
+    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, message.BAD_REQUEST))
+  }
 
-//   const calendarId = parseInt(req.params.calendarId, 10)
-//   const { userId } = req.params
-//   const { groupId } = req.params
-//   const calendarUpdateDto: CalendarUpdateDto = req.body
+  const eventId = parseInt(req.params.eventId)
+  const userId = req.params.userId
+  const groupId = req.params.groupId
+  const calendarUpdateDto: CalendarUpdateDto = req.body
 
-//   try {
-//     const data = await CalendarService.updateCalendar(userId, groupId, calendarId, calendarUpdateDto)
-//     console.log(data)
-//     res.status(200).json(data)
-//   } catch (error) {
-//     console.error('Error updating calendar event', error)
-//     res.status(500).json({ error: 'Internal Server Error' })
-//   }
-// }
+  try {
+    const data = await CalendarService.updateCalendar(userId, groupId, eventId, calendarUpdateDto)
+    console.log(data)
+    res.status(200).send(data)
+  } catch (error) {
+    console.error('Error updating calendar event', error)
+    res.status(500).send({ error: 'Internal Server Error' })
+  }
+}
 
-// // DELETE
-// const deleteCalendarEvent = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
-//   const errors: Result<ValidationError> = validationResult(req)
-//   if (!errors.isEmpty()) {
-//     return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, message.BAD_REQUEST))
-//   }
-//   const { userId } = req.params
-//   const { groupId } = req.params
-//   const calendarId = parseInt(req.params.calendarId, 10)
+// DELETE
+const deleteCalendarEvent = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+  const errors: Result<ValidationError> = validationResult(req)
+  if (!errors.isEmpty()) {
+    return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, message.BAD_REQUEST))
+  }
+  const { userId } = req.params
+  const { groupId } = req.params
+  const eventId = parseInt(req.params.eventId, 10)
 
-//   try {
-//     const data = await CalendarService.deleteCalendar(userId, groupId, calendarId)
-//     console.log(data)
-//     res.status(204).send()
-//   } catch (error) {
-//     console.error('Error deleting calendar event', error)
-//     res.status(500).json({ error: 'Internal Server Error' })
-//   }
-// }
+  try {
+    const data = await CalendarService.deleteCalendar(userId, groupId, eventId)
+    console.log(data)
+    res.status(204).send()
+  } catch (error) {
+    console.error('Error deleting calendar event', error)
+    res.status(500).json({ error: 'Internal Server Error' })
+  }
+}
 
-// // GET
-// const getThisWeeksDuty = async (req: Request, res: Response) => {
-//   try {
-//     const groupId: string = req.params.groupId
-//     const thisWeeksDuty = await CalendarService.getThisWeeksDuty(groupId)
-//     res.status(200).json(thisWeeksDuty)
-//     console.log(thisWeeksDuty)
-//   } catch (error) {
-//     console.error("Error getting this week's duty", error)
-//     res.status(500).json({ error: 'Internal Server Error' })
-//   }
-// }
+// GET
+const getThisWeeksDuty = async (req: Request, res: Response) => {
+  try {
+    const groupId: string = req.params.groupId
+    const thisWeeksDuty = await CalendarService.getThisWeeksDuty(groupId)
+    res.status(200).json(thisWeeksDuty)
+    console.log(thisWeeksDuty)
+  } catch (error) {
+    console.error("Error getting this week's duty", error)
+    res.status(500).json({ error: 'Internal Server Error' })
+  }
+}
 
-// const showCalendar = async (req: Request, res: Response) => {
-//   try {
-//     const groupId: string = req.params.groupId
-//     const calendarEvents = await CalendarService.showCalendar(groupId)
-//     res.status(200).json(calendarEvents)
-//     console.log(calendarEvents)
-//   } catch (error) {
-//     console.error('Error retrieving calendar events', error)
-//     res.status(500).json({ error: 'Internal Server Error' })
-//   }
-// }
+const showCalendar = async (req: Request, res: Response) => {
+  try {
+    const groupId: string = req.params.groupId
+    const calendarEvents = await CalendarService.showCalendar(groupId)
+    res.status(200).json(calendarEvents)
+    console.log(calendarEvents)
+  } catch (error) {
+    console.error('Error retrieving calendar events', error)
+    res.status(500).json({ error: 'Internal Server Error' })
+  }
+}
 
 export {
   createCalendar,
   // createSchedule,
   // createScheduleReadyEvent,
   // createSchedulingEvent,
-  // updateCalendarEvent,
-  // deleteCalendarEvent,
-  // getThisWeeksDuty,
-  // showCalendar,
+  updateCalendarEvent,
+  deleteCalendarEvent,
+  getThisWeeksDuty,
+  showCalendar,
 }

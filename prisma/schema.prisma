@@ -101,12 +101,10 @@ model Calendar {
   group       Group         @relation(fields: [groupId], references: [id])
   groupId     String
   title       String        @db.VarChar(255)
-  // participant   User     @relation(fields: [participantId], references: [id], name: "participant")
-  // participantId String
-  dateStart   DateTime      @db.Date
-  dateEnd     DateTime      @db.Date
+  dateStart   DateTime      
+  dateEnd     DateTime      
   memo        String        @db.Text
-  term        Int //주기를 매일:0 매주:1 매달:2 매년:3 이런식으로 받는건? // 주기가 있다면 서비스로 해결 따로 db 안필요함
+  term        Int
   Participant Participant[]
 }
 
