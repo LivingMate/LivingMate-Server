@@ -6,5 +6,6 @@ export interface FeedCreateResponseDto extends FeedCreateRequestDto {
     groupId: string,
     userName : string,
     userColor : string,
-    createdAt : Date
+    createdAt : Date,
+    pinned: boolean
 }

@@ -39,8 +39,8 @@ const createFeed = async (req: Request, res: Response, next: NextFunction): Prom
 
   const userId: string = req.params.userId
   const groupId: string = req.params.groupId
-  const feedcontent = req.body.content
-  //const feedCreateDto: FeedCreateRequestDto = req.body
+  const feedcontent: string = req.body.content
+  
  
 
   try {
@@ -57,7 +57,7 @@ const createFeed = async (req: Request, res: Response, next: NextFunction): Prom
 /*
   patch
   /feeds/:feedId
-   */
+*/
 
 const updateFeed = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
   const errors: Result<ValidationError> = validationResult(req)
@@ -65,12 +65,12 @@ const updateFeed = async (req: Request, res: Response, next: NextFunction): Prom
     throw new Error('Error at Controller: updateFeed')
   }
 
-  const FeedUpdateRequestDTO: FeedUpdateRequestDto = req.body
+  const content: string = req.body.content;
   const strFeedId = req.params.feedId;
   const feedId = parseInt(strFeedId);
 
   try {
-    const data = await FeedService.updateFeedContent(feedId, FeedUpdateRequestDTO)
+    const data = await FeedService.updateFeedContent(feedId, content)
     return res.status(200).send(data);
     //   util.success(statusCode.CREATED, message.CREATE_EVENT_SUCCESS, data)
     // );
@@ -78,6 +78,30 @@ const updateFeed = async (req: Request, res: Response, next: NextFunction): Prom
     next(error)
   }
 }
+
+/*
+  pin!! 
+  patch
+  /feeds/:feedId
+*/
+
+const pinFeed = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+  const errors: Result<ValidationError> = validationResult(req)
+  if (!errors.isEmpty()) {
+    throw new Error('Error at Controller: updateFeed')
+  }
+
+  const strFeedId = req.params.feedId;
+  const feedId = parseInt(strFeedId);
+
+  try {
+    const data = await FeedService.pinFeed(feedId)
+    return res.status(200).send(data);
+  } catch (error) {
+    next(error)
+  }
+}
+
 
 /*
   delete
@@ -102,4 +126,4 @@ const deleteFeed = async (req: Request, res: Response, next: NextFunction): Prom
   }
 }
 
-export { showFeed, createFeed, updateFeed, deleteFeed }
+export { showFeed, createFeed, updateFeed, deleteFeed, pinFeed }
