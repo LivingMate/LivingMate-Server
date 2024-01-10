@@ -23,6 +23,8 @@ const findCalendarEventById = async (eventId: number) => {
   }
 }
 
+
+
 const findParticipantEventById = async (eventId: number) => {
   try {
     const event = await prisma.participant.findMany({
@@ -113,7 +115,7 @@ const updateRepeatCalendar = async (
       const resUserName = await UserService.getUserNameByUserId(event.userId)
 
       const data: CalendarUpdateResponseDto = {
-        calendarId: event.id,
+        Id: event.id,
         userId: event.userId,
         groupId: event.groupId,
         title: event.title,
@@ -287,6 +289,46 @@ const getDayOfWeek = (date: Date): string => {
   return daysOfWeek[dayIndex];
 };
 
+interface CalendarEvent {
+    id: number;
+    userId: string;
+    groupId: string;
+    title: string;
+    dateStart: Date;
+    dateEnd: Date;
+    memo?: string;
+    term: number;
+    
+}
+interface ExtendedCalendarEvent extends CalendarEvent {
+  daysOfWeek: string[];
+  participants: string[];
+}
+
+
+const groupThisWeekEvents = async (events: CalendarEvent[]) => {
+  const groupedEvents: Record<string, ExtendedCalendarEvent> = {};
+
+  for (const event of events) {
+    const key = `${event.title}-${event.memo || ''}-${event.groupId}`;
+    if (!groupedEvents[key]) {
+      const participants = await getParticipantsForEvent(event.id);
+      const daysOfWeek: string[] = [getDayOfWeek(event.dateStart)]; // 배열로 변경
+      groupedEvents[key] = { ...(event as ExtendedCalendarEvent), daysOfWeek, participants };
+    } else {
+      // 이미 있는 경우, daysOfWeek를 합친다.
+      const existingGroup = groupedEvents[key];
+      existingGroup.daysOfWeek.push(...getDayOfWeek(event.dateStart));
+    }
+  }
+
+  return Object.values(groupedEvents);
+};
+
+
+
+
+
 //참여자가 여러명인 경우
 const multipleParticipants = async (
   participants: string[],
@@ -325,6 +367,21 @@ const multipleParticipants = async (
     console.error('Error creating participants array', error);
     throw error;
   }
+};
+
+
+
+// 이벤트에 대한 참가자 가져오기
+const getParticipantsForEvent = async (eventId: number) => {
+  const participants = await prisma.participant.findMany({
+    where: {
+      calendarId: eventId,
+    },
+    select: {
+      userId: true,
+    },
+  });
+  return participants.map((participant) => participant.userId);
 };
 
 
@@ -423,6 +480,8 @@ export {
   deleteThisRepeatCalendar,
   getCurrentWeekDates,
   getDayOfWeek,
+  groupThisWeekEvents,
+  getParticipantsForEvent,
   multipleParticipants,
   updateParticipants,
   makeArray
