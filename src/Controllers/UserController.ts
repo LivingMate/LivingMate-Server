@@ -38,16 +38,14 @@ const getUserProfile = async (
     res: Response,
     next: NextFunction
   ): Promise<void | Response> => {
-    const userId: string = req.params.userId;
+    const userId = req.params.userId;
   
     try {
-      const data: UserProfileResponseDto =
-        await UserService.getUserProfile(userId);
-  
-      return res
-        .send(data);
+      const data = await UserService.getUserProfile(userId);
+      return res.status(200).send(data);
+
     } catch (error) {
-      next(error);
+        res.status(500).json({ error: 'Error Fetching user profile: Controller' })
     }
   };
 

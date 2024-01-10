@@ -16,7 +16,7 @@ const createUser = async (signupDtO: SignupDto) => {
     data: {
       id: Id,
       userName: signupDtO.userName,
-      groupId: signupDtO.groupId || '', 
+      groupId: 'aaaaaa', //default
       userColor: 'FFFFFF', //default, just temporary value for now
       email: signupDtO.email,
       sex: signupDtO.sex,
@@ -39,34 +39,20 @@ const getUserProfile = async (userId: string) => {
       throw new Error('User has no group!')
     }
 
-    const group = await GroupServiceUtils.findGroupById(userProfile.id)
-    group?.groupName ?? 'DefaultGroupName'
+    const groupName = await GroupServiceUtils.findGroupByGroupId(userProfile.groupId)
 
     const userGroupMembersNamesColors = await GroupServiceUtils.findGroupMembersNamesColorsByGroupId(userProfile.groupId);
-    const groupMembersNames:string[] = [];
-    const groupMembersColors: string[]= [];
-
-    userGroupMembersNamesColors.forEach((member)=>{
-      let name = member.userName;
-      let color= member.userColor;
-
-      groupMembersNames.push(name);
-      groupMembersColors.push(color);
-
-    })
-    
-
-    const data: UserProfileResponseDto = {
+ 
+    const data = {
       userName: userProfile.userName,
       userColor: userProfile.userColor,
-      groupName: group.groupName,
-      groupMembersNames: groupMembersNames,
-      groupMembersColors: groupMembersColors
+      groupName: groupName,
+      membernamesandcolors: userGroupMembersNamesColors
     }
 
-    return data
+    return data;
   } catch (error) {
-    throw error
+    throw new Error('Error: getUserProfile:service');
   }
 }
 
@@ -84,17 +70,6 @@ const findUserById = async (userId: string) => {
   return user
 }
 
-const findGroupByUserId = async (userId: string) => {
-  const group = prisma.user.findUnique({
-    where: {
-      id: userId,
-    }
-  })
-  if (!group) {
-    throw new Error('Group not found!')
-  }
-  return group;
-}
 
 const findUserByIdAndUpdate = async (userId: string, userUpdateRequestDto: UserUpdateRequestDto) => {
   const updatedUser = await prisma.user.update({
@@ -237,7 +212,6 @@ const duplicateId = async(id:string)=>{
 export {
   createUser,
   findUserById,
-  findGroupByUserId,
   findUserByIdAndUpdate,
   getUserProfile,
   // addUserToGroup,
@@ -246,5 +220,6 @@ export {
   findUserColorByUserId,
   updateUserColor,
   createUserId,
-  addUserToGroup
+  addUserToGroup,
+  duplicateId
 }

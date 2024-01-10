@@ -19,8 +19,23 @@ const getGroup = async (req: Request, res: Response, next: NextFunction): Promis
   }
 }
 
-// const createGroup
+const createGroup = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+  const userId: string = req.params.userId
+  const groupName: string = req.body.name
+
+  try {
+    const data = await GroupService.createGroup(userId, groupName)
+
+    return res.send(data)
+  } catch (error) {
+    res.status(500).json({ error: 'Error creating Group: Controller' })
+  }
+}
 
 // const joinGroup
 
 // const leaveGroup
+
+export{
+  createGroup
+}

@@ -5,6 +5,27 @@ import { GroupResponseDto } from '../../DTOs/Group/Responses/GroupResponseDto'
 import * as UserService from '../UserService'
 import { group } from 'console'
 
+
+// groupID로 groupName찾기
+const findGroupByGroupId = async (groupId: string) => {
+  try {
+    const data = await prisma.group.findUnique({
+      where: {
+        id: groupId,
+      },
+    })
+
+    if (data) {
+      return data.groupName
+    } else {
+      return 'error'
+    }
+  } catch (error) {
+    console.error('error :: group/GroupServiceUtils/findGroupByGroupId', error)
+    throw error
+  }
+}
+
 // groupId로 group찾기
 const findGroupById = async (groupId: string) => {
   const group = await prisma.group.findUnique({
@@ -70,18 +91,7 @@ const findGroupNameByGroupId = async (groupId: string) => {
     return groupMembers;
   }
   
-  //return groupMembers 하면 나오는 모양:
-  // [
-  //     {
-  //         userName: 'User 1',
-  //         userColor: 'Color 1'
-  //     },
-  //     {
-  //         userName: 'User 2',
-  //         userColor: 'Color 2'
-  //     },
-  //     // ...other user objects
-  // ]
+
   
   const findGroupMembersColorsByGroupId = async (groupId: string) => {
     const groupMembers = await prisma.user.findMany({
@@ -97,6 +107,7 @@ const findGroupNameByGroupId = async (groupId: string) => {
 
 
   export {
+    findGroupByGroupId,
     findGroupById,
     checkForbiddenGroup,
     checkJoinedGroupId,

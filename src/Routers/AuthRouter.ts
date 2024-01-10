@@ -3,12 +3,12 @@ import express from 'express';
 //import { AuthController } from '../Controllers';
 //import passport from 'passport'
 //import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import * as AuthController from '../Controllers/UserController'
+import * as UserController from '../Controllers/UserController'
 
 const AuthRouter = express.Router();
 
-AuthRouter.post('/signup', AuthController.createUser)
-AuthRouter.get('./profile/:userId', AuthController.getUserProfile)
+AuthRouter.post('/signup', UserController.createUser)
+AuthRouter.get('/profile/:userId', UserController.getUserProfile)
 
 
 

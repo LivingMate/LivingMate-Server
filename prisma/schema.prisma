@@ -36,7 +36,7 @@ model User {
 }
 
 model Group {
-  id                 String               @id @default(cuid())
+  id                 String               @id
   groupName          String               @db.VarChar(255)
   groupOwner         String
   groupCode          String?

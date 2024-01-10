@@ -8,32 +8,50 @@ import * as GroupServiceUtils from './GroupServiceUtils'
 
 
 // createGroup
-const createGroup = async (userId: string): Promise<GroupResponseDto> => {
+const createGroup = async (userId: string, groupName: string) => {
   try {
     const user = await UserService.findUserById(userId)
+    const groupId = await createGroupId();
+
 
     await GroupServiceUtils.checkJoinedGroupId(user?.groupId || '')
 
     const createdGroup = await prisma.group.create({
       data: {
+        id: groupId,
         groupOwner: userId,
-        groupCode: user.groupId,
-        groupName: '',
+        groupName: groupName,
         groupSpending: 0,
       },
     })
 
-    const data: GroupResponseDto = {
-      _id: createdGroup.id,
-      groupCode: createdGroup.groupCode,
-    }
-    return data
+    return createdGroup;
   } catch (error) {
-    throw error
-  } finally {
-    await prisma.$disconnect()
+    throw new Error('Error at creating Group: group service')
   }
 }
+
+//그룹아이디 생성하기 
+const createGroupId = async()=>{
+  
+  const size: number = 8;
+  const characters: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const charactersLength: number = characters.length;
+  let result: string = '';
+  do {
+    result = '';
+    for (let i: number = 0; i < size; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+  } while (await UserService.duplicateId(result));
+
+  return result;
+}
+
+
+
+
+
 
 // 그룹 나가기
 const leaveGroup = async (userId: string, groupId: string): Promise<void> => {

@@ -8,6 +8,6 @@ export interface UserProfileResponseDto{
     userColor: string;
     groupName?: string;
     //groupMembers?: groupMember;
-    groupMembersNames?:string[];
-    groupMembersColors?:string[];
+    groupMembersNamesandColors:string[];
+    
 }
