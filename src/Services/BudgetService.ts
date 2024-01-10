@@ -3,29 +3,28 @@ const prisma = new PrismaClient()
 import { BudgetCreateRequestDto } from '../DTOs/Budget/Request/BudgetCreateRequestDto'
 import { BudgetCreateResponseDto } from '../DTOs/Budget/Response/BudgetCreateResponseDto'
 import { BudgetUpdateRequestDto } from '../DTOs/Budget/Request/BudgetUpdateRequestDto'
-import { checkForbiddenGroup } from './GroupService'
-import {getUserNameByUserId} from './UserService'
+import { checkForbiddenGroup } from './Group/GroupService'
+import { getUserNameByUserId } from './UserService'
 import message from '../modules/message'
 
 // ------------utils-------------
 // 유저 찾기
 const findUserById = async (userId: string) => {
   if (!userId || typeof userId !== 'string') {
-    throw new Error('Invalid userId');
+    throw new Error('Invalid userId')
   }
 
   const data = await prisma.user.findUnique({
     where: {
       id: userId,
     },
-  });
+  })
 
   if (!data) {
-    throw new Error(message.UNAUTHORIZED);
+    throw new Error(message.UNAUTHORIZED)
   }
-  return data;
-};
-
+  return data
+}
 
 // 그룹 찾기
 const findGroupById = async (groupId: string) => {
@@ -41,24 +40,23 @@ const findGroupById = async (groupId: string) => {
   return group
 }
 
-
 // 카테고리 이름으로 아이디 찾기
 const findCategIdByName = async (categoryName: string) => {
   // userId가 정의되어 있지 않거나 문자열이 아닌 경우 에러 발생
   if (!categoryName || typeof categoryName !== 'string') {
-    throw new Error('Invalid categoryName');
+    throw new Error('Invalid categoryName')
   }
 
   const data = await prisma.category.findUnique({
     where: {
       name: categoryName,
     },
-  });
+  })
   if (!data) {
-    throw new Error(message.UNAUTHORIZED);
+    throw new Error(message.UNAUTHORIZED)
   }
   return data.id
-};
+}
 
 // 섭카테고리 이름으로 섭카테고리 id 찾기
 async function findSubCategIdByName(subCategoryName: string) {
@@ -101,7 +99,7 @@ const findUserColorByUserId = async (userId: string) => {
 }
 
 // id를 name으로 반환
-const changeCategIdToName =  async (categoryId: number)=>{
+const changeCategIdToName = async (categoryId: number) => {
   try {
     const result = await prisma.category.findUnique({
       where: {
@@ -140,9 +138,6 @@ async function changeSubCategIdToName(subCategoryId: number) {
   }
 }
 
-
-
-
 // -------------real service----------------
 // 지출 등록
 const createBudget = async (
@@ -150,7 +145,7 @@ const createBudget = async (
   groupId: string,
   budgetCreateRequestDto: BudgetCreateRequestDto,
 ): Promise<BudgetCreateResponseDto> => {
-    try {
+  try {
     const user = await findUserById(userId)
     const group = await findGroupById(groupId)
     const reqCategoryId = await findCategIdByName(budgetCreateRequestDto.category)
@@ -169,10 +164,10 @@ const createBudget = async (
     })
 
     // categoryId와 subCategoryId 변환
-    const resCategory = await changeCategIdToName(event.categoryId);
-    const resSubCategory = await changeSubCategIdToName(event.subCategoryId);
-    const resUserColor = await findUserColorByUserId(event.userId);
-    const resUserName = await getUserNameByUserId(event.userId);
+    const resCategory = await changeCategIdToName(event.categoryId)
+    const resSubCategory = await changeSubCategIdToName(event.subCategoryId)
+    const resUserColor = await findUserColorByUserId(event.userId)
+    const resUserName = await getUserNameByUserId(event.userId)
 
     const createdBudget: BudgetCreateResponseDto = {
       id: event.id,
@@ -185,21 +180,16 @@ const createBudget = async (
       createdAt: event.createdAt,
     }
 
-    return createdBudget;
-
+    return createdBudget
   } catch (error) {
-    console.error('error :: service/budget/createBudget', error);
-    throw error;
+    console.error('error :: service/budget/createBudget', error)
+    throw error
   }
-};
-
-
-
-
+}
 
 //지출내역 보여주기
 const showBudget = async (groupId: string) => {
-  try{
+  try {
     const Budgets = await prisma.userSpendings.findMany({
       take: 10,
       where: {
@@ -207,38 +197,34 @@ const showBudget = async (groupId: string) => {
       },
     })
 
-    let BudgetsToShow: BudgetCreateResponseDto[] = [];
+    let BudgetsToShow: BudgetCreateResponseDto[] = []
 
     await Promise.all(
-    Budgets.map(async (budget) =>{
+      Budgets.map(async (budget) => {
+        let resCategory = await changeCategIdToName(budget.categoryId)
+        let resSubCategory = await changeSubCategIdToName(budget.subCategoryId)
+        let resUserColor = await findUserColorByUserId(budget.userId)
+        let resUserName = await getUserNameByUserId(budget.userId)
 
-      let resCategory =  await changeCategIdToName(budget.categoryId);
-      let resSubCategory = await changeSubCategIdToName(budget.subCategoryId);
-      let resUserColor =  await findUserColorByUserId(budget.userId);
-      let resUserName =  await getUserNameByUserId(budget.userId);
+        BudgetsToShow.push({
+          id: budget.id,
+          spendingName: budget.spendingName,
+          spendings: budget.spendings,
+          category: resCategory,
+          subCategory: resSubCategory,
+          userColor: resUserColor,
+          userName: resUserName,
+          createdAt: budget.createdAt,
+        })
+      }),
+    )
 
-      BudgetsToShow.push({
-      id: budget.id,
-      spendingName: budget.spendingName,
-      spendings: budget.spendings,
-      category: resCategory,
-      subCategory: resSubCategory,
-      userColor: resUserColor,
-      userName: resUserName,
-      createdAt: budget.createdAt,
-    });
-    }
-    ))
-
-    return BudgetsToShow;
-
-  } catch(error) {
+    return BudgetsToShow
+  } catch (error) {
     console.error('error :: service/budget/showBudget', error)
-    throw error;
+    throw error
   }
 }
-
-
 
 //지출내역 수정
 const updateBudget = async (budgetId: number, BudgetUpdateRequestDto: BudgetUpdateRequestDto) => {
@@ -248,7 +234,7 @@ const updateBudget = async (budgetId: number, BudgetUpdateRequestDto: BudgetUpda
         id: budgetId,
       },
       data: {
-        spendingName : BudgetUpdateRequestDto.spendingName,
+        spendingName: BudgetUpdateRequestDto.spendingName,
         spendings: BudgetUpdateRequestDto.spending,
         categoryId: await findCategIdByName(BudgetUpdateRequestDto.category),
         subCategoryId: await findSubCategIdByName(BudgetUpdateRequestDto.subCategory),
@@ -256,23 +242,22 @@ const updateBudget = async (budgetId: number, BudgetUpdateRequestDto: BudgetUpda
     })
     //return updatedBudget;
 
-    const UserName = await getUserNameByUserId(updatedBudget.userId);
-    const UserColor = await findUserColorByUserId(updatedBudget.userId);
-    const resCategory = await changeCategIdToName(updatedBudget.categoryId);
-    const resSubCategory = await changeSubCategIdToName(updatedBudget.subCategoryId);
+    const UserName = await getUserNameByUserId(updatedBudget.userId)
+    const UserColor = await findUserColorByUserId(updatedBudget.userId)
+    const resCategory = await changeCategIdToName(updatedBudget.categoryId)
+    const resSubCategory = await changeSubCategIdToName(updatedBudget.subCategoryId)
 
-    const budgetToReturn : BudgetCreateResponseDto={
-    userColor: UserColor,
-    userName: UserName,
-    createdAt: updatedBudget.createdAt,
-    spendings: updatedBudget.spendings,
-    spendingName: updatedBudget.spendingName,
-    id: updatedBudget.id,
-    category: resCategory,
-    subCategory: resSubCategory
-  };
-  return budgetToReturn;
-
+    const budgetToReturn: BudgetCreateResponseDto = {
+      userColor: UserColor,
+      userName: UserName,
+      createdAt: updatedBudget.createdAt,
+      spendings: updatedBudget.spendings,
+      spendingName: updatedBudget.spendingName,
+      id: updatedBudget.id,
+      category: resCategory,
+      subCategory: resSubCategory,
+    }
+    return budgetToReturn
   } catch (error) {
     throw new Error('error :: service/budget/updateBudgetContent')
   }
@@ -280,22 +265,21 @@ const updateBudget = async (budgetId: number, BudgetUpdateRequestDto: BudgetUpda
 
 //지출내역 삭제
 const deleteBudget = async (BudgetId: number) => {
-  try{
+  try {
     await prisma.userSpendings.delete({
       where: {
         id: BudgetId,
       },
     })
-    return 0;
+    return 0
   } catch (error) {
     throw new Error('error :: service/budget/deleteBudget')
   }
 }
 
-
 //지출내역 검색
 const searchBudget = async (groupId: string, searchKey: string) => {
-  try{
+  try {
     const searchedBudget = await prisma.userSpendings.findMany({
       where: {
         groupId: groupId,
@@ -305,79 +289,72 @@ const searchBudget = async (groupId: string, searchKey: string) => {
       },
     })
 
-    let BudgetsToShow: BudgetCreateResponseDto[] = [];
+    let BudgetsToShow: BudgetCreateResponseDto[] = []
 
     await Promise.all(
-    searchedBudget.map(async (budget) =>{
+      searchedBudget.map(async (budget) => {
+        let resCategory = await changeCategIdToName(budget.categoryId)
+        let resSubCategory = await changeSubCategIdToName(budget.subCategoryId)
+        let resUserColor = await findUserColorByUserId(budget.userId)
+        let resUserName = await getUserNameByUserId(budget.userId)
 
-      let resCategory =  await changeCategIdToName(budget.categoryId);
-      let resSubCategory = await changeSubCategIdToName(budget.subCategoryId);
-      let resUserColor =  await findUserColorByUserId(budget.userId);
-      let resUserName =  await getUserNameByUserId(budget.userId);
+        BudgetsToShow.push({
+          id: budget.id,
+          spendingName: budget.spendingName,
+          spendings: budget.spendings,
+          category: resCategory,
+          subCategory: resSubCategory,
+          userColor: resUserColor,
+          userName: resUserName,
+          createdAt: budget.createdAt,
+        })
+      }),
+    )
 
-      BudgetsToShow.push({
-      id: budget.id,
-      spendingName: budget.spendingName,
-      spendings: budget.spendings,
-      category: resCategory,
-      subCategory: resSubCategory,
-      userColor: resUserColor,
-      userName: resUserName,
-      createdAt: budget.createdAt,
-    });
-    }
-    ))
-
-    return BudgetsToShow;
-
+    return BudgetsToShow
   } catch (error) {
-  throw new Error('error :: service/budget/searchBudget');
+    throw new Error('error :: service/budget/searchBudget')
   }
 }
 
-
 // 서브카테고리 새로 만들기 // categoryName-<id
-const createSubCategory = async(groupId:string, categoryId:number, name:string)=>{
+const createSubCategory = async (groupId: string, categoryId: number, name: string) => {
   const newSubCategory = await prisma.subCategory.create({
-    data:{
+    data: {
       name: name,
-      groupId : groupId,
-      categoryId: categoryId
-    }
+      groupId: groupId,
+      categoryId: categoryId,
+    },
   })
-  return newSubCategory;
+  return newSubCategory
 }
 
 //카테고리 보여주기 -> 만들 필요 있나??
 
-//서브카테고리 보여주기 
-const showSubCategory = async(groupId:string, categoryName: string)=>{
-  
-  const categoryId = await findCategIdByName(categoryName);
+//서브카테고리 보여주기
+const showSubCategory = async (groupId: string, categoryName: string) => {
+  const categoryId = await findCategIdByName(categoryName)
   const SubCategories = await prisma.subCategory.findMany({
-    select:{
+    select: {
       name: true,
     },
-    where:{
-      groupId : groupId,
-      categoryId: categoryId
-    }
-  });
+    where: {
+      groupId: groupId,
+      categoryId: categoryId,
+    },
+  })
 
-  return SubCategories;
+  return SubCategories
 }
-
-
-
 
 //정산파트1 최종함수//
 //각 지출액 - 그룹 평균 지출액 값 반환
 const getGroupMemberSpending = async (groupId: string) => {
   const GroupSpending = await prisma.userSpendings.groupBy({
     by: ['groupId'],
-    where:{
-      groupId : groupId,
-      isDone: false
+    where: {
+      groupId: groupId,
+      isDone: false,
     },
     _sum: {
       spendings: true,
@@ -385,21 +362,21 @@ const getGroupMemberSpending = async (groupId: string) => {
     // having:{
     //   groupId: groupId
     // }
-   })
+  })
 
-   for (const group of GroupSpending) {
-    const groupId = group.groupId;
-    const groupSum = group._sum.spendings;
-    if (!groupSum){
-      throw new Error('groupSum Error: Null');
+  for (const group of GroupSpending) {
+    const groupId = group.groupId
+    const groupSum = group._sum.spendings
+    if (!groupSum) {
+      throw new Error('groupSum Error: Null')
     }
-    const memberNum = await getMemberNumber(groupId);
-    if(!memberNum){
-      throw new Error('memberNum Error: Null');
+    const memberNum = await getMemberNumber(groupId)
+    if (!memberNum) {
+      throw new Error('memberNum Error: Null')
     }
-    const groupAvg = Math.round(groupSum/memberNum);
+    const groupAvg = Math.round(groupSum / memberNum)
 
-    let groupMemberSpendings: { userId: string; userSpending: number}[] = []
+    let groupMemberSpendings: { userId: string; userSpending: number }[] = []
     groupMemberSpendings = await getUserSpending(groupId)
 
     groupMemberSpendings.forEach((member) => {
@@ -408,33 +385,32 @@ const getGroupMemberSpending = async (groupId: string) => {
       }
       member.userSpending -= groupAvg
     })
-    console.log("각 지출액 - 그룹 평균 지출액:", groupMemberSpendings);
-    return groupMemberSpendings    
+    console.log('각 지출액 - 그룹 평균 지출액:', groupMemberSpendings)
+    return groupMemberSpendings
   }
 }
 
-const getMemberNumber = async (groupId: string)=>{
+const getMemberNumber = async (groupId: string) => {
   const memberNum = await prisma.user.groupBy({
     by: ['groupId'],
-    where:{
-      groupId : groupId
+    where: {
+      groupId: groupId,
     },
-    _count:{
-      _all: true
-    }
+    _count: {
+      _all: true,
+    },
   })
 
-  let memberNumInt;
-  memberNum.forEach((member)=>{
-    memberNumInt = member._count._all;
+  let memberNumInt
+  memberNum.forEach((member) => {
+    memberNumInt = member._count._all
   })
 
-  return memberNumInt;
+  return memberNumInt
 }
 
-
-//각 유저의 지출액 합 
-const getUserSpending = async (groupId: string): Promise<{ userId: string; userSpending: number}[]>=>{
+//각 유저의 지출액 합
+const getUserSpending = async (groupId: string): Promise<{ userId: string; userSpending: number }[]> => {
   const userSpendings = await prisma.userSpendings.groupBy({
     by: ['userId'],
     _sum: {
@@ -446,7 +422,7 @@ const getUserSpending = async (groupId: string): Promise<{ userId: string; userS
     },
   })
 
-  const groupMemberSpendingsBefore: { userId: string; userSpending: number}[] = []
+  const groupMemberSpendingsBefore: { userId: string; userSpending: number }[] = []
 
   userSpendings.forEach((record) => {
     const userId = record.userId
@@ -459,54 +435,43 @@ const getUserSpending = async (groupId: string): Promise<{ userId: string; userS
     groupMemberSpendingsBefore.push({ userId, userSpending })
   })
 
-  return groupMemberSpendingsBefore;
+  return groupMemberSpendingsBefore
 }
 
-
-
-
-
-
 //정산파트2//
-const getAdjustmentsCalc = async (groupId: string)=> {
-  const GroupMemberSpendingsAfter = await getGroupMemberSpending(groupId);
-  
+const getAdjustmentsCalc = async (groupId: string) => {
+  const GroupMemberSpendingsAfter = await getGroupMemberSpending(groupId)
 
-  if(!GroupMemberSpendingsAfter){
-    throw new Error("No Spendings found: getAdjustments")
+  if (!GroupMemberSpendingsAfter) {
+    throw new Error('No Spendings found: getAdjustments')
   }
 
-  if(GroupMemberSpendingsAfter.some(obj => obj.userSpending === null)){
+  if (GroupMemberSpendingsAfter.some((obj) => obj.userSpending === null)) {
     throw new Error('Null Value error')
   }
 
-  let Positives = GroupMemberSpendingsAfter.filter(obj => obj.userSpending >= 0);
-  let Negatives = GroupMemberSpendingsAfter.filter(obj => obj.userSpending < 0);
+  let Positives = GroupMemberSpendingsAfter.filter((obj) => obj.userSpending >= 0)
+  let Negatives = GroupMemberSpendingsAfter.filter((obj) => obj.userSpending < 0)
 
-  Positives = Positives.sort((a,b)=>b.userSpending - a.userSpending);
-  Negatives = Negatives.sort((a,b)=>b.userSpending - a.userSpending); //내림차순 정렬 완료
-  console.log("내림차순 정렬 후 처음pos: ", Positives)
-  console.log("내림차순 정렬 후 처음neg: ",Negatives)
+  Positives = Positives.sort((a, b) => b.userSpending - a.userSpending)
+  Negatives = Negatives.sort((a, b) => b.userSpending - a.userSpending) //내림차순 정렬 완료
+  console.log('내림차순 정렬 후 처음pos: ', Positives)
+  console.log('내림차순 정렬 후 처음neg: ', Negatives)
 
-  
-  while(Positives.length != 0 && Negatives.length != 0){
-
-    if((Math.abs(Positives[0].userSpending))<= 10 || Math.abs((Negatives[0].userSpending))<=10){
+  while (Positives.length != 0 && Negatives.length != 0) {
+    if (Math.abs(Positives[0].userSpending) <= 10 || Math.abs(Negatives[0].userSpending) <= 10) {
       //sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Positives[0].userSpending);
-        Negatives[0].userSpending = NaN;
-        Positives[0].userSpending = NaN;
-    }
-    else{
-      if(Math.abs(Positives[0].userSpending) > Math.abs(Negatives[0].userSpending)){
-        sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Math.abs(Negatives[0].userSpending));
-        Positives[0].userSpending += Negatives[0].userSpending;
-        Negatives[0].userSpending = NaN; 
-      }
-
-      else if(Math.abs(Positives[0].userSpending) < Math.abs(Negatives[0].userSpending)){
-        sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Positives[0].userSpending);
-        Negatives[0].userSpending += Positives[0].userSpending;
-        Positives[0].userSpending = NaN;
+      Negatives[0].userSpending = NaN
+      Positives[0].userSpending = NaN
+    } else {
+      if (Math.abs(Positives[0].userSpending) > Math.abs(Negatives[0].userSpending)) {
+        sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Math.abs(Negatives[0].userSpending))
+        Positives[0].userSpending += Negatives[0].userSpending
+        Negatives[0].userSpending = NaN
+      } else if (Math.abs(Positives[0].userSpending) < Math.abs(Negatives[0].userSpending)) {
+        sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Positives[0].userSpending)
+        Negatives[0].userSpending += Positives[0].userSpending
+        Positives[0].userSpending = NaN
       }
 
       // else if(Math.abs(Positives[0].userSpending) == Math.abs(Negatives[0].userSpending)){
@@ -514,59 +479,56 @@ const getAdjustmentsCalc = async (groupId: string)=> {
       //   Negatives[0].userSpending = NaN;
       //   Positives[0].userSpending = NaN;
       // }
-      Positives = Positives.filter(obj => !isNaN(obj.userSpending));
-      Negatives = Negatives.filter(obj=>!isNaN(obj.userSpending));
+      Positives = Positives.filter((obj) => !isNaN(obj.userSpending))
+      Negatives = Negatives.filter((obj) => !isNaN(obj.userSpending))
 
-      Positives = Positives.sort((a,b)=>b.userSpending - a.userSpending);
-      Negatives = Negatives.sort((a,b)=>b.userSpending - a.userSpending); 
-      
-      console.log("whilepos",Positives)
-      console.log("whileneg", Negatives)
+      Positives = Positives.sort((a, b) => b.userSpending - a.userSpending)
+      Negatives = Negatives.sort((a, b) => b.userSpending - a.userSpending)
+
+      console.log('whilepos', Positives)
+      console.log('whileneg', Negatives)
     }
   }
-  return 0;
+  return 0
 }
 
-
-const sendToAdjustments = async(groupId: string, fromId:string, toId:string, change:number)=>{
-  //const Adjustment = 
+const sendToAdjustments = async (groupId: string, fromId: string, toId: string, change: number) => {
+  //const Adjustment =
   await prisma.adjustment.create({
-    data:{
+    data: {
       groupId: groupId,
       plusUserId: toId,
       minusUserId: fromId,
-      change: change
-    }
+      change: change,
+    },
   })
-
 }
 
-getAdjustmentsCalc('aaaaab');
+getAdjustmentsCalc('aaaaab')
 
-const takeFromAdjustments = async(groupId: string)=>{
+const takeFromAdjustments = async (groupId: string) => {
   const Adjustment = await prisma.adjustment.findMany({
-    select:{
+    select: {
       plusUserId: true,
       minusUserId: true,
-      change: true
+      change: true,
     },
-    where:{
+    where: {
       groupId: groupId,
-    }
+    },
   })
-  return Adjustment;
+  return Adjustment
 }
 //userId 별로 보여줘야 함
 
-
-//adjustment 지우기 -> 정산 완료 눌렀을 때 사용할 것.. 
-const deleteAdjustment = async(groupId: string)=>{
+//adjustment 지우기 -> 정산 완료 눌렀을 때 사용할 것..
+const deleteAdjustment = async (groupId: string) => {
   const AdjustmentDeletion = await prisma.adjustment.deleteMany({
-    where:{
-      groupId: groupId
-    }
+    where: {
+      groupId: groupId,
+    },
   })
-  return 0;
+  return 0
 }
 
 //정산 마이너 기능 (날짜 반환)
@@ -583,19 +545,15 @@ const getDayReturn = async (groupId: string) => {
     throw new Error('Error in retrieving date: dayreturn')
   }
 
-  return lastday;
+  return lastday
 }
 
-const getAdjustments = async(groupId: string)=>{
-  const AdjustedResult = await takeFromAdjustments(groupId);
-  const LastCalculatedDate = await getDayReturn(groupId);
+const getAdjustments = async (groupId: string) => {
+  const AdjustedResult = await takeFromAdjustments(groupId)
+  const LastCalculatedDate = await getDayReturn(groupId)
 
-  return {LastCalculatedDate, AdjustedResult};
+  return { LastCalculatedDate, AdjustedResult }
 }
-
-
-
-
 
 export {
   findUserById,
@@ -619,10 +577,8 @@ export {
   //getAdjustments,
   searchBudget,
   createSubCategory,
-  showSubCategory
+  showSubCategory,
 }
-
-
 
 // 서브카테고리 수정
 // const updateSubCategory = async(budgetId: number, subCategory:string)=>{

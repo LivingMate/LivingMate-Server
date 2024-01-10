@@ -3,10 +3,10 @@ const prisma = new PrismaClient()
 import { BudgetCreateRequestDto } from '../../DTOs/Budget/Request/BudgetCreateRequestDto'
 import { BudgetCreateResponseDto } from '../../DTOs/Budget/Response/BudgetCreateResponseDto'
 import { BudgetUpdateRequestDto } from '../../DTOs/Budget/Request/BudgetUpdateRequestDto'
-import { checkForbiddenGroup } from '../GroupService'
+import { checkForbiddenGroup } from '../Group/GroupServiceUtils'
 import message from '../../modules/message'
 import * as UserService from '../UserService'
-import * as GroupService from '../GroupService'
+import * as GroupServiceUtils from '../Group/GroupServiceUtils'
 import * as BudgetServiceUtils from '../Budget/BudgetServiceUtils'
 
 // -------------real service----------------
@@ -18,7 +18,7 @@ const createBudget = async (
 ): Promise<BudgetCreateResponseDto> => {
   try {
     const user = await UserService.findUserById(userId)
-    const group = await GroupService.findGroupById(groupId)
+    const group = await GroupServiceUtils.findGroupById(groupId)
     const reqCategoryId = await BudgetServiceUtils.findCategIdByName(budgetCreateRequestDto.category)
     const reqSubCategoryId = await BudgetServiceUtils.findSubCategIdByName(budgetCreateRequestDto.subCategory)
     await checkForbiddenGroup(user.groupId, groupId)
@@ -197,10 +197,8 @@ const createSubCategory = async (groupId: string, categoryId: number, name: stri
       categoryId: categoryId,
     },
   })
-  return newSubCategory;
+  return newSubCategory
 }
-
-
 
 //서브카테고리 보여주기
 const showSubCategory = async (groupId: string, categoryName: string) => {
@@ -215,11 +213,8 @@ const showSubCategory = async (groupId: string, categoryName: string) => {
     },
   })
 
-  return SubCategories;
+  return SubCategories
 }
-
-
-
 
 //정산파트1 최종함수//
 //각 지출액 - 그룹 평균 지출액 값 반환
@@ -309,11 +304,11 @@ const getUserSpending = async (groupId: string): Promise<{ userId: string; userS
     groupMemberSpendingsBefore.push({ userId, userSpending })
   })
 
-  return groupMemberSpendingsBefore;
+  return groupMemberSpendingsBefore
 }
 
 //가계부 내부 정산 반환 함수
-const AdjAtBudget = async(groupId: string) => {
+const AdjAtBudget = async (groupId: string) => {
   const GroupSpending = await prisma.userSpendings.groupBy({
     by: ['groupId'],
     where: {
@@ -335,12 +330,12 @@ const AdjAtBudget = async(groupId: string) => {
     if (!memberNum) {
       throw new Error('memberNum Error: Null')
     }
-    const groupAvg = Math.round(groupSum / memberNum);
+    const groupAvg = Math.round(groupSum / memberNum)
 
     let groupMemberSpendings2: { userId: string; userSpending: number }[] = []
     let groupMemberSpendings: { userId: string; userSpending: number }[] = []
-    groupMemberSpendings = await getUserSpending(groupId);
-    groupMemberSpendings2 = await getUserSpending(groupId);
+    groupMemberSpendings = await getUserSpending(groupId)
+    groupMemberSpendings2 = await getUserSpending(groupId)
 
     groupMemberSpendings.forEach((member) => {
       if (member.userSpending == null || groupAvg == null) {
@@ -348,15 +343,15 @@ const AdjAtBudget = async(groupId: string) => {
       }
       member.userSpending -= groupAvg
     })
-    
-    return{
-      groupAvg, groupSum, groupMemberSpendings, groupMemberSpendings2
+
+    return {
+      groupAvg,
+      groupSum,
+      groupMemberSpendings,
+      groupMemberSpendings2,
     }
   }
-  
 }
-
-
 
 //정산파트2//
 const getAdjustmentsCalc = async (groupId: string) => {
@@ -388,17 +383,14 @@ const getAdjustmentsCalc = async (groupId: string) => {
         sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Math.abs(Negatives[0].userSpending))
         Positives[0].userSpending += Negatives[0].userSpending
         Negatives[0].userSpending = NaN
-
       } else if (Math.abs(Positives[0].userSpending) < Math.abs(Negatives[0].userSpending)) {
         sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Positives[0].userSpending)
         Negatives[0].userSpending += Positives[0].userSpending
         Positives[0].userSpending = NaN
-      }
-
-      else if(Math.abs(Positives[0].userSpending) == Math.abs(Negatives[0].userSpending)){
-        sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Positives[0].userSpending);
-        Negatives[0].userSpending = NaN;
-        Positives[0].userSpending = NaN;
+      } else if (Math.abs(Positives[0].userSpending) == Math.abs(Negatives[0].userSpending)) {
+        sendToAdjustments(groupId, Negatives[0].userId, Positives[0].userId, Positives[0].userSpending)
+        Negatives[0].userSpending = NaN
+        Positives[0].userSpending = NaN
       }
       Positives = Positives.filter((obj) => !isNaN(obj.userSpending))
       Negatives = Negatives.filter((obj) => !isNaN(obj.userSpending))
@@ -414,7 +406,6 @@ const getAdjustmentsCalc = async (groupId: string) => {
 }
 
 const sendToAdjustments = async (groupId: string, fromId: string, toId: string, change: number) => {
-  
   await prisma.adjustment.create({
     data: {
       groupId: groupId,
@@ -437,15 +428,18 @@ const takeFromAdjustments = async (groupId: string) => {
     },
   })
 
-  const AdjustmentToReturn: {plusUserName:string; plusUserColor:string; minusUserName:string; minusUserColor:string; change:number }[] =[];
+  const AdjustmentToReturn: {
+    plusUserName: string
+    plusUserColor: string
+    minusUserName: string
+    minusUserColor: string
+    change: number
+  }[] = []
 
   await Promise.all(
-
-    
     Adjustment.map(async (record) => {
-
-      if(!record.plusUserId || !record.minusUserId){
-            throw new Error('Null Error: Adjustment to Return')
+      if (!record.plusUserId || !record.minusUserId) {
+        throw new Error('Null Error: Adjustment to Return')
       }
 
       let plusUserName = await UserService.getUserNameByUserId(record.plusUserId)
@@ -455,15 +449,18 @@ const takeFromAdjustments = async (groupId: string) => {
       let change = record.change
 
       AdjustmentToReturn.push({
-        plusUserName, plusUserColor,minusUserName,minusUserColor,change
+        plusUserName,
+        plusUserColor,
+        minusUserName,
+        minusUserColor,
+        change,
       })
     }),
   )
-  return AdjustmentToReturn;
+  return AdjustmentToReturn
 }
 
-
-//adjustment 지우기 -> 정산 완료 눌렀을 때 사용할 것..-> isDone을 주자.. 
+//adjustment 지우기 -> 정산 완료 눌렀을 때 사용할 것..-> isDone을 주자..
 
 // const deleteAdjustment = async (groupId: string) => {
 //   await prisma.adjustment.deleteMany({
@@ -487,44 +484,36 @@ const getDayReturn = async (groupId: string) => {
   if (!lastday) {
     throw new Error('Error in retrieving date: dayreturn')
   }
-  return lastday.createdAt;
+  return lastday.createdAt
 }
 
-const isDone = async (groupId: string) =>{
+const isDone = async (groupId: string) => {
   await prisma.userSpendings.updateMany({
-    where:{
-      groupId : groupId,
-      isDone : false
+    where: {
+      groupId: groupId,
+      isDone: false,
     },
-    data:{
-      isDone: true
-    }
-})
+    data: {
+      isDone: true,
+    },
+  })
 }
 
 const getAdjustments = async (groupId: string) => {
   const AdjustedResult = await takeFromAdjustments(groupId)
   const LastCalculatedDate = await getDayReturn(groupId)
 
-  await isDone(groupId);
+  await isDone(groupId)
 
   return { LastCalculatedDate, AdjustedResult }
 }
 
-
-
-
-
-const finalAdjustment = async(groupId: string) =>{
+const finalAdjustment = async (groupId: string) => {
   let final1 = await getAdjustmentsCalc(groupId)
-  let final = await getAdjustments(groupId);
-  
-  return {final1, final}
-  
+  let final = await getAdjustments(groupId)
+
+  return { final1, final }
 }
-
-
-
 
 export {
   createBudget,
@@ -543,5 +532,5 @@ export {
   createSubCategory,
   showSubCategory,
   finalAdjustment,
-  AdjAtBudget
+  AdjAtBudget,
 }

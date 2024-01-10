@@ -3,7 +3,8 @@ import { SignupDto } from '../DTOs/Auth/Requests/SignupDto'
 import { UserUpdateRequestDto } from '../DTOs/User/Request/UserUpdateRequestDto'
 import { UserUpdateResponseDto } from '../DTOs/User/Response/UserUpdateResponseDto'
 import { UserProfileResponseDto } from '../DTOs/User/Response/UserProfileResponseDto'
-import * as GroupService from './GroupService'
+import * as GroupService from './Group/GroupService'
+import * as GroupServiceUtils from './Group/GroupServiceUtils'
 import message from '../modules/message'
 import { sign } from 'crypto'
 
@@ -37,13 +38,13 @@ const getUserProfile = async (userId: string): Promise<UserProfileResponseDto> =
     if (userProfile.groupId === null || userProfile.groupId === undefined) {
       throw new Error('User has no group!')
     }
-    const userGroupName = await GroupService.findGroupNameByGroupId(userProfile.groupId)
+    const userGroupName = await GroupServiceUtils.findGroupNameByGroupId(userProfile.groupId)
     const groupName = userGroupName?.groupName ?? 'DefaultGroupName'
 
-    const userGroupMembersNames = await GroupService.findGroupMembersNamesByGroupId(userProfile.groupId)
+    const userGroupMembersNames = await GroupServiceUtils.findGroupMembersNamesByGroupId(userProfile.groupId)
     const groupMembersNames = userGroupMembersNames ?? []
 
-    const userGroupMembersColors = await GroupService.findGroupMembersColorsByGroupId(userProfile.groupId)
+    const userGroupMembersColors = await GroupServiceUtils.findGroupMembersColorsByGroupId(userProfile.groupId)
     const groupMembersColors = userGroupMembersColors ?? []
 
     const data: UserProfileResponseDto = {
@@ -143,7 +144,6 @@ const findUserColorByUserId = async (userId: string) => {
   }
 }
 
-
 // userName으로 userID 찾기
 const getUserIdbyName = async (userName: string[]) => {
   // userId가 정의되어 있지 않거나 문자열이 아닌 경우 에러 발생
@@ -229,12 +229,12 @@ const duplicateId = async(id:string)=>{
 
 
 export {
-  createUser,
+  // createUser,
   findUserById,
   findGroupIdByUserId,
   findUserByIdAndUpdate,
   getUserProfile,
-  addUserToGroup,
+  // addUserToGroup,
   getUserNameByUserId,
   getUserIdbyName,
   findUserColorByUserId,
