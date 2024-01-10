@@ -229,7 +229,7 @@ const duplicateId = async(id:string)=>{
 
 
 export {
-  // createUser,
+  createUser,
   findUserById,
   findGroupIdByUserId,
   findUserByIdAndUpdate,
