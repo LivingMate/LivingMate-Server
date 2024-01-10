@@ -4,25 +4,40 @@ import { UserUpdateRequestDto } from '../DTOs/User/Request/UserUpdateRequestDto'
 import { UserUpdateResponseDto } from '../DTOs/User/Response/UserUpdateResponseDto'
 import { UserProfileResponseDto } from '../DTOs/User/Response/UserProfileResponseDto'
 import * as GroupService from './Group/GroupService'
+import * as GroupServiceUtils from './Group/GroupServiceUtils'
 import message from '../modules/message'
 import { sign } from 'crypto'
 
 const prisma = new PrismaClient()
 
-const createUser = async (signupDtO: SignupDto) => {
-  const user = await prisma.user.create({
-    data: {
-      userName: signupDtO.userName,
-      groupId: signupDtO.groupId || '',
-      userColor: 'FFFFFF', //default, just temporary value for now
-      email: signupDtO.email,
-      sex: signupDtO.sex,
-      age: signupDtO.age,
-    },
-  })
-  //if 이미 존재하는 유저인지 확인
-  return user
-}
+// const createUser = async (
+//   signUpDto : SignupDto,
+// ) => {
+//   try {
+//     const event = await prisma.user.create({
+//       data: {
+//         userName : signUpDto.
+//       },
+//     })
+
+//     const resUserName = await UserService.getUserNameByUserId(event.userId)
+//     const resUserColor = await UserService.findUserColorByUserId(event.userId)
+
+//     const data: FeedCreateResponseDto = {
+//       feedId: event.id,
+//       userId: event.userId,
+//       userName: resUserName,
+//       userColor: resUserColor,
+//       groupId: event.groupId,
+//       content: event.content,
+//       createdAt: event.createdAt,
+//       pinned: event.pin
+//     }
+//     return data
+//   } catch (error) {
+//     console.error('error :: service/feed/createFeed', error)
+//     throw error
+//   }
 
 const getUserProfile = async (userId: string): Promise<UserProfileResponseDto> => {
   try {
@@ -34,13 +49,13 @@ const getUserProfile = async (userId: string): Promise<UserProfileResponseDto> =
     if (userProfile.groupId === null || userProfile.groupId === undefined) {
       throw new Error('User has no group!')
     }
-    const userGroupName = await GroupService.findGroupNameByGroupId(userProfile.groupId)
+    const userGroupName = await GroupServiceUtils.findGroupNameByGroupId(userProfile.groupId)
     const groupName = userGroupName?.groupName ?? 'DefaultGroupName'
 
-    const userGroupMembersNames = await GroupService.findGroupMembersNamesByGroupId(userProfile.groupId)
+    const userGroupMembersNames = await GroupServiceUtils.findGroupMembersNamesByGroupId(userProfile.groupId)
     const groupMembersNames = userGroupMembersNames ?? []
 
-    const userGroupMembersColors = await GroupService.findGroupMembersColorsByGroupId(userProfile.groupId)
+    const userGroupMembersColors = await GroupServiceUtils.findGroupMembersColorsByGroupId(userProfile.groupId)
     const groupMembersColors = userGroupMembersColors ?? []
 
     const data: UserProfileResponseDto = {
@@ -158,30 +173,30 @@ const getUserIdbyName = async (userName: string[]) => {
   return data.id
 }
 
-//+ 그룹 참여하는 서비스
-const addUserToGroup = async (signupDTO: SignupDto, groupId: string) => {
-  //1. createUser with signupDTO
-  //2. put her groupId in her record at User table
-  //3. assign her id(? not sure) to Group's User[]? Did it mean it had foreign relations with the table?
-  const newUser = await createUser(signupDTO)
-  await prisma.user.update({
-    where: {
-      id: newUser.id,
-    },
-    data: {
-      groupId: groupId,
-    },
-  })
-  return newUser
-}
+// //+ 그룹 참여하는 서비스
+// const addUserToGroup = async (signupDTO: SignupDto, groupId: string) => {
+//   //1. createUser with signupDTO
+//   //2. put her groupId in her record at User table
+//   //3. assign her id(? not sure) to Group's User[]? Did it mean it had foreign relations with the table?
+//   const newUser = await createUser(signupDTO)
+//   await prisma.user.update({
+//     where: {
+//       id: newUser.id,
+//     },
+//     data: {
+//       groupId: groupId,
+//     },
+//   })
+//   return newUser
+// }
 
 export {
-  createUser,
+  // createUser,
   findUserById,
   findGroupIdByUserId,
   findUserByIdAndUpdate,
   getUserProfile,
-  addUserToGroup,
+  // addUserToGroup,
   getUserNameByUserId,
   getUserIdbyName,
   findUserColorByUserId,

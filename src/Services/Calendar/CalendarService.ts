@@ -474,12 +474,33 @@ const getThisWeeksDuty = async (groupId: string) => {
       },
     })
 
-    return calendarEventsThisWeek
+    const groupedEvents = groupEventsByTitleMemoGroupId(calendarEventsThisWeek);
+
+    const data = groupedEvents.map((group) => ({
+      title: group[0].title,
+      memo: group[0].memo,
+      groupId: group[0].groupId,
+      daysOfWeek: group.map((event) => CalendarServiceUtils.getDayOfWeek(event.dateStart)),
+    }));
+
+    return data;
   } catch (error) {
     console.error("Error searching this week's duty", error)
     throw error
   }
 }
+
+const groupEventsByTitleMemoGroupId = (events) => {
+  const groupedEvents = {};
+  for (const event of events) {
+    const key = `${event.title}-${event.memo || ''}-${event.groupId}`;
+    if (!groupedEvents[key]) {
+      groupedEvents[key] = [];
+    }
+    groupedEvents[key].push(event);
+  }
+  return Object.values(groupedEvents);
+};
 
 export {
   createCalendar,
@@ -490,4 +511,5 @@ export {
   updateCalendar,
   deleteCalendar,
   getThisWeeksDuty,
+  groupEventsByTitleMemoGroupId
 }

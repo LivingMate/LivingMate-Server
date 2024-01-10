@@ -280,6 +280,13 @@ const getCurrentWeekDates = () => {
   }
 }
 
+// 날짜를 요일로 변환
+const getDayOfWeek = (date: Date): string => {
+  const daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"];
+  const dayIndex = date.getDay();
+  return daysOfWeek[dayIndex];
+};
+
 //참여자가 여러명인 경우
 const multipleParticipants = async (
   participants: string[],
@@ -415,6 +422,7 @@ export {
   deleteRepeatCalendar,
   deleteThisRepeatCalendar,
   getCurrentWeekDates,
+  getDayOfWeek,
   multipleParticipants,
   updateParticipants,
   makeArray
