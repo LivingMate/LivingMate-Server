@@ -1,5 +1,5 @@
 export interface CalendarCreateDto {
-  calendarId: number;
+  Id: number;
   title: string;
   userId: string;  
   groupId: string;

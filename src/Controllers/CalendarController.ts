@@ -100,8 +100,8 @@ const deleteCalendarEvent = async (req: Request, res: Response, next: NextFuncti
   if (!errors.isEmpty()) {
     return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, message.BAD_REQUEST))
   }
-  const { userId } = req.params
-  const { groupId } = req.params
+  const userId = req.params.userId
+  const groupId = req.params.groupId;
   const eventId = parseInt(req.params.eventId, 10)
 
   try {

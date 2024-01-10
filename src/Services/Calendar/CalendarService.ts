@@ -310,7 +310,7 @@ const updateCalendar = async (
       const UserColor = await UserService.findUserColorByUserId(userId)
 
       const eventToReturn: CalendarUpdateResponseDto = {
-        calendarId: eventId,
+        Id: eventId,
         userId: userId,
         groupId: groupId,
         title: updatedEvent2.title,
@@ -376,7 +376,7 @@ const updateCalendar = async (
     const UserColor = await UserService.findUserColorByUserId(updatedEvent.userId)
 
     const eventToReturn: CalendarUpdateResponseDto = {
-      calendarId: updatedEvent.id,
+      Id: updatedEvent.id,
       userId: userId,
       groupId: groupId,
       title: updatedEvent.title,
@@ -457,12 +457,25 @@ const showCalendar = async (groupId: string) => {
   }
 }
 
-// 이번주 날짜의 일정 반환
+
+interface CalendarEvent {
+  id: number;
+  userId: string;
+  groupId: string;
+  title: string;
+  dateStart: Date;
+  dateEnd: Date;
+  memo?: string;
+  term: number;
+  participants?: string[];
+}
+
+
 const getThisWeeksDuty = async (groupId: string) => {
   try {
-    const { startDate, endDate } = CalendarServiceUtils.getCurrentWeekDates()
+    const { startDate, endDate } = CalendarServiceUtils.getCurrentWeekDates();
 
-    const calendarEventsThisWeek = await prisma.calendar.findMany({
+    const calendarEventsThisWeek: CalendarEvent[] = await prisma.calendar.findMany({
       where: {
         groupId: groupId,
         dateStart: {
@@ -472,35 +485,24 @@ const getThisWeeksDuty = async (groupId: string) => {
           lte: endDate,
         },
       },
-    })
+    });
 
-    const groupedEvents = groupEventsByTitleMemoGroupId(calendarEventsThisWeek);
+    const groupedEvents = await CalendarServiceUtils.groupThisWeekEvents(calendarEventsThisWeek);
 
     const data = groupedEvents.map((group) => ({
-      title: group[0].title,
-      memo: group[0].memo,
-      groupId: group[0].groupId,
-      daysOfWeek: group.map((event) => CalendarServiceUtils.getDayOfWeek(event.dateStart)),
+      title: group.title,
+      groupId: group.groupId,
+      daysOfWeek: group.daysOfWeek,
+      participants: group.participants,
     }));
 
     return data;
   } catch (error) {
-    console.error("Error searching this week's duty", error)
-    throw error
+    console.error("이번 주의 일정 검색 중 오류", error);
+    throw error;
   }
-}
-
-const groupEventsByTitleMemoGroupId = (events) => {
-  const groupedEvents = {};
-  for (const event of events) {
-    const key = `${event.title}-${event.memo || ''}-${event.groupId}`;
-    if (!groupedEvents[key]) {
-      groupedEvents[key] = [];
-    }
-    groupedEvents[key].push(event);
-  }
-  return Object.values(groupedEvents);
 };
+
 
 export {
   createCalendar,
@@ -511,5 +513,4 @@ export {
   updateCalendar,
   deleteCalendar,
   getThisWeeksDuty,
-  groupEventsByTitleMemoGroupId
 }
