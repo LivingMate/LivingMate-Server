@@ -4,5 +4,5 @@ export interface SignupDto {
   userName: string
   sex: boolean
   age: number
-  fcmToken: string
+  fcmToken?: string
 }

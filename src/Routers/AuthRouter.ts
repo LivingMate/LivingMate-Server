@@ -1,11 +1,19 @@
-// import express from 'express';
-// import { body } from 'express-validator';
-// //import { AuthController } from '../Controllers';
-// import passport from 'passport'
-// import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-// import { Router, Request, Response } from "express";
+import express from 'express';
+//import { body } from 'express-validator';
+//import { AuthController } from '../Controllers';
+//import passport from 'passport'
+//import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import * as AuthController from '../Controllers/UserController'
 
-// const router:Router = Router();
+const AuthRouter = express.Router();
+
+AuthRouter.post('/signup', AuthController.createUser)
+AuthRouter.get('./profile/:userId', AuthController.getUserProfile)
+
+
+
+
+
 
 // router.get('/google', passport.authenticate('google', {scope:['profile', 'email']}));
 
@@ -30,3 +38,5 @@ router.get('/auth/logout', (req, res) => {
  */
 
 //export default router;
+
+export {AuthRouter};

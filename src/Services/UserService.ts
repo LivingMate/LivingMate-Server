@@ -23,12 +23,12 @@ const createUser = async (signupDtO: SignupDto) => {
       age: signupDtO.age,
     },
   })
-  updateUserColor(Id);
+  const createdUser = await updateUserColor(user.id);
   //if 이미 존재하는 유저인지 확인
-  return user
+  return createdUser
 }
 
-const getUserProfile = async (userId: string): Promise<UserProfileResponseDto> => {
+const getUserProfile = async (userId: string) => {
   try {
     const userProfile = await findUserById(userId)
     if (!userProfile) {
@@ -38,21 +38,30 @@ const getUserProfile = async (userId: string): Promise<UserProfileResponseDto> =
     if (userProfile.groupId === null || userProfile.groupId === undefined) {
       throw new Error('User has no group!')
     }
-    const userGroupName = await GroupServiceUtils.findGroupNameByGroupId(userProfile.groupId)
-    const groupName = userGroupName?.groupName ?? 'DefaultGroupName'
 
-    const userGroupMembersNames = await GroupServiceUtils.findGroupMembersNamesByGroupId(userProfile.groupId)
-    const groupMembersNames = userGroupMembersNames ?? []
+    const group = await GroupServiceUtils.findGroupById(userProfile.id)
+    group?.groupName ?? 'DefaultGroupName'
 
-    const userGroupMembersColors = await GroupServiceUtils.findGroupMembersColorsByGroupId(userProfile.groupId)
-    const groupMembersColors = userGroupMembersColors ?? []
+    const userGroupMembersNamesColors = await GroupServiceUtils.findGroupMembersNamesColorsByGroupId(userProfile.groupId);
+    const groupMembersNames:string[] = [];
+    const groupMembersColors: string[]= [];
+
+    userGroupMembersNamesColors.forEach((member)=>{
+      let name = member.userName;
+      let color= member.userColor;
+
+      groupMembersNames.push(name);
+      groupMembersColors.push(color);
+
+    })
+    
 
     const data: UserProfileResponseDto = {
       userName: userProfile.userName,
       userColor: userProfile.userColor,
-      groupName,
-      groupMembersNames,
-      groupMembersColors,
+      groupName: group.groupName,
+      groupMembersNames: groupMembersNames,
+      groupMembersColors: groupMembersColors
     }
 
     return data
@@ -75,19 +84,16 @@ const findUserById = async (userId: string) => {
   return user
 }
 
-const findGroupIdByUserId = async (userId: string) => {
+const findGroupByUserId = async (userId: string) => {
   const group = prisma.user.findUnique({
     where: {
       id: userId,
-    },
-    select: {
-      groupId: true,
-    },
+    }
   })
   if (!group) {
     throw new Error('Group not found!')
   }
-  return group
+  return group;
 }
 
 const findUserByIdAndUpdate = async (userId: string, userUpdateRequestDto: UserUpdateRequestDto) => {
@@ -231,7 +237,7 @@ const duplicateId = async(id:string)=>{
 export {
   createUser,
   findUserById,
-  findGroupIdByUserId,
+  findGroupByUserId,
   findUserByIdAndUpdate,
   getUserProfile,
   // addUserToGroup,
@@ -239,5 +245,6 @@ export {
   getUserIdbyName,
   findUserColorByUserId,
   updateUserColor,
-  createUserId
+  createUserId,
+  addUserToGroup
 }
