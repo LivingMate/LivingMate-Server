@@ -10,8 +10,10 @@ import { sign } from 'crypto'
 const prisma = new PrismaClient()
 
 const createUser = async (signupDtO: SignupDto) => {
+  const Id = await createUserId();
   const user = await prisma.user.create({
     data: {
+      id: Id,
       userName: signupDtO.userName,
       groupId: signupDtO.groupId || '', 
       userColor: 'FFFFFF', //default, just temporary value for now
@@ -20,6 +22,7 @@ const createUser = async (signupDtO: SignupDto) => {
       age: signupDtO.age,
     },
   })
+  updateUserColor(Id);
   //if 이미 존재하는 유저인지 확인
   return user
 }
@@ -178,6 +181,53 @@ const addUserToGroup = async (signupDTO: SignupDto, groupId: string) => {
   return newUser
 }
 
+const createColor = async()=>{
+  const color = Math.floor(Math.random() * 16777215).toString(16);
+   return '#'+ color;
+}
+
+const updateUserColor = async(userId:string) =>{
+  const color = await createColor();
+  const userWithColor = await prisma.user.update({
+    where:{
+      id : userId
+    },
+    data:{
+      userColor: color
+    }
+  })
+  return userWithColor;
+}
+
+const createUserId = async()=>{
+  
+    const size: number = 8;
+    const characters: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const charactersLength: number = characters.length;
+    let result: string = '';
+    do {
+      result = '';
+      for (let i: number = 0; i < size; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      }
+    } while (await duplicateId(result));
+  
+    return result;
+ 
+}
+
+const duplicateId = async(id:string)=>{
+  const user = await prisma.user.findUnique({
+    where:{
+      id : id
+    }
+  });
+  if (!user) return false;
+  else return true;
+
+}
+
+
 export {
   createUser,
   findUserById,
@@ -188,4 +238,6 @@ export {
   getUserNameByUserId,
   getUserIdbyName,
   findUserColorByUserId,
+  updateUserColor,
+  createUserId
 }

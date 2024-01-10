@@ -11,7 +11,7 @@ datasource db {
 }
 
 model User {
-  id              String               @id @default(cuid())
+  id              String               @id 
   userName        String               @unique
   userColor       String
   email           String               @unique

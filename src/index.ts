@@ -6,6 +6,7 @@ import express, { Express, Request, Response, NextFunction } from 'express'
 import { FeedRouter } from './Routers/FeedRouter'
 import { CalendarRouter } from './Routers/CalendarRouter';
 import {BudgetRouter} from './Routers/BudgetRouter';
+import { SignupDto } from './DTOs/Auth/Requests/SignupDto';
 const app = express()
 
 app.use(express.json())
