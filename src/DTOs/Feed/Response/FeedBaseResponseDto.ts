@@ -1,6 +1,4 @@
-import { FeedBaseDto } from '../FeedBaseDto';
-
-export interface FeedBaseResponseDto extends FeedBaseDto {
+export interface FeedBaseResponseDto {
     createdAt: Date;
     userName: string;
     userColor: string;
