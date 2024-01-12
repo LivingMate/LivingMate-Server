@@ -3,7 +3,7 @@ const prisma = new PrismaClient()
 import { BudgetCreateRequestDto } from '../DTOs/Budget/Request/BudgetCreateRequestDto'
 import { BudgetCreateResponseDto } from '../DTOs/Budget/Response/BudgetCreateResponseDto'
 import { BudgetUpdateRequestDto } from '../DTOs/Budget/Request/BudgetUpdateRequestDto'
-import { checkForbiddenGroup } from './Group/GroupService'
+//import { checkForbiddenGroup } from './Group/GroupService'
 import { getUserNameByUserId } from './UserService'
 import message from '../modules/message'
 
@@ -150,7 +150,7 @@ const createBudget = async (
     const group = await findGroupById(groupId)
     const reqCategoryId = await findCategIdByName(budgetCreateRequestDto.category)
     const reqSubCategoryId = await findSubCategIdByName(budgetCreateRequestDto.subCategory)
-    await checkForbiddenGroup(user.groupId, groupId)
+    //await checkForbiddenGroup(user.groupId, groupId)
 
     const event = await prisma.userSpendings.create({
       data: {
