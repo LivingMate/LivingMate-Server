@@ -25,17 +25,13 @@ const findFeedEventById = async (eventId: number) => {
 
 // ------- real service -------
 //신규 피드 등록
-const createFeed = async (
-  userId: string,
-  groupId: string,
-  content: string
-): Promise<FeedCreateResponseDto> => {
+const createFeed = async (userId: string, groupId: string, content: string): Promise<FeedCreateResponseDto> => {
   try {
     const event = await prisma.feed.create({
       data: {
         userId: userId,
         groupId: groupId,
-        content: content
+        content: content,
       },
     })
 
@@ -45,12 +41,12 @@ const createFeed = async (
     const data: FeedCreateResponseDto = {
       feedId: event.id,
       userId: event.userId,
-      userName: resUserName,
-      userColor: resUserColor,
+      //userName: resUserName,
+      //userColor: resUserColor,
       groupId: event.groupId,
       content: event.content,
       createdAt: event.createdAt,
-      pinned: event.pin
+      pinned: event.pin,
     }
     return data
   } catch (error) {
@@ -60,8 +56,11 @@ const createFeed = async (
 }
 
 //피드내용 수정
-const updateFeedContent = async (//userId: string, groupId: string, 
-  feedId: number, content:string) => {
+const updateFeedContent = async (
+  //userId: string, groupId: string,
+  feedId: number,
+  content: string,
+) => {
   try {
     const existingEvent = await findFeedEventById(feedId)
     if (!existingEvent) {
@@ -73,32 +72,31 @@ const updateFeedContent = async (//userId: string, groupId: string,
         id: feedId,
       },
       data: {
-        content: content
+        content: content,
       },
     })
 
-    const resUserName = await UserService.getUserNameByUserId(updatedEvent.userId)
-    const resUserColor = await UserService.findUserColorByUserId(updatedEvent.userId)
+    //const resUserName = await UserService.getUserNameByUserId(updatedEvent.userId)
+    //const resUserColor = await UserService.findUserColorByUserId(updatedEvent.userId)
 
     const FeedToReturn: FeedUpdateResponseDto = {
       feedId: updatedEvent.id,
       userId: updatedEvent.userId,
-      userName: resUserName,
-      userColor: resUserColor,
+      //userName: resUserName,
+      //userColor: resUserColor,
       groupId: updatedEvent.groupId,
       content: updatedEvent.content,
       createdAt: updatedEvent.createdAt,
-      pinned: updatedEvent.pin
+      pinned: updatedEvent.pin,
     }
-    return FeedToReturn;
-
+    return FeedToReturn
   } catch (error) {
     console.error('error :: service/feed/updatefeed', error)
     throw error
   }
 }
 
-//피드 고정 
+//피드 고정
 const pinFeed = async (FeedId: number) => {
   const pinnedFeed = await prisma.feed.update({
     where: {
@@ -108,7 +106,7 @@ const pinFeed = async (FeedId: number) => {
       pin: true,
     },
   })
-  return pinnedFeed;
+  return pinnedFeed
 }
 
 //피드 삭제
@@ -132,7 +130,7 @@ const deleteFeed = async (FeedId: number) => {
   }
 }
 
-//피드 보여주기 : 객체 타입의 배열로 반환됨! 
+//피드 보여주기 : 객체 타입의 배열로 반환됨!
 const showFeed = async (GroupId: string) => {
   const Feeds = await prisma.feed.findMany({
     where: {
@@ -142,7 +140,7 @@ const showFeed = async (GroupId: string) => {
       id: 'desc',
     },
   })
-  return Feeds;
+  return Feeds
 }
 
 //피드 찾기
@@ -155,7 +153,7 @@ const findFeedByFeedId = async (FeedId: number) => {
   if (!Feed) {
     throw new Error('No Feed Found!')
   }
-  return Feed;
+  return Feed
 }
 
 export { createFeed, deleteFeed, findFeedByFeedId, pinFeed, showFeed, updateFeedContent }

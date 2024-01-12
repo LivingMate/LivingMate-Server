@@ -37,17 +37,19 @@ const createBudget = async (
     // categoryId와 subCategoryId 변환
     const resCategory = await BudgetServiceUtils.changeCategIdToName(event.categoryId)
     const resSubCategory = await BudgetServiceUtils.changeSubCategIdToName(event.subCategoryId)
-    const resUserColor = await UserService.findUserColorByUserId(event.userId)
-    const resUserName = await UserService.getUserNameByUserId(event.userId)
+    //const resUserColor = await UserService.findUserColorByUserId(event.userId)
+    //const resUserName = await UserService.getUserNameByUserId(event.userId)
 
     const createdBudget: BudgetCreateResponseDto = {
       id: event.id,
+      userId: event.userId,
+      groupId: event.groupId,
       spendingName: event.spendingName,
       spendings: event.spendings,
       category: resCategory,
       subCategory: resSubCategory,
-      userColor: resUserColor,
-      userName: resUserName,
+      //userColor: resUserColor,
+      //userName: resUserName,
       createdAt: event.createdAt,
     }
 
@@ -74,17 +76,19 @@ const showBudget = async (groupId: string) => {
       Budgets.map(async (budget) => {
         let resCategory = await BudgetServiceUtils.changeCategIdToName(budget.categoryId)
         let resSubCategory = await BudgetServiceUtils.changeSubCategIdToName(budget.subCategoryId)
-        let resUserColor = await UserService.findUserColorByUserId(budget.userId)
-        let resUserName = await UserService.getUserNameByUserId(budget.userId)
+        //let resUserColor = await UserService.findUserColorByUserId(budget.userId)
+        //let resUserName = await UserService.getUserNameByUserId(budget.userId)
 
         BudgetsToShow.push({
           id: budget.id,
+          userId: budget.userId,
+          groupId: budget.groupId,
           spendingName: budget.spendingName,
           spendings: budget.spendings,
           category: resCategory,
           subCategory: resSubCategory,
-          userColor: resUserColor,
-          userName: resUserName,
+          //userColor: resUserColor,
+          //userName: resUserName,
           createdAt: budget.createdAt,
         })
       }),
@@ -113,14 +117,16 @@ const updateBudget = async (budgetId: number, BudgetUpdateRequestDto: BudgetUpda
     })
     //return updatedBudget;
 
-    const UserName = await UserService.getUserNameByUserId(updatedBudget.userId)
-    const UserColor = await UserService.findUserColorByUserId(updatedBudget.userId)
+    //const UserName = await UserService.getUserNameByUserId(updatedBudget.userId)
+    //const UserColor = await UserService.findUserColorByUserId(updatedBudget.userId)
     const resCategory = await BudgetServiceUtils.changeCategIdToName(updatedBudget.categoryId)
     const resSubCategory = await BudgetServiceUtils.changeSubCategIdToName(updatedBudget.subCategoryId)
 
     const budgetToReturn: BudgetCreateResponseDto = {
-      userColor: UserColor,
-      userName: UserName,
+      //userColor: UserColor,
+      //userName: UserName,
+      userId: updatedBudget.userId,
+      groupId: updatedBudget.groupId,
       createdAt: updatedBudget.createdAt,
       spendings: updatedBudget.spendings,
       spendingName: updatedBudget.spendingName,
@@ -166,17 +172,19 @@ const searchBudget = async (groupId: string, searchKey: string) => {
       searchedBudget.map(async (budget) => {
         let resCategory = await BudgetServiceUtils.changeCategIdToName(budget.categoryId)
         let resSubCategory = await BudgetServiceUtils.changeSubCategIdToName(budget.subCategoryId)
-        let resUserColor = await UserService.findUserColorByUserId(budget.userId)
-        let resUserName = await UserService.getUserNameByUserId(budget.userId)
+        //let resUserColor = await UserService.findUserColorByUserId(budget.userId)
+        //let resUserName = await UserService.getUserNameByUserId(budget.userId)
 
         BudgetsToShow.push({
           id: budget.id,
+          userId: budget.userId,
+          groupId: budget.groupId,
           spendingName: budget.spendingName,
           spendings: budget.spendings,
           category: resCategory,
           subCategory: resSubCategory,
-          userColor: resUserColor,
-          userName: resUserName,
+          //userColor: resUserColor,
+          //userName: resUserName,
           createdAt: budget.createdAt,
         })
       }),

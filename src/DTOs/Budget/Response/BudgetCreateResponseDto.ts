@@ -1,8 +1,10 @@
-import { BudgetCreateRequestDto } from "../Request/BudgetCreateRequestDto";
+import { BudgetCreateRequestDto } from '../Request/BudgetCreateRequestDto'
 
-export interface BudgetCreateResponseDto extends BudgetCreateRequestDto{
-    id: number;
-    userColor: string;
-    userName : string;
-    createdAt : Date;
+export interface BudgetCreateResponseDto extends BudgetCreateRequestDto {
+  id: number
+  userId: string
+  groupId: string
+  //userColor: string
+  //userName: string
+  createdAt: Date
 }

@@ -21,23 +21,6 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Typescript + Node.js + Express Server')
 })
 
-// app.get('/feeds', async (req, res) => {
-//    try {
-//      const items = await prisma.feed.findMany();
-//      res.json(items);
-//    } catch (error) {
-//      res.status(500).json({ error: 'Error fetching items' });
-//    }
-//  });
-
-//  app.get('/user', async (req, res) => {
-//    try {
-//      const items = await prisma.user.findMany();
-//      res.json(items);
-//    } catch (error) {
-//      res.status(500).json({ error: 'Error fetching items' });
-//    }
-//  });
 
 app.use(FeedRouter);
 app.use(CalendarRouter);
@@ -53,6 +36,22 @@ interface ErrorType {
   message: string
   status: number
 }
+
+
+const admin = require("firebase-admin");
+
+const serviceAccount = require("../serviceAcountKey.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
+
+
+
+
+
+
+
 
 
 

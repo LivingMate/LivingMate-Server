@@ -444,18 +444,40 @@ const deleteCalendar = async (userId: string, groupId: string, eventId: number) 
 // 일정 보여주기
 const showCalendar = async (groupId: string) => {
   try {
+    // 캘린더 이벤트 가져오기
     const calendarEvents = await prisma.calendar.findMany({
-      take: 10000000,
+      take: 9999999,
       where: {
         groupId: groupId,
       },
-    })
-    return calendarEvents
+    });
+
+    // 각 이벤트에 대한 참여자 정보 가져오기
+    const calendarEventsWithParticipants = await Promise.all(
+      calendarEvents.map(async (event) => {
+        const participants = await prisma.participant.findMany({
+          where: {
+            calendarId: event.id,
+          },
+          select: {
+            userId: true,
+          },
+        });
+
+        return {
+          ...event,
+          participants: participants.map((participant) => participant.userId),
+        };
+      })
+    );
+
+    return calendarEventsWithParticipants;
   } catch (error) {
-    console.error('error :: service/calendar/showCalendar', error)
-    throw error
+    console.error('error :: service/calendar/showCalendarWithParticipants', error);
+    throw error;
   }
-}
+};
+
 
 
 interface CalendarEvent {
