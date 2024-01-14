@@ -38,13 +38,13 @@ interface ErrorType {
 }
 
 
-const admin = require("firebase-admin");
+// const admin = require("firebase-admin");
 
-const serviceAccount = require("../serviceAcountKey.json");
+// const serviceAccount = require("../serviceAcountKey.json");
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount),
+// });
 
 
 
