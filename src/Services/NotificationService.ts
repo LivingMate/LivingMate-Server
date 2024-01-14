@@ -81,4 +81,4 @@ const sendPushNotification = async (registrationToken: string, notificationType:
   }
 };
 
-export {sendPushNotification}
+export { sendPushNotification }
