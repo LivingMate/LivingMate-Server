@@ -64,7 +64,7 @@ const createFeed = (userId, groupId, content) => __awaiter(void 0, void 0, void 
             data: {
                 userId: userId,
                 groupId: groupId,
-                content: content
+                content: content,
             },
         });
         const resUserName = yield UserService.getUserNameByUserId(event.userId);
@@ -72,12 +72,12 @@ const createFeed = (userId, groupId, content) => __awaiter(void 0, void 0, void 
         const data = {
             feedId: event.id,
             userId: event.userId,
-            userName: resUserName,
-            userColor: resUserColor,
+            //userName: resUserName,
+            //userColor: resUserColor,
             groupId: event.groupId,
             content: event.content,
             createdAt: event.createdAt,
-            pinned: event.pin
+            pinned: event.pin,
         };
         return data;
     }
@@ -88,7 +88,8 @@ const createFeed = (userId, groupId, content) => __awaiter(void 0, void 0, void 
 });
 exports.createFeed = createFeed;
 //피드내용 수정
-const updateFeedContent = (//userId: string, groupId: string, 
+const updateFeedContent = (
+//userId: string, groupId: string,
 feedId, content) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const existingEvent = yield findFeedEventById(feedId);
@@ -100,20 +101,20 @@ feedId, content) => __awaiter(void 0, void 0, void 0, function* () {
                 id: feedId,
             },
             data: {
-                content: content
+                content: content,
             },
         });
-        const resUserName = yield UserService.getUserNameByUserId(updatedEvent.userId);
-        const resUserColor = yield UserService.findUserColorByUserId(updatedEvent.userId);
+        //const resUserName = await UserService.getUserNameByUserId(updatedEvent.userId)
+        //const resUserColor = await UserService.findUserColorByUserId(updatedEvent.userId)
         const FeedToReturn = {
             feedId: updatedEvent.id,
             userId: updatedEvent.userId,
-            userName: resUserName,
-            userColor: resUserColor,
+            //userName: resUserName,
+            //userColor: resUserColor,
             groupId: updatedEvent.groupId,
             content: updatedEvent.content,
             createdAt: updatedEvent.createdAt,
-            pinned: updatedEvent.pin
+            pinned: updatedEvent.pin,
         };
         return FeedToReturn;
     }
@@ -123,7 +124,7 @@ feedId, content) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.updateFeedContent = updateFeedContent;
-//피드 고정 
+//피드 고정
 const pinFeed = (FeedId) => __awaiter(void 0, void 0, void 0, function* () {
     const pinnedFeed = yield prisma.feed.update({
         where: {
@@ -156,7 +157,7 @@ const deleteFeed = (FeedId) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.deleteFeed = deleteFeed;
-//피드 보여주기 : 객체 타입의 배열로 반환됨! 
+//피드 보여주기 : 객체 타입의 배열로 반환됨!
 const showFeed = (GroupId) => __awaiter(void 0, void 0, void 0, function* () {
     const Feeds = yield prisma.feed.findMany({
         where: {

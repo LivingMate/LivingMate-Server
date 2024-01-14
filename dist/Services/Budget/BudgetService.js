@@ -61,16 +61,18 @@ const createBudget = (userId, groupId, budgetCreateRequestDto) => __awaiter(void
         // categoryId와 subCategoryId 변환
         const resCategory = yield BudgetServiceUtils.changeCategIdToName(event.categoryId);
         const resSubCategory = yield BudgetServiceUtils.changeSubCategIdToName(event.subCategoryId);
-        const resUserColor = yield UserService.findUserColorByUserId(event.userId);
-        const resUserName = yield UserService.getUserNameByUserId(event.userId);
+        //const resUserColor = await UserService.findUserColorByUserId(event.userId)
+        //const resUserName = await UserService.getUserNameByUserId(event.userId)
         const createdBudget = {
             id: event.id,
+            userId: event.userId,
+            groupId: event.groupId,
             spendingName: event.spendingName,
             spendings: event.spendings,
             category: resCategory,
             subCategory: resSubCategory,
-            userColor: resUserColor,
-            userName: resUserName,
+            //userColor: resUserColor,
+            //userName: resUserName,
             createdAt: event.createdAt,
         };
         return createdBudget;
@@ -94,16 +96,18 @@ const showBudget = (groupId) => __awaiter(void 0, void 0, void 0, function* () {
         yield Promise.all(Budgets.map((budget) => __awaiter(void 0, void 0, void 0, function* () {
             let resCategory = yield BudgetServiceUtils.changeCategIdToName(budget.categoryId);
             let resSubCategory = yield BudgetServiceUtils.changeSubCategIdToName(budget.subCategoryId);
-            let resUserColor = yield UserService.findUserColorByUserId(budget.userId);
-            let resUserName = yield UserService.getUserNameByUserId(budget.userId);
+            //let resUserColor = await UserService.findUserColorByUserId(budget.userId)
+            //let resUserName = await UserService.getUserNameByUserId(budget.userId)
             BudgetsToShow.push({
                 id: budget.id,
+                userId: budget.userId,
+                groupId: budget.groupId,
                 spendingName: budget.spendingName,
                 spendings: budget.spendings,
                 category: resCategory,
                 subCategory: resSubCategory,
-                userColor: resUserColor,
-                userName: resUserName,
+                //userColor: resUserColor,
+                //userName: resUserName,
                 createdAt: budget.createdAt,
             });
         })));
@@ -130,17 +134,19 @@ const updateBudget = (budgetId, BudgetUpdateRequestDto) => __awaiter(void 0, voi
             },
         });
         //return updatedBudget;
-        const UserName = yield UserService.getUserNameByUserId(updatedBudget.userId);
-        const UserColor = yield UserService.findUserColorByUserId(updatedBudget.userId);
+        //const UserName = await UserService.getUserNameByUserId(updatedBudget.userId)
+        //const UserColor = await UserService.findUserColorByUserId(updatedBudget.userId)
         const resCategory = yield BudgetServiceUtils.changeCategIdToName(updatedBudget.categoryId);
         const resSubCategory = yield BudgetServiceUtils.changeSubCategIdToName(updatedBudget.subCategoryId);
         const budgetToReturn = {
-            userColor: UserColor,
-            userName: UserName,
+            //userColor: UserColor,
+            //userName: UserName,
+            id: updatedBudget.id,
+            userId: updatedBudget.userId,
+            groupId: updatedBudget.groupId,
             createdAt: updatedBudget.createdAt,
             spendings: updatedBudget.spendings,
             spendingName: updatedBudget.spendingName,
-            id: updatedBudget.id,
             category: resCategory,
             subCategory: resSubCategory,
         };
@@ -181,16 +187,18 @@ const searchBudget = (groupId, searchKey) => __awaiter(void 0, void 0, void 0, f
         yield Promise.all(searchedBudget.map((budget) => __awaiter(void 0, void 0, void 0, function* () {
             let resCategory = yield BudgetServiceUtils.changeCategIdToName(budget.categoryId);
             let resSubCategory = yield BudgetServiceUtils.changeSubCategIdToName(budget.subCategoryId);
-            let resUserColor = yield UserService.findUserColorByUserId(budget.userId);
-            let resUserName = yield UserService.getUserNameByUserId(budget.userId);
+            //let resUserColor = await UserService.findUserColorByUserId(budget.userId)
+            //let resUserName = await UserService.getUserNameByUserId(budget.userId)
             BudgetsToShow.push({
                 id: budget.id,
+                userId: budget.userId,
+                groupId: budget.groupId,
                 spendingName: budget.spendingName,
                 spendings: budget.spendings,
                 category: resCategory,
                 subCategory: resSubCategory,
-                userColor: resUserColor,
-                userName: resUserName,
+                //userColor: resUserColor,
+                //userName: resUserName,
                 createdAt: budget.createdAt,
             });
         })));
@@ -417,25 +425,39 @@ const takeFromAdjustments = (groupId) => __awaiter(void 0, void 0, void 0, funct
             groupId: groupId,
         },
     });
-    const AdjustmentToReturn = [];
-    yield Promise.all(Adjustment.map((record) => __awaiter(void 0, void 0, void 0, function* () {
-        if (!record.plusUserId || !record.minusUserId) {
-            throw new Error('Null Error: Adjustment to Return');
-        }
-        let plusUserName = yield UserService.getUserNameByUserId(record.plusUserId);
-        let plusUserColor = yield UserService.findUserColorByUserId(record.plusUserId);
-        let minusUserName = yield UserService.getUserNameByUserId(record.minusUserId);
-        let minusUserColor = yield UserService.findUserColorByUserId(record.plusUserId);
-        let change = record.change;
-        AdjustmentToReturn.push({
+    /*
+      const AdjustmentToReturn: {
+        plusUserName: string
+        plusUserColor: string
+        minusUserName: string
+        minusUserColor: string
+        change: number
+      }[] = []
+    
+      await Promise.all(
+        Adjustment.map(async (record) => {
+          if (!record.plusUserId || !record.minusUserId) {
+            throw new Error('Null Error: Adjustment to Return')
+          }
+    
+          let plusUserName = await UserService.getUserNameByUserId(record.plusUserId)
+          let plusUserColor = await UserService.findUserColorByUserId(record.plusUserId)
+          let minusUserName = await UserService.getUserNameByUserId(record.minusUserId)
+          let minusUserColor = await UserService.findUserColorByUserId(record.plusUserId)
+          let change = record.change
+    
+          AdjustmentToReturn.push({
             plusUserName,
             plusUserColor,
             minusUserName,
             minusUserColor,
             change,
-        });
-    })));
-    return AdjustmentToReturn;
+          })
+        }),
+      )
+      return AdjustmentToReturn
+      */
+    return Adjustment;
 });
 //adjustment 지우기 -> 정산 완료 눌렀을 때 사용할 것..-> isDone을 주자..
 // const deleteAdjustment = async (groupId: string) => {
@@ -480,9 +502,9 @@ const getAdjustments = (groupId) => __awaiter(void 0, void 0, void 0, function* 
 });
 exports.getAdjustments = getAdjustments;
 const finalAdjustment = (groupId) => __awaiter(void 0, void 0, void 0, function* () {
-    let final1 = yield getAdjustmentsCalc(groupId);
+    yield getAdjustmentsCalc(groupId);
     let final = yield getAdjustments(groupId);
-    return { final1, final };
+    return { final };
 });
 exports.finalAdjustment = finalAdjustment;
 //# sourceMappingURL=BudgetService.js.map

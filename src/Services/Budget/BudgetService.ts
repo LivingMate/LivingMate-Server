@@ -125,12 +125,12 @@ const updateBudget = async (budgetId: number, BudgetUpdateRequestDto: BudgetUpda
     const budgetToReturn: BudgetCreateResponseDto = {
       //userColor: UserColor,
       //userName: UserName,
+      id: updatedBudget.id,
       userId: updatedBudget.userId,
       groupId: updatedBudget.groupId,
       createdAt: updatedBudget.createdAt,
       spendings: updatedBudget.spendings,
       spendingName: updatedBudget.spendingName,
-      id: updatedBudget.id,
       category: resCategory,
       subCategory: resSubCategory,
     }
@@ -435,7 +435,7 @@ const takeFromAdjustments = async (groupId: string) => {
       groupId: groupId,
     },
   })
-
+/*
   const AdjustmentToReturn: {
     plusUserName: string
     plusUserColor: string
@@ -466,6 +466,8 @@ const takeFromAdjustments = async (groupId: string) => {
     }),
   )
   return AdjustmentToReturn
+  */
+ return Adjustment;
 }
 
 //adjustment 지우기 -> 정산 완료 눌렀을 때 사용할 것..-> isDone을 주자..
@@ -517,10 +519,10 @@ const getAdjustments = async (groupId: string) => {
 }
 
 const finalAdjustment = async (groupId: string) => {
-  let final1 = await getAdjustmentsCalc(groupId)
+  await getAdjustmentsCalc(groupId)
   let final = await getAdjustments(groupId)
 
-  return { final1, final }
+  return { final }
 }
 
 export {

@@ -19,22 +19,6 @@ app.set('host', process.env.HOST || '0.0.0.0'); // 서버 아이피
 app.get('/', (req, res) => {
     res.send('Typescript + Node.js + Express Server');
 });
-// app.get('/feeds', async (req, res) => {
-//    try {
-//      const items = await prisma.feed.findMany();
-//      res.json(items);
-//    } catch (error) {
-//      res.status(500).json({ error: 'Error fetching items' });
-//    }
-//  });
-//  app.get('/user', async (req, res) => {
-//    try {
-//      const items = await prisma.user.findMany();
-//      res.json(items);
-//    } catch (error) {
-//      res.status(500).json({ error: 'Error fetching items' });
-//    }
-//  });
 app.use(FeedRouter_1.FeedRouter);
 app.use(CalendarRouter_1.CalendarRouter);
 app.use(BudgetRouter_1.BudgetRouter);
@@ -43,6 +27,11 @@ app.use(GroupRouter_1.GroupRouter);
 app.listen(3000, () => {
     console.log('서버가 3000번 포트에서 실행 중');
 });
+// const admin = require("firebase-admin");
+// const serviceAccount = require("../serviceAcountKey.json");
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount),
+// });
 // app.use(function (err: ErrorType, req: Request, res: Response, next: NextFunction) {
 //   res.locals.message = err.message
 //   res.locals.error = req.app.get('env') === 'production' ? err : {}

@@ -418,16 +418,29 @@ exports.deleteCalendar = deleteCalendar;
 // 일정 보여주기
 const showCalendar = (groupId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        // 캘린더 이벤트 가져오기
         const calendarEvents = yield prisma.calendar.findMany({
-            take: 10000000,
+            take: 9999999,
             where: {
                 groupId: groupId,
             },
         });
-        return calendarEvents;
+        // 각 이벤트에 대한 참여자 정보 가져오기
+        const calendarEventsWithParticipants = yield Promise.all(calendarEvents.map((event) => __awaiter(void 0, void 0, void 0, function* () {
+            const participants = yield prisma.participant.findMany({
+                where: {
+                    calendarId: event.id,
+                },
+                select: {
+                    userId: true,
+                },
+            });
+            return Object.assign(Object.assign({}, event), { participants: participants.map((participant) => participant.userId) });
+        })));
+        return calendarEventsWithParticipants;
     }
     catch (error) {
-        console.error('error :: service/calendar/showCalendar', error);
+        console.error('error :: service/calendar/showCalendarWithParticipants', error);
         throw error;
     }
 });
