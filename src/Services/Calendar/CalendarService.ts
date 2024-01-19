@@ -13,8 +13,10 @@ import { SchedulingCreateResponseDto } from '../../DTOs/Calendar/Response/Schedu
 import * as UserService from '../UserService'
 import * as GroupServiceUtils from '../Group/GroupServiceUtils'
 import message from '../../modules/message'
+import { da } from 'date-fns/locale'
+import { preloadStyle } from 'next/dist/server/app-render/entry-base'
 
-// CREATE
+// CREATE -------------------------------
 // 주기 생성을 위한 서비스
 const createRepeatCalendar = async (
   userId: string,
@@ -156,27 +158,34 @@ const createCalendar = async (userId: string, groupId: string, calendarCreateDto
 }
 
 // 일정 조율 등록1
-// 제목만 받는것
+// 기본 정보만 받는것
 const createSchedule = async (
   groupId: string,
   scheduleCreateDto: ScheduleCreateDto,
 ): Promise<ScheduleCreateResponseDto> => {
   try {
     const group = await GroupServiceUtils.findGroupById(groupId)
+    const datesString = JSON.stringify(scheduleCreateDto.dates)
 
     const event = await prisma.schedule.create({
       data: {
         groupId: groupId,
         title: scheduleCreateDto.title,
-        used: false,
+        dates: datesString,
+        startTime: scheduleCreateDto.startTime,
+        endTime: scheduleCreateDto.endTime,
       },
     })
+
+    const datesArray = JSON.parse(event.dates)
 
     const data: ScheduleCreateResponseDto = {
       scheduleId: event.id,
       groupId: event.groupId,
       title: event.title,
-      used: false,
+      dates: datesArray,
+      startTime: event.startTime,
+      endTime: event.endTime,
     }
 
     return data
@@ -186,50 +195,65 @@ const createSchedule = async (
   }
 }
 
-// // 일정 조율 등록2
-// 자기 가능한 날짜 시간 선택쓰
-// const createBossScheduling = async(
-//   userId: string,
-//   groupId: string,
-//   scheduleId: number,
-//   schedulingCreateDto : SchedulingCreateDto
-// ) : Promise<SchedulingCreateResponseDto> => {
-//   try {
-//     const group = await GroupServiceUtils.findGroupById(groupId)
+// 일정 조율 등록2
+// 자기 가능한 날짜 시간 받아오기
+const createScheduling = async (
+  groupId: string,
+  scheduleId: number,
+  schedulingArray: SchedulingCreateDto[],
+): Promise<SchedulingCreateResponseDto[]> => {
+  const responseData: SchedulingCreateResponseDto[] = []
+  try {
+    const group = await GroupServiceUtils.findGroupById(groupId)
 
-//     const existSchedule = await prisma.existSchedule.create({
-//       data: {
-//         groupId: groupId,
-//         scheduleId: scheduleId,
-//         optionDate: schedulingCreateDto.date,
-//         optionTime: schedulingCreateDto.time
-//       },
-//     })
+    // existingEvent를 반복문 밖에서 한 번만 체크
+    const existingEvent = await CalendarServiceUtils.findSchedulingEventById(scheduleId)
+    if (existingEvent) {
+      await prisma.scheduling.deleteMany({
+        where: {
+          scheduleId: scheduleId,
+        },
+      })
+    }
 
-//     const availabelDay = await prisma.availableDay.create({
-//       data: {
-//         userId: userId,
-//         scheduleId: scheduleId,
-//         existScheduleId: existSchedule.id,
+    // 배열을 순회하며 각각의 일정 정보에 대해 처리
+    for (let i = 0; i < schedulingArray.length; i++) {
+      let schedulingCreateDto = schedulingArray[i]
 
-//       }
-//     })
+      let selectedByString = JSON.stringify(schedulingCreateDto.selectedBy)
 
-//     // const data: ScheduleCreateResponseDto = {
-//     //   scheduleId: event.id,
-//     //   groupId: event.groupId,
-//     //   title: event.title,
-//     //   used: false,
-//     // }
+      let event = await prisma.scheduling.create({
+        data: {
+          groupId: groupId,
+          scheduleId: scheduleId,
+          date: schedulingCreateDto.date,
+          time: schedulingCreateDto.time,
+          selectedBy: selectedByString,
+        },
+      })
 
-//     return data
-//   } catch (error) {
-//     console.error('error :: service/calendar/createSchedule', error)
-//     throw error
-//   }
-// }
+      const selectedByArray = JSON.parse(event.selectedBy)
 
-// PATCH
+      const data: SchedulingCreateResponseDto = {
+        schedulingId: event.id,
+        groupId: groupId,
+        scheduleId: scheduleId,
+        date: event.date,
+        time: event.time,
+        selectedBy: selectedByArray,
+      }
+
+      responseData.push(data)
+    }
+
+    return responseData
+  } catch (error) {
+    console.error('error :: service/calendar/createScheduling', error)
+    throw error
+  }
+}
+
+// PATCH -----------------------------
 // 일정 update
 const updateCalendar = async (
   userId: string,
@@ -396,7 +420,7 @@ const updateCalendar = async (
   }
 }
 
-// DELETE
+// DELETE ------------------------------
 // 일정 삭제
 const deleteCalendar = async (userId: string, groupId: string, eventId: number) => {
   try {
@@ -440,7 +464,29 @@ const deleteCalendar = async (userId: string, groupId: string, eventId: number) 
   }
 }
 
-// GET
+// 스케줄과 스케줄링 삭제
+const deleteSchedule = async (groupId: string, eventId: number) => {
+  try {
+    await prisma.scheduling.deleteMany({
+      where: {
+        groupId: groupId,
+        scheduleId: eventId,
+      },
+    })
+    await prisma.schedule.delete({
+      where: {
+        groupId: groupId,
+        id: eventId,
+      },
+    })
+    return 0
+  } catch (error) {
+    console.error('error :: service/schedule/deleteSchedule', error)
+    throw error
+  }
+}
+
+// GET --------------------------------------
 // 일정 보여주기
 const showCalendar = async (groupId: string) => {
   try {
@@ -450,7 +496,7 @@ const showCalendar = async (groupId: string) => {
       where: {
         groupId: groupId,
       },
-    });
+    })
 
     // 각 이벤트에 대한 참여자 정보 가져오기
     const calendarEventsWithParticipants = await Promise.all(
@@ -462,40 +508,38 @@ const showCalendar = async (groupId: string) => {
           select: {
             userId: true,
           },
-        });
+        })
 
         return {
           ...event,
           participants: participants.map((participant) => participant.userId),
-        };
-      })
-    );
+        }
+      }),
+    )
 
-    return calendarEventsWithParticipants;
+    return calendarEventsWithParticipants
   } catch (error) {
-    console.error('error :: service/calendar/showCalendarWithParticipants', error);
-    throw error;
+    console.error('error :: service/calendar/showCalendarWithParticipants', error)
+    throw error
   }
-};
-
-
-
-interface CalendarEvent {
-  id: number;
-  userId: string;
-  groupId: string;
-  title: string;
-  dateStart: Date;
-  dateEnd: Date;
-  memo?: string;
-  term: number;
-  participants?: string[];
 }
 
+// 이번주 일정 보여주기
+interface CalendarEvent {
+  id: number
+  userId: string
+  groupId: string
+  title: string
+  dateStart: Date
+  dateEnd: Date
+  memo?: string
+  term: number
+  participants?: string[]
+}
 
 const getThisWeeksDuty = async (groupId: string) => {
   try {
-    const { startDate, endDate } = CalendarServiceUtils.getCurrentWeekDates();
+    const { startDate, endDate } = CalendarServiceUtils.getCurrentWeekDates()
 
     const calendarEventsThisWeek: CalendarEvent[] = await prisma.calendar.findMany({
       where: {
@@ -507,32 +551,92 @@ const getThisWeeksDuty = async (groupId: string) => {
           lte: endDate,
         },
       },
-    });
+    })
 
-    const groupedEvents = await CalendarServiceUtils.groupThisWeekEvents(calendarEventsThisWeek);
+    const groupedEvents = await CalendarServiceUtils.groupThisWeekEvents(calendarEventsThisWeek)
 
     const data = groupedEvents.map((group) => ({
       title: group.title,
       groupId: group.groupId,
       daysOfWeek: group.daysOfWeek,
       participants: group.participants,
+    }))
+
+    return data
+  } catch (error) {
+    console.error('이번 주의 일정 검색 중 오류', error)
+    throw error
+  }
+}
+
+// 스케줄 보여주기
+const showSchedule = async (groupId: string) => {
+  try {
+    const scheduleEvents = await prisma.schedule.findMany({
+      take: 100,
+      where: {
+        groupId: groupId,
+      },
+      select: {
+        id: true,
+        groupId: true,
+        title: true,
+        dates: true,
+        startTime: true,
+        endTime: true,
+      },
+    })
+    const scheduleEventsWithParsedDates = scheduleEvents.map(event => ({
+      ...event,
+      dates: JSON.parse(event.dates),
     }));
 
-    return data;
+    return scheduleEventsWithParsedDates
   } catch (error) {
-    console.error("이번 주의 일정 검색 중 오류", error);
-    throw error;
+    console.error('스케줄 반환 오류', error)
+    throw error
   }
-};
+}
 
+// 스케줄링 보여주기
+const showScheduling = async (groupId: string, scheduleId: number) => {
+  try{
+    const schedulingEvents = await prisma.scheduling.findMany({
+      take: 100,
+      where: {
+        groupId: groupId,
+        scheduleId: scheduleId
+      },
+      select: {
+        id: true,
+        groupId: true,
+        date: true,
+        time: true,
+        selectedBy: true
+      },
+    });
+    const schedulingEventsWithParsedSelectedBy = schedulingEvents.map(event => ({
+      ...event,
+      selectedBy: JSON.parse(event.selectedBy),
+    }));
+    
+    return schedulingEventsWithParsedSelectedBy
+  } catch (error) {
+    console.error('스케줄링 반환 오류', error)
+    throw error
+  }
+}
 
 export {
   createCalendar,
   createRepeatCalendar,
   createSchedule,
-  // createBossScheduling,
+  createScheduling,
   showCalendar,
   updateCalendar,
   deleteCalendar,
+  deleteSchedule,
   getThisWeeksDuty,
+  showSchedule,
+  showScheduling
 }

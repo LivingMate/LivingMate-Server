@@ -24,11 +24,8 @@ model User {
   Feed            Feed[]
   NotiSender      Notification[]  @relation("sender")
   NotiReciever    Notification[]  @relation("reciever")
-  // MultiSender     NotificationMulti[]  @relation("sender")
-  // MultiReciever   NotificationMulti[]  @relation("reciever")
   CalendarUser    Calendar[]      @relation("user")
   // CalendarParticipant Calendar[]           @relation("participant")
-  AvailableDay    AvailableDay[]
   UserSpendings   UserSpendings[]
   AdjustmentMinus Adjustment[]    @relation("minusUser")
   AdjustmentPlus  Adjustment[]    @relation("plusUser")
@@ -45,12 +42,11 @@ model Group {
   User          User[]
   Feed          Feed[]
   Notification  Notification[]
-  // NotificationMulti  NotificationMulti[]
   Calendar      Calendar[]
   ExistCalendar ExistCalendar[]
   Participant   Participant[]
   Schedule      Schedule[]
-  ExistSchedule ExistSchedule[]
+  Scheduling    Scheduling[]
   UserSpendings UserSpendings[]
   Adjustment    Adjustment[]
   SubCategory   SubCategory[]
@@ -79,18 +75,6 @@ model Notification {
   recieverId String?
   delete     Boolean  @default(false)
 }
-
-// model NotificationMulti {
-//   id         Int      @id
-//   group      Group    @relation(fields: [groupId], references: [id])
-//   groupId    String
-//   text       String   @db.LongText
-//   createdAt  DateTime @default(now())
-//   sender     User?    @relation(fields: [senderId], references: [id], name: "sender")
-//   senderId   String?
-//   reciever   User?    @relation(fields: [recieverId], references: [id], name: "reciever") // 배열로 받아야 함
-//   recieverId String?
-// }
 
 // -----------일정 등록 부분
 model Calendar {
@@ -128,34 +112,25 @@ model Participant {
 
 // -----------일정조율 부분
 model Schedule {
-  id            Int             @id @default(autoincrement())
-  group         Group           @relation(fields: [groupId], references: [id])
-  groupId       String
-  title         String
-  used          Boolean
-  ExistSchedule ExistSchedule[]
-  AvailableDay  AvailableDay[]
+  id         Int          @id @default(autoincrement())
+  group      Group        @relation(fields: [groupId], references: [id])
+  groupId    String
+  title      String
+  dates      String
+  startTime  String
+  endTime    String
+  Scheduling Scheduling[]
 }
 
-model ExistSchedule {
-  id           Int            @id @default(autoincrement())
-  group        Group          @relation(fields: [groupId], references: [id])
-  groupId      String
-  schedule     Schedule       @relation(fields: [scheduleId], references: [id])
-  scheduleId   Int
-  optionDate   String
-  optionTime   String
-  AvailableDay AvailableDay[]
-}
-
-model AvailableDay {
-  id              Int           @id @default(autoincrement())
-  user            User          @relation(fields: [userId], references: [id])
-  userId          String
-  schedule        Schedule      @relation(fields: [scheduleId], references: [id])
-  scheduleId      Int
-  ExistSchedule   ExistSchedule @relation(fields: [existScheduleId], references: [id])
-  existScheduleId Int
+model Scheduling {
+  id         Int      @id @default(autoincrement())
+  group      Group    @relation(fields: [groupId], references: [id])
+  groupId    String
+  schedule   Schedule @relation(fields: [scheduleId], references: [id])
+  scheduleId Int
+  date       String
+  time       String
+  selectedBy String
 }
 
 // ------------- 정산부분
@@ -188,7 +163,6 @@ model Adjustment {
 }
 
 model Category {
-  // 가계부 카테고리별 금액 확인할때 필요할것같아서 만들어봤음
   id          Int             @id @default(autoincrement())
   name        String
   spendings   UserSpendings[]
@@ -198,7 +172,6 @@ model Category {
 }
 
 model SubCategory {
-  // 필요성을 잘 모르겠지만,, 혹시 몰라서 만들어봄
   id         Int             @id @default(autoincrement())
   group      Group           @relation(fields: [groupId], references: [id])
   groupId    String
