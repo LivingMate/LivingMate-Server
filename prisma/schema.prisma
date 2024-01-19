@@ -22,10 +22,8 @@ model User {
   groupId         String
   fcmToken        String?
   Feed            Feed[]
-  NotiSender      Notification[]  @relation("sender")
-  NotiReciever    Notification[]  @relation("reciever")
+  Notification    Notification[]
   CalendarUser    Calendar[]      @relation("user")
-  // CalendarParticipant Calendar[]           @relation("participant")
   UserSpendings   UserSpendings[]
   AdjustmentMinus Adjustment[]    @relation("minusUser")
   AdjustmentPlus  Adjustment[]    @relation("plusUser")
@@ -43,7 +41,6 @@ model Group {
   Feed          Feed[]
   Notification  Notification[]
   Calendar      Calendar[]
-  ExistCalendar ExistCalendar[]
   Participant   Participant[]
   Schedule      Schedule[]
   Scheduling    Scheduling[]
@@ -52,6 +49,7 @@ model Group {
   SubCategory   SubCategory[]
 }
 
+// ----------------- 피드
 model Feed {
   id        Int      @id @default(autoincrement())
   user      User     @relation(fields: [userId], references: [id])
@@ -63,20 +61,19 @@ model Feed {
   pin       Boolean  @default(false)
 }
 
+// --------------- 알림
 model Notification {
-  id         Int      @id @default(autoincrement())
-  group      Group    @relation(fields: [groupId], references: [id])
-  groupId    String
-  text       String   @db.LongText
-  createdAt  DateTime @default(now())
-  sender     User?    @relation(fields: [senderId], references: [id], name: "sender")
-  senderId   String?
-  reciever   User?    @relation(fields: [recieverId], references: [id], name: "reciever")
-  recieverId String?
-  delete     Boolean  @default(false)
+  id        Int      @id @default(autoincrement())
+  group     Group    @relation(fields: [groupId], references: [id])
+  groupId   String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  text      String   @db.LongText
+  createdAt DateTime @default(now())
+  isDelete  Boolean  @default(false)
 }
 
-// -----------일정 등록 부분
+// ----------- 일정 등록 부분
 model Calendar {
   id          Int           @id @default(autoincrement())
   user        User          @relation(fields: [userId], references: [id], name: "user")
@@ -89,15 +86,6 @@ model Calendar {
   memo        String        @db.Text
   term        Int
   Participant Participant[]
-}
-
-model ExistCalendar {
-  id        Int      @id @default(autoincrement())
-  group     Group    @relation(fields: [groupId], references: [id])
-  groupId   String
-  term      Int
-  title     String
-  dateStart DateTime @db.Date
 }
 
 model Participant {
