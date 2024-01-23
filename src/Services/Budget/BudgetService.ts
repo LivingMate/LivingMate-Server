@@ -5,7 +5,7 @@ import { BudgetCreateResponseDto } from '../../DTOs/Budget/Response/BudgetCreate
 import { BudgetUpdateRequestDto } from '../../DTOs/Budget/Request/BudgetUpdateRequestDto'
 import { checkForbiddenGroup } from '../Group/GroupServiceUtils'
 import message from '../../modules/message'
-import * as UserService from '../UserService'
+import * as UserService from '../User/UserService'
 import * as GroupServiceUtils from '../Group/GroupServiceUtils'
 import * as BudgetServiceUtils from '../Budget/BudgetServiceUtils'
 
@@ -435,7 +435,7 @@ const takeFromAdjustments = async (groupId: string) => {
       groupId: groupId,
     },
   })
-/*
+  /*
   const AdjustmentToReturn: {
     plusUserName: string
     plusUserColor: string
@@ -467,7 +467,7 @@ const takeFromAdjustments = async (groupId: string) => {
   )
   return AdjustmentToReturn
   */
- return Adjustment;
+  return Adjustment
 }
 
 //adjustment 지우기 -> 정산 완료 눌렀을 때 사용할 것..-> isDone을 주자..

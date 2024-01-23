@@ -2,33 +2,32 @@ import { Group, PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 import { SignupDto } from '../../DTOs/Auth/Requests/SignupDto'
 import { GroupResponseDto } from '../../DTOs/Group/Responses/GroupResponseDto'
-import * as UserService from '../UserService'
+import * as UserService from '../User/UserService'
+import * as UserServiceUtils from '../User/UserServiceUtils'
 import { group } from 'console'
 import * as GroupServiceUtils from './GroupServiceUtils'
 
-
-//그룹아이디 생성하기 
-const createGroupId = async()=>{
-  
-  const size: number = 8;
-  const characters: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  const charactersLength: number = characters.length;
-  let result: string = '';
+//그룹아이디 생성하기
+const createGroupId = async () => {
+  const size: number = 8
+  const characters: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+  const charactersLength: number = characters.length
+  let result: string = ''
   do {
-    result = '';
+    result = ''
     for (let i: number = 0; i < size; i++) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      result += characters.charAt(Math.floor(Math.random() * charactersLength))
     }
-  } while (await UserService.duplicateId(result));
+  } while (await UserServiceUtils.duplicateId(result))
 
-  return result;
+  return result
 }
 
 // createGroup
 const createGroup = async (userId: string, groupName: string) => {
   try {
-    const user = await UserService.findUserById(userId)
-    const groupId = await createGroupId();
+    const user = await UserServiceUtils.findUserById(userId)
+    const groupId = await createGroupId()
 
     await GroupServiceUtils.checkJoinedGroupId(user?.groupId || '')
 
@@ -41,18 +40,15 @@ const createGroup = async (userId: string, groupName: string) => {
       },
     })
 
-    const GroupReturn = await UserService.addUserToGroup(userId,createdGroup.id);
-    return GroupReturn;
+    const GroupReturn = await UserServiceUtils.addUserToGroup(userId, createdGroup.id)
+    return GroupReturn
 
     //return createdGroup;
   } catch (error) {
-    console.error('Error at creating Group: group service', error);
-    throw new Error('Error at creating Group: group service');
+    console.error('Error at creating Group: group service', error)
+    throw new Error('Error at creating Group: group service')
   }
 }
-
-
-
 
 // 그룹 나가기
 const leaveGroup = async (userId: string, groupId: string): Promise<void> => {
@@ -124,8 +120,4 @@ const getGroup = async (userId: string): Promise<string | null> => {
   }
 }
 
-export {
-  createGroup,
-  leaveGroup,
-  getGroup,
-}
+export { createGroup, leaveGroup, getGroup }

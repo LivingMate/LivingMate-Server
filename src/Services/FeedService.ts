@@ -3,7 +3,7 @@ const prisma = new PrismaClient()
 import { FeedCreateRequestDto } from '../DTOs/Feed/Request/FeedCreateRequestDto'
 import { FeedCreateResponseDto } from '../DTOs/Feed/Response/FeedCreateResponseDto'
 import { FeedUpdateResponseDto } from '../DTOs/Feed/Response/FeedUpdateResponseDto'
-import * as UserService from './UserService'
+import * as UserService from './User/UserService'
 import message from '../modules/message'
 
 // -------utils--------

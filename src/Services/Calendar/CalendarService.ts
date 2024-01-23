@@ -10,7 +10,8 @@ import { CalendarUpdateDto } from '../../DTOs/Calendar/Request/CalendarUpdateDto
 import { CalendarUpdateResponseDto } from '../../DTOs/Calendar/Response/CalendarUpdateResponseDto'
 import { SchedulingCreateDto } from '../../DTOs/Calendar/Request/SchedulingCreateDto'
 import { SchedulingCreateResponseDto } from '../../DTOs/Calendar/Response/SchedulingCreateResponseDto'
-import * as UserService from '../UserService'
+import * as UserService from '../User/UserService'
+import * as UserServiceUtils from '../User/UserServiceUtils'
 import * as GroupServiceUtils from '../Group/GroupServiceUtils'
 import message from '../../modules/message'
 import { da } from 'date-fns/locale'
@@ -83,15 +84,14 @@ const createRepeatCalendar = async (
       }
     }
 
-    const resUserName = await UserService.getUserNameByUserId(userId)
+    const resUserName = await UserServiceUtils.getUserNameByUserId(userId)
     await prisma.notification.create({
       data: {
         groupId: groupId,
         userId: userId,
         text: `${resUserName}가 반복 일정을 등록했습니다.`,
-        isDelete: false
-      }
-
+        isDelete: false,
+      },
     })
     return createdEvents
   } catch (error) {
@@ -103,7 +103,7 @@ const createRepeatCalendar = async (
 // 일정등록하는 부분(바로등록용)
 const createCalendar = async (userId: string, groupId: string, calendarCreateDto: CalendarCreateDto) => {
   try {
-    const user = await UserService.findUserById(userId)
+    const user = await UserServiceUtils.findUserById(userId)
     const group = await GroupServiceUtils.findGroupById(groupId)
     await GroupServiceUtils.checkForbiddenGroup(user.groupId, groupId)
 
@@ -139,14 +139,14 @@ const createCalendar = async (userId: string, groupId: string, calendarCreateDto
         },
       })
 
-      const resUserName = await UserService.getUserNameByUserId(event.userId)
+      const resUserName = await UserServiceUtils.getUserNameByUserId(event.userId)
       await prisma.notification.create({
         data: {
           groupId: groupId,
           userId: userId,
           text: `${resUserName}가 일정을 등록했습니다.`,
-          isDelete: false
-        }
+          isDelete: false,
+        },
       })
 
       await CalendarServiceUtils.multipleParticipants(calendarCreateDto.participants, groupId, event.id)
@@ -194,14 +194,14 @@ const createSchedule = async (
         endTime: scheduleCreateDto.endTime,
       },
     })
-    const resUserName = await UserService.getUserNameByUserId(userId)
+    const resUserName = await UserServiceUtils.getUserNameByUserId(userId)
     await prisma.notification.create({
       data: {
         groupId: groupId,
         userId: userId,
         text: `${resUserName}가 일정 조율을 등록했습니다.`,
-        isDelete: false
-      }
+        isDelete: false,
+      },
     })
     const datesArray = JSON.parse(event.dates)
 
@@ -288,7 +288,7 @@ const updateCalendar = async (
   calendarUpdateDto: CalendarUpdateDto,
 ) => {
   try {
-    const user = await UserService.findUserById(userId)
+    const user = await UserServiceUtils.findUserById(userId)
     const group = await GroupServiceUtils.findGroupById(groupId)
     const existingEvent = await CalendarServiceUtils.findCalendarEventById(eventId)
 
@@ -356,8 +356,8 @@ const updateCalendar = async (
       })
 
       await CalendarServiceUtils.multipleParticipants(calendarUpdateDto.participants, groupId, updatedEvent2.id)
-      const UserName = await UserService.getUserNameByUserId(userId)
-      const UserColor = await UserService.findUserColorByUserId(userId)
+      const UserName = await UserServiceUtils.getUserNameByUserId(userId)
+      const UserColor = await UserServiceUtils.findUserColorByUserId(userId)
 
       const eventToReturn: CalendarUpdateResponseDto = {
         Id: eventId,
@@ -422,8 +422,8 @@ const updateCalendar = async (
     })
 
     await CalendarServiceUtils.multipleParticipants(calendarUpdateDto.participants, groupId, updatedEvent.id)
-    const UserName = await UserService.getUserNameByUserId(updatedEvent.userId)
-    const UserColor = await UserService.findUserColorByUserId(updatedEvent.userId)
+    const UserName = await UserServiceUtils.getUserNameByUserId(updatedEvent.userId)
+    const UserColor = await UserServiceUtils.findUserColorByUserId(updatedEvent.userId)
 
     const eventToReturn: CalendarUpdateResponseDto = {
       Id: updatedEvent.id,
@@ -612,10 +612,10 @@ const showSchedule = async (groupId: string) => {
         endTime: true,
       },
     })
-    const scheduleEventsWithParsedDates = scheduleEvents.map(event => ({
+    const scheduleEventsWithParsedDates = scheduleEvents.map((event) => ({
       ...event,
       dates: JSON.parse(event.dates),
-    }));
+    }))
 
     return scheduleEventsWithParsedDates
   } catch (error) {
@@ -626,26 +626,26 @@ const showSchedule = async (groupId: string) => {
 
 // 스케줄링 보여주기
 const showScheduling = async (groupId: string, scheduleId: number) => {
-  try{
+  try {
     const schedulingEvents = await prisma.scheduling.findMany({
       take: 100,
       where: {
         groupId: groupId,
-        scheduleId: scheduleId
+        scheduleId: scheduleId,
       },
       select: {
         id: true,
         groupId: true,
         date: true,
         time: true,
-        selectedBy: true
+        selectedBy: true,
       },
-    });
-    const schedulingEventsWithParsedSelectedBy = schedulingEvents.map(event => ({
+    })
+    const schedulingEventsWithParsedSelectedBy = schedulingEvents.map((event) => ({
       ...event,
       selectedBy: JSON.parse(event.selectedBy),
-    }));
-    
+    }))
+
     return schedulingEventsWithParsedSelectedBy
   } catch (error) {
     console.error('스케줄링 반환 오류', error)
@@ -664,5 +664,5 @@ export {
   deleteSchedule,
   getThisWeeksDuty,
   showSchedule,
-  showScheduling
+  showScheduling,
 }

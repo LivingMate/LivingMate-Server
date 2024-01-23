@@ -1,12 +1,11 @@
-import { NextFunction, Request, Response } from "express";
-import { validationResult, Result, ValidationError } from 'express-validator';
-import { UserProfileResponseDto } from '../DTOs/User/Response/UserProfileResponseDto';
-import { SignupDto } from "../DTOs/Auth/Requests/SignupDto";
-import * as UserService from '../Services/UserService';
-import statusCode from "../modules/statusCode";
-import message from "../modules/message";
-import util from "../modules/util";
-
+import { NextFunction, Request, Response } from 'express'
+import { validationResult, Result, ValidationError } from 'express-validator'
+import { UserProfileResponseDto } from '../DTOs/User/Response/UserProfileResponseDto'
+import { SignupDto } from '../DTOs/Auth/Requests/SignupDto'
+import * as UserService from '../Services/User/UserService'
+import statusCode from '../modules/statusCode'
+import message from '../modules/message'
+import util from '../modules/util'
 
 // POST
 const createUser = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
@@ -16,7 +15,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction): Prom
   }
 
   const signupDto: SignupDto = req.body
-  
+
   try {
     const data = await UserService.createUser(signupDto)
     console.log(data)
@@ -26,7 +25,6 @@ const createUser = async (req: Request, res: Response, next: NextFunction): Prom
     res.status(500).json({ error: 'Internal Server Error' })
   }
 }
-
 
 // // PATCH
 // const addUserToGroup = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
@@ -49,24 +47,19 @@ const createUser = async (req: Request, res: Response, next: NextFunction): Prom
 // }
 
 // GET
-const getUserProfile = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void | Response> => {
-    const userId = req.params.userId;
-  
-    try {
-      const data = await UserService.getUserProfile(userId);
-      return res.status(200).send(data);
+const getUserProfile = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+  const userId = req.params.userId
 
-    } catch (error) {
-        res.status(500).json({ error: 'Error Fetching user profile: Controller' })
-    }
-  };
-
-  export{
-    createUser,
-    getUserProfile,
-    // addUserToGroup
+  try {
+    const data = await UserService.getUserProfile(userId)
+    return res.status(200).send(data)
+  } catch (error) {
+    res.status(500).json({ error: 'Error Fetching user profile: Controller' })
   }
+}
+
+export {
+  createUser,
+  getUserProfile,
+  // addUserToGroup
+}
