@@ -67,7 +67,7 @@ const findUserById = async (userId: string) => {
     throw new Error('User not found!') //임시
   }
 
-  return user
+  return user;
 }
 
 
