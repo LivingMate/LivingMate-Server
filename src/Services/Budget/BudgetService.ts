@@ -34,6 +34,15 @@ const createBudget = async (
       },
     })
 
+    await prisma.notification.create({
+      data: {
+        groupId: groupId,
+        userId: userId,
+        text: `${userId}가 버젯을 등록했습니다.`,
+        isDelete: false
+      }
+    })
+
     // categoryId와 subCategoryId 변환
     const resCategory = await BudgetServiceUtils.changeCategIdToName(event.categoryId)
     const resSubCategory = await BudgetServiceUtils.changeSubCategIdToName(event.subCategoryId)

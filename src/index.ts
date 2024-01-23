@@ -5,8 +5,8 @@ import message from './modules/message'
 import express, { Express, Request, Response, NextFunction } from 'express'
 import { FeedRouter } from './Routers/FeedRouter'
 import { CalendarRouter } from './Routers/CalendarRouter';
-import {BudgetRouter} from './Routers/BudgetRouter';
-import {AuthRouter} from './Routers/AuthRouter';
+import { BudgetRouter } from './Routers/BudgetRouter';
+import { AuthRouter } from './Routers/AuthRouter';
 import { GroupRouter } from './Routers/GroupRouter'
 
 const app = express()
@@ -32,26 +32,14 @@ app.listen(3000, () => {
   console.log('서버가 3000번 포트에서 실행 중')
 })
 
-interface ErrorType {
-  message: string
-  status: number
-}
 
-
+// // 토큰 관련
 // const admin = require("firebase-admin");
-
 // const serviceAccount = require("../serviceAcountKey.json");
 
 // admin.initializeApp({
 //   credential: admin.credential.cert(serviceAccount),
 // });
-
-
-
-
-
-
-
 
 
 

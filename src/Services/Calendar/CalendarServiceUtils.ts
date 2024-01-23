@@ -23,7 +23,20 @@ const findCalendarEventById = async (eventId: number) => {
   }
 }
 
+const findSchedulingEventById = async (eventId: number) => {
+  try {
+    const event = await prisma.scheduling.findMany({
+      where: {
+        scheduleId: eventId,
+      },
+    })
 
+    return event
+  } catch (error) {
+    console.error('error :: service/calendar/CalendarServiceUtils/findSchedulingEventById', error)
+    throw error
+  }
+}
 
 const findParticipantEventById = async (eventId: number) => {
   try {
@@ -39,7 +52,6 @@ const findParticipantEventById = async (eventId: number) => {
     throw error
   }
 }
-
 
 // 만약 반복 일정인 것이라면 여기에 그 일정에 대한 정보가 저장이 됨(반복 제거)
 const makeCalendarEventExist = async (eventId: number) => {
@@ -119,8 +131,8 @@ const updateRepeatCalendar = async (
         userId: event.userId,
         groupId: event.groupId,
         title: event.title,
-        userColor : resUserColor,
-        userName : resUserName,
+        userColor: resUserColor,
+        userName: resUserName,
         dateStart: dayjs(event.dateStart).format('YYYY-MM-DD HH:mm:ss'),
         dateEnd: dayjs(event.dateEnd).format('YYYY-MM-DD HH:mm:ss'),
         term: event.term,
@@ -186,7 +198,7 @@ const deleteRepeatCalendar = async (
       select: {
         id: true,
       },
-    });
+    })
 
     // Step 2: 삭제할 calendarId에 해당하는 participant 삭제 및 개수 가져오기
     const deletedParticipants = await prisma.participant.deleteMany({
@@ -195,7 +207,7 @@ const deleteRepeatCalendar = async (
           in: calendarIdsToDelete.map((calendar) => calendar.id),
         },
       },
-    });
+    })
 
     // Step 3: 실제 calendar 삭제 및 개수 가져오기
     const deletedCalendars = await prisma.calendar.deleteMany({
@@ -204,16 +216,15 @@ const deleteRepeatCalendar = async (
           in: calendarIdsToDelete.map((calendar) => calendar.id),
         },
       },
-    });
+    })
 
     // deletedCalendars와 deletedParticipants에 각각 몇 개가 삭제되었는지 정보가 들어있습니다.
-    console.log(`Deleted ${deletedCalendars.count} calendars and ${deletedParticipants.count} participants.`);
+    console.log(`Deleted ${deletedCalendars.count} calendars and ${deletedParticipants.count} participants.`)
   } catch (error) {
-    console.error('error :: service/calendar/calendarServiceUtil/deleteRepeatCalendar', error);
-    throw error;
+    console.error('error :: service/calendar/calendarServiceUtil/deleteRepeatCalendar', error)
+    throw error
   }
-};
-
+}
 
 const deleteThisRepeatCalendar = async (
   eventId: number,
@@ -239,7 +250,7 @@ const deleteThisRepeatCalendar = async (
       select: {
         id: true,
       },
-    });
+    })
 
     // Step 2: 삭제할 calendarId에 해당하는 participant 삭제 및 개수 가져오기
     const deletedParticipants = await prisma.participant.deleteMany({
@@ -248,7 +259,7 @@ const deleteThisRepeatCalendar = async (
           in: calendarIdsToDelete.map((calendar) => calendar.id),
         },
       },
-    });
+    })
 
     // Step 3: 실제 calendar 삭제 및 개수 가져오기
     const deletedCalendars = await prisma.calendar.deleteMany({
@@ -257,15 +268,15 @@ const deleteThisRepeatCalendar = async (
           in: calendarIdsToDelete.map((calendar) => calendar.id),
         },
       },
-    });
+    })
 
     // deletedCalendars와 deletedParticipants에 각각 몇 개가 삭제되었는지 정보가 들어있습니다.
-    console.log(`Deleted ${deletedCalendars.count} calendars and ${deletedParticipants.count} participants.`);
+    console.log(`Deleted ${deletedCalendars.count} calendars and ${deletedParticipants.count} participants.`)
   } catch (error) {
-    console.error('error :: service/calendar/calendarServiceUtil/deleteRepeatCalendar', error);
-    throw error;
+    console.error('error :: service/calendar/calendarServiceUtil/deleteRepeatCalendar', error)
+    throw error
   }
-};
+}
 
 // 이번주 날짜 반환
 const getCurrentWeekDates = () => {
@@ -284,58 +295,48 @@ const getCurrentWeekDates = () => {
 
 // 날짜를 요일로 변환
 const getDayOfWeek = (date: Date): string => {
-  const daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"];
-  const dayIndex = date.getDay();
-  return daysOfWeek[dayIndex];
-};
+  const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토']
+  const dayIndex = date.getDay()
+  return daysOfWeek[dayIndex]
+}
 
 interface CalendarEvent {
-    id: number;
-    userId: string;
-    groupId: string;
-    title: string;
-    dateStart: Date;
-    dateEnd: Date;
-    memo?: string;
-    term: number;
-    
+  id: number
+  userId: string
+  groupId: string
+  title: string
+  dateStart: Date
+  dateEnd: Date
+  memo?: string
+  term: number
 }
 interface ExtendedCalendarEvent extends CalendarEvent {
-  daysOfWeek: string[];
-  participants: string[];
+  daysOfWeek: string[]
+  participants: string[]
 }
 
-
 const groupThisWeekEvents = async (events: CalendarEvent[]) => {
-  const groupedEvents: Record<string, ExtendedCalendarEvent> = {};
+  const groupedEvents: Record<string, ExtendedCalendarEvent> = {}
 
   for (const event of events) {
-    const key = `${event.title}-${event.memo || ''}-${event.groupId}`;
+    const key = `${event.title}-${event.memo || ''}-${event.groupId}`
     if (!groupedEvents[key]) {
-      const participants = await getParticipantsForEvent(event.id);
-      const daysOfWeek: string[] = [getDayOfWeek(event.dateStart)]; // 배열로 변경
-      groupedEvents[key] = { ...(event as ExtendedCalendarEvent), daysOfWeek, participants };
+      const participants = await getParticipantsForEvent(event.id)
+      const daysOfWeek: string[] = [getDayOfWeek(event.dateStart)] // 배열로 변경
+      groupedEvents[key] = { ...(event as ExtendedCalendarEvent), daysOfWeek, participants }
     } else {
       // 이미 있는 경우, daysOfWeek를 합친다.
-      const existingGroup = groupedEvents[key];
-      existingGroup.daysOfWeek.push(...getDayOfWeek(event.dateStart));
+      const existingGroup = groupedEvents[key]
+      existingGroup.daysOfWeek.push(...getDayOfWeek(event.dateStart))
     }
   }
 
-  return Object.values(groupedEvents);
-};
-
-
-
-
+  return Object.values(groupedEvents)
+}
 
 //참여자가 여러명인 경우
-const multipleParticipants = async (
-  participants: string[],
-  groupId: string,
-  calendarId: number
-) => {
-  const num: number = participants.length;
+const multipleParticipants = async (participants: string[], groupId: string, calendarId: number) => {
+  const num: number = participants.length
 
   try {
     const existingEvent = await findParticipantEventById(calendarId)
@@ -345,10 +346,10 @@ const multipleParticipants = async (
         where: {
           calendarId: calendarId,
         },
-      });
+      })
     }
 
-    const createdEvents = [];
+    const createdEvents = []
 
     for (let i = 0; i < num; i++) {
       const event = await prisma.participant.create({
@@ -357,19 +358,17 @@ const multipleParticipants = async (
           groupId: groupId,
           calendarId: calendarId,
         },
-      });
+      })
 
-      createdEvents.push(event);
+      createdEvents.push(event)
     }
 
-    return createdEvents;
+    return createdEvents
   } catch (error) {
-    console.error('Error creating participants array', error);
-    throw error;
+    console.error('Error creating participants array', error)
+    throw error
   }
-};
-
-
+}
 
 // 이벤트에 대한 참가자 가져오기
 const getParticipantsForEvent = async (eventId: number) => {
@@ -380,24 +379,19 @@ const getParticipantsForEvent = async (eventId: number) => {
     select: {
       userId: true,
     },
-  });
-  return participants.map((participant) => participant.userId);
-};
-
+  })
+  return participants.map((participant) => participant.userId)
+}
 
 // 참여자가 여러명인거를 수정할 경우
-const updateParticipants = async (
-  participants: string[],
-  groupId: string,
-  calendarId: number
-) => {
+const updateParticipants = async (participants: string[], groupId: string, calendarId: number) => {
   try {
     // 해당 calendarId를 가진 참가자 데이터 조회
     const existingParticipants = await prisma.participant.findMany({
       where: {
         calendarId: calendarId,
       },
-    });
+    })
 
     // 만약 해당 calendarId를 가진 참가자 데이터가 없다면 생성
     if (existingParticipants.length === 0) {
@@ -409,11 +403,11 @@ const updateParticipants = async (
               groupId: groupId,
               calendarId: calendarId,
             },
-          });
-        })
-      );
+          })
+        }),
+      )
 
-      return createdParticipants;
+      return createdParticipants
     }
 
     // 이미 해당 calendarId를 가진 참가자 데이터가 있다면 업데이트
@@ -421,7 +415,7 @@ const updateParticipants = async (
       where: {
         calendarId: calendarId,
       },
-    });
+    })
 
     const updatedParticipants = await Promise.all(
       participants.map(async (userId) => {
@@ -431,47 +425,42 @@ const updateParticipants = async (
             groupId: groupId,
             calendarId: calendarId,
           },
-        });
-      })
-    );
+        })
+      }),
+    )
 
-    return updatedParticipants;
+    return updatedParticipants
   } catch (error) {
-    console.error('Error updating participants array', error);
-    throw error;
+    console.error('Error updating participants array', error)
+    throw error
   }
-};
-
+}
 
 // 참가자 각각을 배열로 합치기
-const makeArray = async (
-  calendarId: number
-): Promise<string[]> => {
+const makeArray = async (calendarId: number): Promise<string[]> => {
   try {
-    let arr: string[] = [];
+    let arr: string[] = []
 
     const participants = await prisma.participant.findMany({
       where: {
         calendarId: calendarId,
       },
-    });
+    })
 
     participants.forEach((participant) => {
-      arr.push(participant.userId);
-    });
+      arr.push(participant.userId)
+    })
 
-    return arr; 
+    return arr
   } catch (error) {
-    console.error('makeArray에서 오류 발생:', error);
-    throw error;
+    console.error('makeArray에서 오류 발생:', error)
+    throw error
   }
-};
-
-
-
+}
 
 export {
   findCalendarEventById,
+  findSchedulingEventById,
   findParticipantEventById,
   makeCalendarEventExist,
   checkExistSchedule,
@@ -484,5 +473,5 @@ export {
   getParticipantsForEvent,
   multipleParticipants,
   updateParticipants,
-  makeArray
+  makeArray,
 }

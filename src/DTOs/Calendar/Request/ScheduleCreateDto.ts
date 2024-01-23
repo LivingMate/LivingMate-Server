@@ -2,5 +2,7 @@ export interface ScheduleCreateDto {
   scheduleId: number
   groupId: string
   title: string
-  used: boolean
+  dates: string[]
+  startTime: string
+  endTime: string
 }
