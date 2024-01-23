@@ -8,10 +8,6 @@ import * as UserController from '../Controllers/UserController'
 const AuthRouter = express.Router();
 
 AuthRouter.post('/signup', UserController.createUser)
-AuthRouter.get('/profile/:userId', UserController.getUserProfile)
-
-
-
 
 
 

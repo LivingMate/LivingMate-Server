@@ -5,6 +5,7 @@ import { UserUpdateResponseDto } from '../DTOs/User/Response/UserUpdateResponseD
 import { UserProfileResponseDto } from '../DTOs/User/Response/UserProfileResponseDto'
 import * as GroupService from './Group/GroupService'
 import * as GroupServiceUtils from './Group/GroupServiceUtils'
+import * as NotificationService from './NotificationService'
 import message from '../modules/message'
 import { sign } from 'crypto'
 
@@ -146,20 +147,21 @@ const getUserIdbyName = async (userName: string[]) => {
 
 
 //+ 그룹 참여하는 서비스
-const addUserToGroup = async (signupDTO: SignupDto, groupId: string) => {
+const addUserToGroup = async (userId: string, groupId: string) => {
   //1. createUser with signupDTO
   //2. put her groupId in her record at User table
   //3. assign her id(? not sure) to Group's User[]? Did it mean it had foreign relations with the table?
-  const newUser = await createUser(signupDTO)
-  await prisma.user.update({
+  
+  const data = await prisma.user.update({
     where: {
-      id: newUser.id,
+      id: userId,
     },
     data: {
       groupId: groupId,
     },
   })
-  return newUser
+  await NotificationService.makeNotification(groupId, userId, "newUser")
+  return data
 }
 
 const createColor = async()=>{

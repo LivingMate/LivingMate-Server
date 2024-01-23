@@ -39,10 +39,11 @@ const createSchedule = async (req: Request, res: Response, next: NextFunction): 
   }
 
   const groupId = req.params.groupId
+  const userId = req.params.userId
   const scheduleCreateDto: ScheduleCreateDto = req.body
 
   try {
-    const data = await CalendarService.createSchedule(groupId, scheduleCreateDto)
+    const data = await CalendarService.createSchedule(groupId, userId, scheduleCreateDto)
     console.log(data)
     res.status(201).json(data)
   } catch (error) {

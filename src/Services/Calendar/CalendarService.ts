@@ -44,16 +44,14 @@ const createRepeatCalendar = async (
       })
 
       await CalendarServiceUtils.multipleParticipants(calendarCreateDto.participants, groupId, event.id)
-      const resUserColor = await UserService.findUserColorByUserId(event.userId)
-      const resUserName = await UserService.getUserNameByUserId(event.userId)
 
       const data = {
         calendarId: event.id,
         userId: event.userId,
         groupId: event.groupId,
         title: event.title,
-        userColor: resUserColor,
-        userName: resUserName,
+        // userColor: resUserColor,
+        // userName: resUserName,
         dateStart: dayjs(event.dateStart).format('YYYY-MM-DD HH:mm:ss'),
         dateEnd: dayjs(event.dateEnd).format('YYYY-MM-DD HH:mm:ss'),
         term: event.term,
@@ -84,6 +82,17 @@ const createRepeatCalendar = async (
           break
       }
     }
+
+    const resUserName = await UserService.getUserNameByUserId(userId)
+    await prisma.notification.create({
+      data: {
+        groupId: groupId,
+        userId: userId,
+        text: `${resUserName}가 반복 일정을 등록했습니다.`,
+        isDelete: false
+      }
+
+    })
     return createdEvents
   } catch (error) {
     console.error('error :: service/calendar/createRecurringCalendar', error)
@@ -130,17 +139,25 @@ const createCalendar = async (userId: string, groupId: string, calendarCreateDto
         },
       })
 
-      await CalendarServiceUtils.multipleParticipants(calendarCreateDto.participants, groupId, event.id)
-      const resUserColor = await UserService.findUserColorByUserId(event.userId)
       const resUserName = await UserService.getUserNameByUserId(event.userId)
+      await prisma.notification.create({
+        data: {
+          groupId: groupId,
+          userId: userId,
+          text: `${resUserName}가 일정을 등록했습니다.`,
+          isDelete: false
+        }
+      })
+
+      await CalendarServiceUtils.multipleParticipants(calendarCreateDto.participants, groupId, event.id)
 
       const data = {
         calendarId: event.id,
         userId: event.userId,
         groupId: event.groupId,
         title: event.title,
-        userColor: resUserColor,
-        userName: resUserName,
+        // userColor: resUserColor,
+        // userName: resUserName,
         dateStart: dayjs(event.dateStart).format('YYYY-MM-DD HH:mm:ss'),
         dateEnd: dayjs(event.dateEnd).format('YYYY-MM-DD HH:mm:ss'),
         term: event.term,
@@ -161,6 +178,7 @@ const createCalendar = async (userId: string, groupId: string, calendarCreateDto
 // 기본 정보만 받는것
 const createSchedule = async (
   groupId: string,
+  userId: string,
   scheduleCreateDto: ScheduleCreateDto,
 ): Promise<ScheduleCreateResponseDto> => {
   try {
@@ -176,7 +194,15 @@ const createSchedule = async (
         endTime: scheduleCreateDto.endTime,
       },
     })
-
+    const resUserName = await UserService.getUserNameByUserId(userId)
+    await prisma.notification.create({
+      data: {
+        groupId: groupId,
+        userId: userId,
+        text: `${resUserName}가 일정 조율을 등록했습니다.`,
+        isDelete: false
+      }
+    })
     const datesArray = JSON.parse(event.dates)
 
     const data: ScheduleCreateResponseDto = {

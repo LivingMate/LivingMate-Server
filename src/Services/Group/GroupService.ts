@@ -7,30 +7,6 @@ import { group } from 'console'
 import * as GroupServiceUtils from './GroupServiceUtils'
 
 
-// createGroup
-const createGroup = async (userId: string, groupName: string) => {
-  try {
-    const user = await UserService.findUserById(userId)
-    const groupId = await createGroupId();
-
-
-    await GroupServiceUtils.checkJoinedGroupId(user?.groupId || '')
-
-    const createdGroup = await prisma.group.create({
-      data: {
-        id: groupId,
-        groupOwner: userId,
-        groupName: groupName,
-        groupSpending: 0,
-      },
-    })
-
-    return createdGroup;
-  } catch (error) {
-    throw new Error('Error at creating Group: group service')
-  }
-}
-
 //그룹아이디 생성하기 
 const createGroupId = async()=>{
   
@@ -48,7 +24,32 @@ const createGroupId = async()=>{
   return result;
 }
 
+// createGroup
+const createGroup = async (userId: string, groupName: string) => {
+  try {
+    const user = await UserService.findUserById(userId)
+    const groupId = await createGroupId();
 
+    await GroupServiceUtils.checkJoinedGroupId(user?.groupId || '')
+
+    const createdGroup = await prisma.group.create({
+      data: {
+        id: groupId,
+        groupOwner: userId,
+        groupName: groupName,
+        groupSpending: 0,
+      },
+    })
+
+    const GroupReturn = await UserService.addUserToGroup(userId,createdGroup.id);
+    return GroupReturn;
+
+    //return createdGroup;
+  } catch (error) {
+    console.error('Error at creating Group: group service', error);
+    throw new Error('Error at creating Group: group service');
+  }
+}
 
 
 

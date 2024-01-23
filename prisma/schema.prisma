@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,23 +8,27 @@ datasource db {
 }
 
 model User {
-  id              String          @id
-  userName        String          @unique
-  userColor       String
-  email           String          @unique
-  sex             Boolean
-  age             Int
-  createdAt       DateTime        @default(now())
-  group           Group           @relation(fields: [groupId], references: [id])
-  groupId         String
-  fcmToken        String?
-  Feed            Feed[]
-  Notification    Notification[]
-  CalendarUser    Calendar[]      @relation("user")
-  UserSpendings   UserSpendings[]
-  AdjustmentMinus Adjustment[]    @relation("minusUser")
-  AdjustmentPlus  Adjustment[]    @relation("plusUser")
-  Participant     Participant[]
+  id                String          @id
+  userName          String          @unique
+  userColor         String
+  email             String          @unique
+  sex               Boolean
+  age               Int
+  createdAt         DateTime        @default(now()) @db.DateTime(0)
+  updatedAt         DateTime        @updatedAt @db.DateTime(0)
+  groupId           String
+  fcmToken          String?
+  notificationState Boolean         @default(false)
+  AdjustmentMinus   Adjustment[]    @relation("minusUser")
+  AdjustmentPlus    Adjustment[]    @relation("plusUser")
+  CalendarUser      Calendar[]      @relation("user")
+  Feed              Feed[]
+  Notification      Notification[]
+  Participant       Participant[]
+  group             Group           @relation(fields: [groupId], references: [id])
+  UserSpendings     UserSpendings[]
+
+  @@index([groupId], map: "User_groupId_fkey")
 }
 
 model Group {
@@ -37,136 +38,157 @@ model Group {
   groupCode     String?
   groupSpending Float
   createdAt     DateTime        @default(now())
-  User          User[]
+  Adjustment    Adjustment[]
+  Calendar      Calendar[]
   Feed          Feed[]
   Notification  Notification[]
-  Calendar      Calendar[]
   Participant   Participant[]
   Schedule      Schedule[]
   Scheduling    Scheduling[]
-  UserSpendings UserSpendings[]
-  Adjustment    Adjustment[]
   SubCategory   SubCategory[]
+  User          User[]
+  UserSpendings UserSpendings[]
 }
 
-// ----------------- 피드
 model Feed {
   id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id])
   userId    String
-  group     Group    @relation(fields: [groupId], references: [id])
   groupId   String
   content   String   @default("")
   createdAt DateTime @default(now())
   pin       Boolean  @default(false)
+  group     Group    @relation(fields: [groupId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([groupId], map: "Feed_groupId_fkey")
+  @@index([userId], map: "Feed_userId_fkey")
 }
 
-// --------------- 알림
 model Notification {
   id        Int      @id @default(autoincrement())
-  group     Group    @relation(fields: [groupId], references: [id])
   groupId   String
-  user      User     @relation(fields: [userId], references: [id])
   userId    String
   text      String   @db.LongText
   createdAt DateTime @default(now())
   isDelete  Boolean  @default(false)
+  group     Group    @relation(fields: [groupId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([groupId], map: "Notification_groupId_fkey")
+  @@index([userId], map: "Notification_userId_fkey")
 }
 
-// ----------- 일정 등록 부분
 model Calendar {
   id          Int           @id @default(autoincrement())
-  user        User          @relation(fields: [userId], references: [id], name: "user")
   userId      String
-  group       Group         @relation(fields: [groupId], references: [id])
   groupId     String
   title       String        @db.VarChar(255)
   dateStart   DateTime
   dateEnd     DateTime
   memo        String        @db.Text
   term        Int
+  group       Group         @relation(fields: [groupId], references: [id])
+  user        User          @relation("user", fields: [userId], references: [id])
   Participant Participant[]
+
+  @@index([groupId], map: "Calendar_groupId_fkey")
+  @@index([userId], map: "Calendar_userId_fkey")
 }
 
 model Participant {
   id         Int      @id @default(autoincrement())
-  group      Group    @relation(fields: [groupId], references: [id])
   groupId    String
-  user       User     @relation(fields: [userId], references: [id])
   userId     String
-  calendar   Calendar @relation(fields: [calendarId], references: [id])
   calendarId Int
+  calendar   Calendar @relation(fields: [calendarId], references: [id])
+  group      Group    @relation(fields: [groupId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@index([calendarId], map: "Participant_calendarId_fkey")
+  @@index([groupId], map: "Participant_groupId_fkey")
+  @@index([userId], map: "Participant_userId_fkey")
 }
 
-// -----------일정조율 부분
 model Schedule {
   id         Int          @id @default(autoincrement())
-  group      Group        @relation(fields: [groupId], references: [id])
   groupId    String
   title      String
   dates      String
   startTime  String
   endTime    String
+  group      Group        @relation(fields: [groupId], references: [id])
   Scheduling Scheduling[]
+
+  @@index([groupId], map: "Schedule_groupId_fkey")
 }
 
 model Scheduling {
   id         Int      @id @default(autoincrement())
-  group      Group    @relation(fields: [groupId], references: [id])
   groupId    String
-  schedule   Schedule @relation(fields: [scheduleId], references: [id])
   scheduleId Int
   date       String
   time       String
   selectedBy String
+  group      Group    @relation(fields: [groupId], references: [id])
+  schedule   Schedule @relation(fields: [scheduleId], references: [id])
+
+  @@index([groupId], map: "Scheduling_groupId_fkey")
+  @@index([scheduleId], map: "Scheduling_scheduleId_fkey")
 }
 
-// ------------- 정산부분
 model UserSpendings {
   id            Int         @id @default(autoincrement())
-  user          User        @relation(fields: [userId], references: [id])
   userId        String
-  group         Group       @relation(fields: [groupId], references: [id])
   groupId       String
   spendings     Float       @default(0)
-  category      Category    @relation(fields: [categoryId], references: [id])
   categoryId    Int
-  subCategory   SubCategory @relation(fields: [subCategoryId], references: [id])
   subCategoryId Int
   createdAt     DateTime    @default(now())
   spendingName  String
   isDone        Boolean     @default(false)
+  category      Category    @relation(fields: [categoryId], references: [id])
+  group         Group       @relation(fields: [groupId], references: [id])
+  subCategory   SubCategory @relation(fields: [subCategoryId], references: [id])
+  user          User        @relation(fields: [userId], references: [id])
+
+  @@index([categoryId], map: "UserSpendings_categoryId_fkey")
+  @@index([groupId], map: "UserSpendings_groupId_fkey")
+  @@index([subCategoryId], map: "UserSpendings_subCategoryId_fkey")
+  @@index([userId], map: "UserSpendings_userId_fkey")
 }
 
 model Adjustment {
   id          Int      @id @default(autoincrement())
-  group       Group    @relation(fields: [groupId], references: [id])
   groupId     String
-  minusUser   User?    @relation(fields: [minusUserId], references: [id], name: "minusUser")
   minusUserId String?
-  plusUser    User?    @relation(fields: [plusUserId], references: [id], name: "plusUser")
   plusUserId  String?
   change      Int
   createdAt   DateTime @default(now())
+  group       Group    @relation(fields: [groupId], references: [id])
+  minusUser   User?    @relation("minusUser", fields: [minusUserId], references: [id])
+  plusUser    User?    @relation("plusUser", fields: [plusUserId], references: [id])
+
+  @@index([groupId], map: "Adjustment_groupId_fkey")
+  @@index([minusUserId], map: "Adjustment_minusUserId_fkey")
+  @@index([plusUserId], map: "Adjustment_plusUserId_fkey")
 }
 
 model Category {
   id          Int             @id @default(autoincrement())
-  name        String
-  spendings   UserSpendings[]
+  name        String          @unique
   SubCategory SubCategory[]
-
-  @@unique([name])
+  spendings   UserSpendings[]
 }
 
 model SubCategory {
   id         Int             @id @default(autoincrement())
-  group      Group           @relation(fields: [groupId], references: [id])
   groupId    String
-  category   Category        @relation(fields: [categoryId], references: [id])
   categoryId Int
-  name       String
+  name       String          @unique
+  category   Category        @relation(fields: [categoryId], references: [id])
+  group      Group           @relation(fields: [groupId], references: [id])
   spendings  UserSpendings[]
 
-  @@unique([name])
+  @@index([categoryId], map: "SubCategory_categoryId_fkey")
+  @@index([groupId], map: "SubCategory_groupId_fkey")
 }

@@ -8,8 +8,6 @@ import message from "../modules/message";
 import util from "../modules/util";
 
 
-
-
 // POST
 const createUser = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
   const errors: Result<ValidationError> = validationResult(req)
@@ -19,7 +17,6 @@ const createUser = async (req: Request, res: Response, next: NextFunction): Prom
 
   const signupDto: SignupDto = req.body
   
-
   try {
     const data = await UserService.createUser(signupDto)
     console.log(data)
@@ -31,6 +28,25 @@ const createUser = async (req: Request, res: Response, next: NextFunction): Prom
 }
 
 
+// // PATCH
+// const addUserToGroup = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+//   const errors: Result<ValidationError> = validationResult(req)
+//   if (!errors.isEmpty()) {
+//     return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, message.BAD_REQUEST))
+//   }
+
+//   const signupDto: SignupDto = req.body
+//   const groupId = req.params.groupId
+
+//   try {
+//     const data = await UserService.addUserToGroup(signupDto, groupId)
+//     console.log(data)
+//     res.status(201).send(data)
+//   } catch (error) {
+//     console.error('Error creating userToGroup: controller', error)
+//     res.status(500).json({ error: 'Internal Server Error' })
+//   }
+// }
 
 // GET
 const getUserProfile = async (
@@ -51,5 +67,6 @@ const getUserProfile = async (
 
   export{
     createUser,
-    getUserProfile
+    getUserProfile,
+    // addUserToGroup
   }
