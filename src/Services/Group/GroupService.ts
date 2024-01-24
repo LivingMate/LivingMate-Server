@@ -23,7 +23,7 @@ const createGroupId = async () => {
   return result
 }
 
-// createGroup
+// 방장이 자신의 그룹 생성 후 자신 그룹 참여
 const createGroup = async (userId: string, groupName: string) => {
   try {
     const user = await UserServiceUtils.findUserById(userId)
@@ -41,12 +41,26 @@ const createGroup = async (userId: string, groupName: string) => {
     })
 
     const GroupReturn = await UserServiceUtils.addUserToGroup(userId, createdGroup.id)
-    return GroupReturn
+    return createdGroup
 
     //return createdGroup;
   } catch (error) {
     console.error('Error at creating Group: group service', error)
     throw new Error('Error at creating Group: group service')
+  }
+}
+
+// 참여자들이 자기 그룹 찾아들어가기
+const goGroup = async(userId: string, groupId: string) => {
+  try {
+    const user = await UserServiceUtils.findUserById(userId)
+    const group = await GroupServiceUtils.findGroupById(groupId)
+
+    const GroupReturn = await UserServiceUtils.addUserToGroup(user.id, group.id)
+    return GroupReturn
+
+  } catch (error) {
+    console.error('Error at entering Group: group service', error)
   }
 }
 
@@ -120,4 +134,8 @@ const getGroup = async (userId: string): Promise<string | null> => {
   }
 }
 
-export { createGroup, leaveGroup, getGroup }
+export { 
+  createGroup,
+  goGroup, 
+  leaveGroup, 
+  getGroup }

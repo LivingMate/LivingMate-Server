@@ -34,10 +34,24 @@ const createGroup = async (req: Request, res: Response, next: NextFunction): Pro
   }  
 }
 
+const goGroup = async (req: Request, res: Response, next: NextFunction) =>{
+  const userId = req.params.userId
+  const groupId = req.body.groupId
+
+  try{
+    const data = await GroupService.goGroup(userId, groupId)
+    console.log(data)
+    return res.send(data)
+  } catch (error) {
+    console.error('Error at entering Group: Controller', error);
+    res.status(500).json({ error: 'Error creating Group: Controller' });
+  }  
+}
 // const joinGroup
 
 // const leaveGroup
 
 export{
-  createGroup
+  createGroup,
+  goGroup
 }

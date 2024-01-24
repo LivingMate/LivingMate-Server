@@ -44,6 +44,19 @@ async function getUserNameByUserId(userId: string) {
   }
 }
 
+const updateUserColor = async (userId: string) => {
+    const color = await createColor()
+    const userWithColor = await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        userColor: color,
+      },
+    })
+    return userWithColor
+  }
+
 // userId로 userColor 찾기
 const findUserColorByUserId = async (userId: string) => {
   try {
@@ -133,6 +146,7 @@ const createUserId = async () => {
 export {
   findUserById,
   getUserNameByUserId,
+  updateUserColor,
   findUserColorByUserId,
   getUserIdbyName,
   addUserToGroup,

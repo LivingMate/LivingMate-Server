@@ -18,14 +18,14 @@ const createUser = async (signupDtO: SignupDto) => {
     data: {
       id: Id,
       userName: signupDtO.userName,
-      groupId: 'aaaaaa', //default
+      groupId: signupDtO.groupId || 'aaaaaa', //default
       userColor: 'FFFFFF', //default, just temporary value for now
       email: signupDtO.email,
       sex: signupDtO.sex,
       age: signupDtO.age,
     },
   })
-  const createdUser = await updateUserColor(user.id)
+  const createdUser = await UserServiceUtils.updateUserColor(user.id)
   //if 이미 존재하는 유저인지 확인
   return createdUser
 }
@@ -74,18 +74,7 @@ const findUserByIdAndUpdate = async (userId: string, userUpdateRequestDto: UserU
   return updatedUser
 }
 
-const updateUserColor = async (userId: string) => {
-  const color = await UserServiceUtils.createColor()
-  const userWithColor = await prisma.user.update({
-    where: {
-      id: userId,
-    },
-    data: {
-      userColor: color,
-    },
-  })
-  return userWithColor
-}
+
 
 export {
   createUser,

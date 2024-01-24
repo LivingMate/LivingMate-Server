@@ -1,17 +1,17 @@
 
-// //import { body } from 'express-validator';
-// //import { AuthController } from '../Controllers';
-// import passport from "passport";
-// import * as UserController from '../Controllers/UserController'
-// import * as session from 'express-session';
-// import { Strategy as GoogleStrategy, Profile } from 'passport-google-oauth20';
-// // import GoogleStrategy from "passport-google-oauth20";
-// import * as UserService from "../Services/UserService";
-// import express, { Request, Response, NextFunction } from 'express'
+//import { body } from 'express-validator';
+//import { AuthController } from '../Controllers';
+import passport from "passport";
+import * as UserController from '../Controllers/UserController'
+import * as session from 'express-session';
+import { Strategy as GoogleStrategy, Profile } from 'passport-google-oauth20';
+// import GoogleStrategy from "passport-google-oauth20";
+import * as UserService from "../Services/User/UserService";
+import express, { Request, Response, NextFunction } from 'express'
 
 
 
-// const AuthRouter = express.Router();
+const AuthRouter = express.Router();
 
 // passport.serializeUser((user:any, done) => {
 //     done(null, {id: user.id, groupId: user.groupId});
@@ -120,7 +120,7 @@
 
 // //export default router;
 
-// //AuthRouter.post('/signup', UserController.createUser)
+AuthRouter.post('/signup', UserController.createUser)
 // AuthRouter.get('/profile/:userId', UserController.getUserProfile)
 
 // AuthRouter.get('/logout',isLoggedIn, (req,res)=>{
@@ -133,4 +133,4 @@
 
 
 
-// export {AuthRouter};
+export {AuthRouter};
