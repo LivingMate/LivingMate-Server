@@ -3,7 +3,6 @@ const prisma = new PrismaClient()
 import { FeedCreateRequestDto } from '../DTOs/Feed/Request/FeedCreateRequestDto'
 import { FeedCreateResponseDto } from '../DTOs/Feed/Response/FeedCreateResponseDto'
 import { FeedUpdateResponseDto } from '../DTOs/Feed/Response/FeedUpdateResponseDto'
-import { FeedPinRequestDto } from '../DTOs/Feed/Request/FeedPinRequestDto'
 import * as UserServiceUtils from './User/UserServiceUtils'
 import message from '../modules/message'
 
@@ -36,8 +35,8 @@ const createFeed = async (userId: string, groupId: string, content: string): Pro
       },
     })
 
-    const resUserName = await UserServiceUtils.getUserNameByUserId(event.userId)
-    const resUserColor = await UserServiceUtils.findUserColorByUserId(event.userId)
+    //const resUserName = await UserServiceUtils.getUserNameByUserId(event.userId)
+    //const resUserColor = await UserServiceUtils.findUserColorByUserId(event.userId)
 
     const data: FeedCreateResponseDto = {
       feedId: event.id,

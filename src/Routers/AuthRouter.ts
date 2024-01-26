@@ -84,7 +84,8 @@ const googleStrategy = async()=>passport.use(
           email: profile.emails[0].value,
           groupId: "aaaaaa",
           userName: profile.displayName,
-          sex: profile._json.gender,
+          //sex: profile._json.gender,
+          sex: false,
           age: profile.age
         })
         return done(null, signUpUser);
@@ -110,11 +111,11 @@ const googleStrategy = async()=>passport.use(
 
 
 
-
+  
 
 // router.get('/google', passport.authenticate('google', {scope:['profile', 'email']}));
 
-AuthRouter.get('/google/callback',
+AuthRouter.get('/auth/google/callback',
     passport.authenticate('google', {successRedirect: '/', failureRedirect: '/auth/login', failureFlash: true
 }))
 
@@ -133,7 +134,7 @@ AuthRouter.get('/auth/logout', function(req, res, next) {
 
 //export default router;
 
-AuthRouter.post('/signup', UserController.createUser)
+AuthRouter.get('/signup', UserController.createUser)
 AuthRouter.get('/profile/:userId', UserController.getUserProfile)
 
 // AuthRouter.get('/logout',isLoggedIn, (req,res)=>{
