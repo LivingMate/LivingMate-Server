@@ -3,6 +3,7 @@ const prisma = new PrismaClient()
 import { FeedCreateRequestDto } from '../DTOs/Feed/Request/FeedCreateRequestDto'
 import { FeedCreateResponseDto } from '../DTOs/Feed/Response/FeedCreateResponseDto'
 import { FeedUpdateResponseDto } from '../DTOs/Feed/Response/FeedUpdateResponseDto'
+import { FeedPinRequestDto } from '../DTOs/Feed/Request/FeedPinRequestDto'
 import * as UserServiceUtils from './User/UserServiceUtils'
 import message from '../modules/message'
 
@@ -97,16 +98,31 @@ const updateFeedContent = async (
 }
 
 //피드 고정
-const pinFeed = async (FeedId: number) => {
-  const pinnedFeed = await prisma.feed.update({
-    where: {
-      id: FeedId,
-    },
-    data: {
-      pin: true,
-    },
-  })
-  return pinnedFeed
+const pinFeed = async (FeedId: number, pin:boolean) => {
+  try{
+    const pinnedFeed = await prisma.feed.update({
+      where: {
+        id: FeedId,
+      },
+      data: {
+        pin: pin
+      },
+    })
+  
+    const data = {
+      feedId: pinnedFeed.id,
+      userId: pinnedFeed.userId,
+      groupId: pinnedFeed.groupId,
+      content: pinnedFeed.content,
+      createdAt: pinnedFeed.createdAt,
+      pin: pinnedFeed.pin,
+    }
+  
+    return(data)
+  } catch (error) {
+    console.error('error :: service/feed/pinfeed', error)
+    throw error
+  }
 }
 
 //피드 삭제
