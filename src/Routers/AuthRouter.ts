@@ -1,17 +1,21 @@
 
-//import { body } from 'express-validator';
-//import { AuthController } from '../Controllers';
-import passport from "passport";
-import * as UserController from '../Controllers/UserController'
-import * as session from 'express-session';
-import { Strategy as GoogleStrategy, Profile } from 'passport-google-oauth20';
-// import GoogleStrategy from "passport-google-oauth20";
-import * as UserService from "../Services/User/UserService";
-import express, { Request, Response, NextFunction } from 'express'
+// //import { body } from 'express-validator';
+// //import { AuthController } from '../Controllers';
+// import passport from "passport";
+// import * as UserController from '../Controllers/UserController'
+// import * as session from 'express-session';
+// import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+// // import GoogleStrategy from "passport-google-oauth20";
+// import * as UserService from "../Services/UserService";
+// import express, { Request, Response, NextFunction } from 'express'
+// import {PrismaClient} from '@prisma/client';
+
+
+// const prisma = new PrismaClient;
 
 
 
-const AuthRouter = express.Router();
+// const AuthRouter = express.Router();
 
 // passport.serializeUser((user:any, done) => {
 //     done(null, {id: user.id, groupId: user.groupId});
@@ -38,29 +42,32 @@ const AuthRouter = express.Router();
   
 //     // 로그인되어 있지 않다면 로그인 페이지로 리다이렉트 
 //     res.redirect('/login');
-//   };
+// };
 
 
 
-// const googleStrategy = new GoogleStrategy({
-//     clientID: process.env.GOOGLE_ID,
-//     clientSecret: process.env.GOOGLE_SECRET,
-//     callbackURL: '/auth/google/callback',
-//     scope: ['email', 'profile' ],
-//     passReqToCallback: true
-//   }, async (req, accessToken, refreshToken, params, profile:Profile, done) => {
-//     try {
-//       if (req.user) { //logged-in user
-
-//         const existingUser = await UserService.findUserById(profile.id);
 
 
-//         if (existingUser && (existingUser.id !== req.user.id)) {
-//           throw new Error('There is already a Google account that belongs to you. Sign in with that account or delete it, then link it with your current account.');
-//           //return done(null, existingUser);
-//         }
+// const googleStrategy = async()=>passport.use(
+//     new GoogleStrategy(
+//         {
+//             clientID: process.env.GOOGLE_ID,
+//             clientSecret: process.env.GOOGLE_SECRET,
+//             callbackURL: '/auth/google/callback',
+//             scope: ['email', 'profile'],
+//             passReqToCallback: true
+//         }, async (req, accessToken, refreshToken, params, profile, done) => {
+//             console.log('google profile : ', profile);
+//              try {
+//                 if (req.user) { //logged-in user
+//                     const existingUser = await UserService.findUserById(profile.id);
+                    
+//                     if (existingUser && (existingUser.id !== req.user.id)) {
+//                         throw new Error('There is already a Google account that belongs to you. Sign in with that account or delete it, then link it with your current account.');
+//                         //return done(null, existingUser); 
+//                     }
 
-//         const user = await UserService.findUserById(req.user.id);
+//                 const user = await UserService.findUserById(req.user.id);
 //         return done(null, user);
 //       }
 
@@ -71,6 +78,7 @@ const AuthRouter = express.Router();
 //       }
 
 //       else{
+        
 //         const signUpUser = await UserService.createUser({
 //           email: profile.emails[0].value,
 //           groupId: "aaaaaa",
@@ -94,9 +102,10 @@ const AuthRouter = express.Router();
 //     } catch (err) {
 //       return done(err);
 //     }
-//   });
+//   }));
 
-//   passport.use('google', googleStrategy);
+//   //passport.use('google', googleStrategy);
+
 
 
 
@@ -120,17 +129,17 @@ const AuthRouter = express.Router();
 
 // //export default router;
 
-AuthRouter.post('/signup', UserController.createUser)
+// //AuthRouter.post('/signup', UserController.createUser)
 // AuthRouter.get('/profile/:userId', UserController.getUserProfile)
 
-// AuthRouter.get('/logout',isLoggedIn, (req,res)=>{
-//     req.logout();
-//     req.session.destroy('/');
-// });
+// // AuthRouter.get('/logout',isLoggedIn, (req,res)=>{
+// //     req.logout();
+// //     req.session.destroy('/');
+// // });
 
 // AuthRouter.get('/google',passport.authenticate('google'));
 
 
 
 
-export {AuthRouter};
+// export {AuthRouter};
