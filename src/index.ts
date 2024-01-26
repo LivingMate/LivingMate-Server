@@ -6,7 +6,7 @@ import express, { Express, Request, Response, NextFunction } from 'express'
 import { FeedRouter } from './Routers/FeedRouter'
 import { CalendarRouter } from './Routers/CalendarRouter';
 import { BudgetRouter } from './Routers/BudgetRouter';
-import { AuthRouter } from './Routers/AuthRouter';
+//import { AuthRouter } from './Routers/AuthRouter';
 import { GroupRouter } from './Routers/GroupRouter'
 
 const app = express()
@@ -25,7 +25,7 @@ app.get('/', (req: Request, res: Response) => {
 app.use(FeedRouter);
 app.use(CalendarRouter);
 app.use(BudgetRouter);
-app.use(AuthRouter);
+//app.use(AuthRouter);
 app.use(GroupRouter);
 
 app.listen(3000, () => {

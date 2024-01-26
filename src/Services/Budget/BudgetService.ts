@@ -224,6 +224,21 @@ const showSubCategory = async (groupId: string, categoryName: string) => {
   return SubCategories
 }
 
+
+//카테고리별 정렬+검색
+const showByCategory = async(groupId:string, category: string)=>{
+  const categoryId = await BudgetServiceUtils.findCategIdByName(category);
+  const budgetsToShow = await prisma.userSpendings.findMany({
+    where:{
+      groupId: groupId,
+      categoryId: categoryId
+    }
+  })
+  return budgetsToShow;
+}
+
+
+
 //정산파트1 최종함수//
 //각 지출액 - 그룹 평균 지출액 값 반환
 const getGroupMemberSpending = async (groupId: string) => {
@@ -543,4 +558,5 @@ export {
   showSubCategory,
   finalAdjustment,
   AdjAtBudget,
+  showByCategory
 }

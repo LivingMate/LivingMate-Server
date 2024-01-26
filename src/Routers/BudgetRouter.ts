@@ -10,6 +10,7 @@ BudgetRouter.get('/budget/search/:groupId/:searchKey', BudgetController.getBudge
 BudgetRouter.get('/budget/sub/:groupId/:categoryName', BudgetController.showSubCategories);
 BudgetRouter.get('/budget/calc/:groupId', BudgetController.getFinalAdjustment);
 BudgetRouter.get('/budget/calcbudget/:groupId', BudgetController.getAdjforBudget);
+BudgetRouter.get('/budget/category/search/:groupId/:category', BudgetController.getBudgetSearchByCategory);
 
 BudgetRouter.post('/budget/:groupId/:userId', BudgetController.createBudget);
 BudgetRouter.post('/budget/subcat/:groupId/:categoryId', BudgetController.createsubCategory);

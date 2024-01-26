@@ -42,6 +42,26 @@ const getBudgetSearch = async (req: Request, res: Response, next: NextFunction):
   }
 }
 
+
+/*
+get
+카테고리별 검색
+*/
+
+
+const getBudgetSearchByCategory = async(req: Request, res: Response, next: NextFunction)=>{
+  const groupId: string = req.params.groupId;
+  const category: string = req.params.category;
+
+  try {
+    const data = await BudgetService.showByCategory(groupId, category);
+
+    return res.send(data)
+  } catch (error) {
+    res.status(500).json({ error: 'Error Searching Budget by Category: Controller' })
+  }
+}
+
 // /*
 // get
 // 정산
@@ -156,5 +176,14 @@ const showSubCategories = async (req: Request, res: Response, next: NextFunction
   }
 }
 
-export { createsubCategory, updateBudget, deleteBudget, createBudget, 
-  getBudgetSearch, showBudget, showSubCategories, getFinalAdjustment, getAdjforBudget }
+export { createsubCategory, 
+  updateBudget, 
+  deleteBudget, 
+  createBudget, 
+  getBudgetSearch,
+   showBudget, 
+   showSubCategories,
+    getFinalAdjustment, 
+    getAdjforBudget, 
+    getBudgetSearchByCategory 
+}
