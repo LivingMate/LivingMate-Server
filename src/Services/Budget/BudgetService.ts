@@ -37,8 +37,8 @@ const createBudget = async (
     // categoryId와 subCategoryId 변환
     const resCategory = await BudgetServiceUtils.changeCategIdToName(event.categoryId)
     const resSubCategory = await BudgetServiceUtils.changeSubCategIdToName(event.subCategoryId)
-    //const resUserColor = await UserService.findUserColorByUserId(event.userId)
-    //const resUserName = await UserService.getUserNameByUserId(event.userId)
+    const resUserColor = await UserServiceUtils.findUserColorByUserId(event.userId)
+    const resUserName = await UserServiceUtils.getUserNameByUserId(event.userId)
 
     const createdBudget: BudgetCreateResponseDto = {
       id: event.id,
@@ -48,11 +48,12 @@ const createBudget = async (
       spendings: event.spendings,
       category: resCategory,
       subCategory: resSubCategory,
-      //userColor: resUserColor,
-      //userName: resUserName,
+      userColor: resUserColor,
+      userName: resUserName,
       createdAt: event.createdAt,
     }
 
+    
     return createdBudget
   } catch (error) {
     console.error('error :: service/budget/createBudget', error)
@@ -76,8 +77,8 @@ const showBudget = async (groupId: string) => {
       Budgets.map(async (budget) => {
         let resCategory = await BudgetServiceUtils.changeCategIdToName(budget.categoryId)
         let resSubCategory = await BudgetServiceUtils.changeSubCategIdToName(budget.subCategoryId)
-        //let resUserColor = await UserService.findUserColorByUserId(budget.userId)
-        //let resUserName = await UserService.getUserNameByUserId(budget.userId)
+        let resUserColor = await UserServiceUtils.findUserColorByUserId(budget.userId)
+        let resUserName = await UserServiceUtils.getUserNameByUserId(budget.userId)
 
         BudgetsToShow.push({
           id: budget.id,
@@ -87,14 +88,14 @@ const showBudget = async (groupId: string) => {
           spendings: budget.spendings,
           category: resCategory,
           subCategory: resSubCategory,
-          //userColor: resUserColor,
-          //userName: resUserName,
+          userColor: resUserColor,
+          userName: resUserName,
           createdAt: budget.createdAt,
         })
       }),
     )
 
-    return BudgetsToShow
+    return BudgetsToShow;
   } catch (error) {
     console.error('error :: service/budget/showBudget', error)
     throw error
@@ -117,14 +118,14 @@ const updateBudget = async (budgetId: number, BudgetUpdateRequestDto: BudgetUpda
     })
     //return updatedBudget;
 
-    //const UserName = await UserService.getUserNameByUserId(updatedBudget.userId)
-    //const UserColor = await UserService.findUserColorByUserId(updatedBudget.userId)
+    const UserName = await UserServiceUtils.getUserNameByUserId(updatedBudget.userId)
+    const UserColor = await UserServiceUtils.findUserColorByUserId(updatedBudget.userId)
     const resCategory = await BudgetServiceUtils.changeCategIdToName(updatedBudget.categoryId)
     const resSubCategory = await BudgetServiceUtils.changeSubCategIdToName(updatedBudget.subCategoryId)
 
     const budgetToReturn: BudgetCreateResponseDto = {
-      //userColor: UserColor,
-      //userName: UserName,
+      userColor: UserColor,
+      userName: UserName,
       id: updatedBudget.id,
       userId: updatedBudget.userId,
       groupId: updatedBudget.groupId,
@@ -172,8 +173,8 @@ const searchBudget = async (groupId: string, searchKey: string) => {
       searchedBudget.map(async (budget) => {
         let resCategory = await BudgetServiceUtils.changeCategIdToName(budget.categoryId)
         let resSubCategory = await BudgetServiceUtils.changeSubCategIdToName(budget.subCategoryId)
-        //let resUserColor = await UserService.findUserColorByUserId(budget.userId)
-        //let resUserName = await UserService.getUserNameByUserId(budget.userId)
+        let resUserColor = await UserServiceUtils.findUserColorByUserId(budget.userId)
+        let resUserName = await UserServiceUtils.getUserNameByUserId(budget.userId)
 
         BudgetsToShow.push({
           id: budget.id,
@@ -183,14 +184,14 @@ const searchBudget = async (groupId: string, searchKey: string) => {
           spendings: budget.spendings,
           category: resCategory,
           subCategory: resSubCategory,
-          //userColor: resUserColor,
-          //userName: resUserName,
+          userColor: resUserColor,
+          userName: resUserName,
           createdAt: budget.createdAt,
         })
       }),
     )
 
-    return BudgetsToShow
+    return BudgetsToShow;
   } catch (error) {
     throw new Error('error :: service/budget/searchBudget')
   }
@@ -233,8 +234,33 @@ const showByCategory = async(groupId:string, category: string)=>{
       groupId: groupId,
       categoryId: categoryId
     }
-  })
-  return budgetsToShow;
+  });
+
+  let BudgetsToShow: BudgetCreateResponseDto[] = []
+
+    await Promise.all(
+      budgetsToShow.map(async (budget) => {
+        let resCategory = await BudgetServiceUtils.changeCategIdToName(budget.categoryId)
+        let resSubCategory = await BudgetServiceUtils.changeSubCategIdToName(budget.subCategoryId)
+        let resUserColor = await UserServiceUtils.findUserColorByUserId(budget.userId)
+        let resUserName = await UserServiceUtils.getUserNameByUserId(budget.userId)
+
+        BudgetsToShow.push({
+          id: budget.id,
+          userId: budget.userId,
+          groupId: budget.groupId,
+          spendingName: budget.spendingName,
+          spendings: budget.spendings,
+          category: resCategory,
+          subCategory: resSubCategory,
+          userColor: resUserColor,
+          userName: resUserName,
+          createdAt: budget.createdAt,
+        })
+      }),
+    )
+
+  return BudgetsToShow; 
 }
 
 
@@ -278,7 +304,7 @@ const getGroupMemberSpending = async (groupId: string) => {
       member.userSpending -= groupAvg
     })
     //console.log('각 지출액 - 그룹 평균 지출액:', groupMemberSpendings)
-    return groupMemberSpendings
+    return groupMemberSpendings;
   }
 }
 
@@ -298,7 +324,7 @@ const getMemberNumber = async (groupId: string) => {
     memberNumInt = member._count._all
   })
 
-  return memberNumInt
+  return memberNumInt;
 }
 
 //각 유저의 지출액 합
@@ -450,7 +476,7 @@ const takeFromAdjustments = async (groupId: string) => {
       groupId: groupId,
     },
   })
-  /*
+  
   const AdjustmentToReturn: {
     plusUserName: string
     plusUserColor: string
@@ -465,10 +491,10 @@ const takeFromAdjustments = async (groupId: string) => {
         throw new Error('Null Error: Adjustment to Return')
       }
 
-      let plusUserName = await UserService.getUserNameByUserId(record.plusUserId)
-      let plusUserColor = await UserService.findUserColorByUserId(record.plusUserId)
-      let minusUserName = await UserService.getUserNameByUserId(record.minusUserId)
-      let minusUserColor = await UserService.findUserColorByUserId(record.plusUserId)
+      let plusUserName = await UserServiceUtils.getUserNameByUserId(record.plusUserId)
+      let plusUserColor = await UserServiceUtils.findUserColorByUserId(record.plusUserId)
+      let minusUserName = await UserServiceUtils.getUserNameByUserId(record.minusUserId)
+      let minusUserColor = await UserServiceUtils.findUserColorByUserId(record.plusUserId)
       let change = record.change
 
       AdjustmentToReturn.push({
@@ -480,9 +506,8 @@ const takeFromAdjustments = async (groupId: string) => {
       })
     }),
   )
-  return AdjustmentToReturn
-  */
-  return Adjustment
+  return AdjustmentToReturn;
+  
 }
 
 //adjustment 지우기 -> 정산 완료 눌렀을 때 사용할 것..-> isDone을 주자..
