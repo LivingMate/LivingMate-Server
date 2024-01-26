@@ -34,8 +34,7 @@ model User {
 model Group {
   id            String          @id
   groupName     String          @db.VarChar(255)
-  groupOwner    String
-  groupCode     String?
+  groupOwner    String          @unique
   groupSpending Float
   createdAt     DateTime        @default(now())
   Adjustment    Adjustment[]

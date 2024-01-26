@@ -5,6 +5,6 @@ import * as GroupController from "../Controllers/GroupController"
 const GroupRouter = Router();
 
 GroupRouter.post('/group/create/:userId',GroupController.createGroup)
-
+GroupRouter.patch('/group/patch/:userId',GroupController.goGroup)
 
 export {GroupRouter};

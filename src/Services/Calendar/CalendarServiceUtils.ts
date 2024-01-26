@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import { CalendarUpdateDto } from '../../DTOs/Calendar/Request/CalendarUpdateDto'
 import { CalendarUpdateResponseDto } from '../../DTOs/Calendar/Response/CalendarUpdateResponseDto'
 import { differenceInDays, startOfWeek, endOfWeek } from 'date-fns'
-import * as UserService from '../UserService'
+import * as UserService from '../User/UserService'
 import { CalendarCreateDto } from '../../DTOs/Calendar/Request/CalendarCreateDto'
 import message from '../../modules/message'
 

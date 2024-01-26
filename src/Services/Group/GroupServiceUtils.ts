@@ -2,9 +2,8 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 import { SignupDto } from '../../DTOs/Auth/Requests/SignupDto'
 import { GroupResponseDto } from '../../DTOs/Group/Responses/GroupResponseDto'
-import * as UserService from '../UserService'
+import * as UserService from '../User/UserService'
 import { group } from 'console'
-
 
 // groupID로 groupName찾기
 const findGroupByGroupId = async (groupId: string) => {
@@ -64,54 +63,51 @@ const checkJoinedGroupId = async (groupId: string) => {
 }
 
 const findGroupNameByGroupId = async (groupId: string) => {
-    const groupName = await prisma.group.findUnique({
-      where: {
-        id: groupId,
-      },
-      select: {
-        groupName: true,
-      },
-    })
-    if (!groupName) {
-      throw new Error('groupName not found!')
-    }
-  
-    return groupName
+  const groupName = await prisma.group.findUnique({
+    where: {
+      id: groupId,
+    },
+    select: {
+      groupName: true,
+    },
+  })
+  if (!groupName) {
+    throw new Error('groupName not found!')
   }
-  
-  const findGroupMembersNamesColorsByGroupId = async (groupId: string) => {
-    const groupMembers = await prisma.user.findMany({
-      where: { groupId: groupId },
-      select: {
-        userName: true,
-        userColor:true
-      },
-    })
-  
-    return groupMembers;
-  }
-  
 
-  
-  const findGroupMembersColorsByGroupId = async (groupId: string) => {
-    const groupMembers = await prisma.user.findMany({
-      where: { groupId: groupId },
-      select: {
-        userColor: true,
-      },
-    })
-    return groupMembers.map((member) => member.userColor) //컬러만 묶어서 array로 반환하는 버전
-  }
-  
-  //멤버 이름과 컬러를 따로 받는 방법의 문제점: 순서가 그대로일지.. 모름... 색이 서로 바뀔 수도 있음.
+  return groupName
+}
 
+const findGroupMembersNamesColorsByGroupId = async (groupId: string) => {
+  const groupMembers = await prisma.user.findMany({
+    where: { groupId: groupId },
+    select: {
+      userName: true,
+      userColor: true,
+    },
+  })
 
-  export {
-    findGroupByGroupId,
-    findGroupById,
-    checkForbiddenGroup,
-    checkJoinedGroupId,
-    findGroupNameByGroupId,
-    findGroupMembersNamesColorsByGroupId,
-    findGroupMembersColorsByGroupId,
-  }
+  return groupMembers
+}
+
+const findGroupMembersColorsByGroupId = async (groupId: string) => {
+  const groupMembers = await prisma.user.findMany({
+    where: { groupId: groupId },
+    select: {
+      userColor: true,
+    },
+  })
+  return groupMembers.map((member) => member.userColor) //컬러만 묶어서 array로 반환하는 버전
+}
+
+//멤버 이름과 컬러를 따로 받는 방법의 문제점: 순서가 그대로일지.. 모름... 색이 서로 바뀔 수도 있음.
+
+export {
+  findGroupByGroupId,
+  findGroupById,
+  checkForbiddenGroup,
+  checkJoinedGroupId,
+  findGroupNameByGroupId,
+  findGroupMembersNamesColorsByGroupId,
+  findGroupMembersColorsByGroupId,
+}
