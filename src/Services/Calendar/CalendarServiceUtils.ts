@@ -78,7 +78,7 @@ const makeCalendarEventExist = async (eventId: number) => {
     console.error('Error finding calendar event by ID', error)
     throw error
   }
-}
+}*/
 
 // 스케줄이 존재하는지 확인
 const checkExistSchedule = async (eventId: number) => {
@@ -463,7 +463,7 @@ export {
   findCalendarEventById,
   findSchedulingEventById,
   findParticipantEventById,
-  makeCalendarEventExist,
+  //makeCalendarEventExist,
   checkExistSchedule,
   updateRepeatCalendar,
   deleteRepeatCalendar,
