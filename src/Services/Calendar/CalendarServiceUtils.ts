@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import { CalendarUpdateDto } from '../../DTOs/Calendar/Request/CalendarUpdateDto'
 import { CalendarUpdateResponseDto } from '../../DTOs/Calendar/Response/CalendarUpdateResponseDto'
 import { differenceInDays, startOfWeek, endOfWeek } from 'date-fns'
-import * as UserService from '../User/UserService'
+import * as UserServiceUtils from '../User/UserServiceUtils'
 import { CalendarCreateDto } from '../../DTOs/Calendar/Request/CalendarCreateDto'
 import message from '../../modules/message'
 
@@ -53,6 +53,7 @@ const findParticipantEventById = async (eventId: number) => {
   }
 }
 
+/*
 // 만약 반복 일정인 것이라면 여기에 그 일정에 대한 정보가 저장이 됨(반복 제거)
 const makeCalendarEventExist = async (eventId: number) => {
   try {
@@ -78,6 +79,7 @@ const makeCalendarEventExist = async (eventId: number) => {
     throw error
   }
 }
+*/
 
 // 스케줄이 존재하는지 확인
 const checkExistSchedule = async (eventId: number) => {
@@ -123,8 +125,8 @@ const updateRepeatCalendar = async (
       })
 
       await multipleParticipants(calendarUpdateDto.participants, groupId, event.id)
-      const resUserColor = await UserService.findUserColorByUserId(event.userId)
-      const resUserName = await UserService.getUserNameByUserId(event.userId)
+      const resUserColor = await UserServiceUtils.findUserColorByUserId(event.userId)
+      const resUserName = await UserServiceUtils.getUserNameByUserId(event.userId)
 
       const data: CalendarUpdateResponseDto = {
         Id: event.id,
@@ -462,7 +464,7 @@ export {
   findCalendarEventById,
   findSchedulingEventById,
   findParticipantEventById,
-  makeCalendarEventExist,
+  //makeCalendarEventExist,
   checkExistSchedule,
   updateRepeatCalendar,
   deleteRepeatCalendar,
