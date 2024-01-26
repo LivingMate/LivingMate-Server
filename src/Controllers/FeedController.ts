@@ -4,6 +4,7 @@ import * as FeedService from '../Services/FeedService'
 import { isPostfixUnaryExpression } from 'typescript'
 import { FeedCreateRequestDto } from '../DTOs/Feed/Request/FeedCreateRequestDto'
 import { FeedUpdateRequestDto } from '../DTOs/Feed/Request/FeedUpdateRequestDto'
+import { FeedPinRequestDto } from '../DTOs/Feed/Request/FeedPinRequestDto'
 import * as CalendarService from '../Services/Calendar/CalendarService'
 
 
@@ -93,9 +94,11 @@ const pinFeed = async (req: Request, res: Response, next: NextFunction): Promise
 
   const strFeedId = req.params.feedId;
   const feedId = parseInt(strFeedId);
+  const pin = req.body.pin;
 
   try {
-    const data = await FeedService.pinFeed(feedId)
+    const data = await FeedService.pinFeed(feedId, pin)
+    console.log(data);
     return res.status(200).send(data);
   } catch (error) {
     next(error)

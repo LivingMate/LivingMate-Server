@@ -5,7 +5,7 @@ import { BudgetCreateResponseDto } from '../../DTOs/Budget/Response/BudgetCreate
 import { BudgetUpdateRequestDto } from '../../DTOs/Budget/Request/BudgetUpdateRequestDto'
 import { checkForbiddenGroup } from '../Group/GroupServiceUtils'
 import message from '../../modules/message'
-import * as UserService from '../User/UserService'
+import * as UserServiceUtils from '../User/UserServiceUtils'
 import * as GroupServiceUtils from '../Group/GroupServiceUtils'
 import * as BudgetServiceUtils from '../Budget/BudgetServiceUtils'
 
@@ -17,7 +17,7 @@ const createBudget = async (
   budgetCreateRequestDto: BudgetCreateRequestDto,
 ): Promise<BudgetCreateResponseDto> => {
   try {
-    const user = await UserService.findUserById(userId)
+    const user = await UserServiceUtils.findUserById(userId)
     const group = await GroupServiceUtils.findGroupById(groupId)
     const reqCategoryId = await BudgetServiceUtils.findCategIdByName(budgetCreateRequestDto.category)
     const reqSubCategoryId = await BudgetServiceUtils.findSubCategIdByName(budgetCreateRequestDto.subCategory)

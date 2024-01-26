@@ -72,7 +72,7 @@ const findUserColorByUserId = async (userId: string) => {
       return 'error'
     }
   } catch (error) {
-    console.error('error :: service/budget/findUserColorByUserId', error)
+    console.error('error :: service/userUtils/findUserColorByUserId', error)
     throw error
   }
 }
@@ -143,6 +143,23 @@ const createUserId = async () => {
   return result
 }
 
+const findUserNotiIdbyUserId = async (userId:string) => {
+  try {
+    const data = await prisma.userNoti.findUnique({
+      where: {
+        userId: userId
+      },
+    })
+    if (!data) {
+      throw new Error(message.UNAUTHORIZED)
+    }
+
+    return data
+  } catch (error) {
+    console.error('error :: service/userUtils/findUserNotiIdbyUserId', error)
+    throw error
+  }
+}
 export {
   findUserById,
   getUserNameByUserId,
@@ -153,4 +170,5 @@ export {
   createColor,
   duplicateId,
   createUserId,
+  findUserNotiIdbyUserId,
 }

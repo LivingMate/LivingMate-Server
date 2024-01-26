@@ -8,6 +8,7 @@ import { CalendarRouter } from './Routers/CalendarRouter';
 import { BudgetRouter } from './Routers/BudgetRouter';
 import { AuthRouter } from './Routers/AuthRouter';
 import { GroupRouter } from './Routers/GroupRouter'
+import { UserRouter } from './Routers/UserRouter'
 
 const app = express()
 
@@ -27,6 +28,7 @@ app.use(CalendarRouter);
 app.use(BudgetRouter);
 app.use(AuthRouter);
 app.use(GroupRouter);
+app.use(UserRouter)
 
 app.listen(3000, () => {
   console.log('서버가 3000번 포트에서 실행 중')

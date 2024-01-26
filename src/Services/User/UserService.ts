@@ -12,6 +12,7 @@ import { sign } from 'crypto'
 
 const prisma = new PrismaClient()
 
+// 신규 유저 생성 & 알림 상태 생성
 const createUser = async (signupDtO: SignupDto) => {
   const Id = await UserServiceUtils.createUserId()
   const user = await prisma.user.create({
@@ -25,11 +26,30 @@ const createUser = async (signupDtO: SignupDto) => {
       age: signupDtO.age,
     },
   })
-  const createdUser = await UserServiceUtils.updateUserColor(user.id)
-  //if 이미 존재하는 유저인지 확인
-  return createdUser
+
+  const userNoti = await prisma.userNoti.create({
+    data: {
+      userId: user.id,
+      groupId: user.groupId,
+      state: true
+    }
+  })
+
+  const data = {
+      userId: user.id,
+      userName: user.userName,
+      userColor: user.userColor,
+      groupId: user.groupId,
+      email: user.email,
+      sex: user.sex,
+      age: user.age,
+      notificationState: userNoti.state
+    }
+
+  return data
 }
 
+// 마이페이지 유저 정보 반환
 const getUserProfile = async (userId: string) => {
   try {
     const userProfile = await UserServiceUtils.findUserById(userId)
@@ -60,7 +80,8 @@ const getUserProfile = async (userId: string) => {
   }
 }
 
-const findUserByIdAndUpdate = async (userId: string, userUpdateRequestDto: UserUpdateRequestDto) => {
+// 유저 정보 수정(이름&색상)
+const userSetUpdate = async (userId: string, userUpdateRequestDto: UserUpdateRequestDto) => {
   const updatedUser = await prisma.user.update({
     where: {
       id: userId,
@@ -71,13 +92,78 @@ const findUserByIdAndUpdate = async (userId: string, userUpdateRequestDto: UserU
     },
   })
 
-  return updatedUser
+  const data = {
+    userName: updatedUser.userName,
+    userColor: updatedUser.userColor,
+  }
+
+  return data
 }
 
+// 유저 정보 조회(이름&색상)
+const userSetGet = async (userId:string) => {
+
+  const user = await UserServiceUtils.findUserById(userId)
+  if (!user) {
+    throw new Error('User Not Found!')
+  }
+
+  const data = {
+    userName: user.userName,
+    userColor: user.userColor,
+  }
+
+  return data
+}
+
+// 유저 알림 설정 여부(on off)
+const notiYesNo = async (userId: string, notificationState:boolean) => {
+  try {
+    const notiState = await prisma.userNoti.update({
+      where: {
+        userId: userId,
+      },
+      data: {
+        state: notificationState,
+      },
+    })
+
+    const data = {
+      notificationState : notiState.state
+    }
+  
+    return data
+  } catch (error) {
+    throw new Error('Error: service/user/notiYesNo')
+  }
+}
+
+// 유저 알림 상태 가져오기 (on off)
+const getUserNotiState = async(userId:string) => {
+  try {
+    const user = await UserServiceUtils.findUserById(userId)
+    const userNotiId = UserServiceUtils.findUserNotiIdbyUserId(user.id)
+
+    if (!user) {
+      throw new Error('User Not Found!')
+    }
+
+    const data = {
+      notiState : (await userNotiId).state
+    }
+
+    return data
+  } catch (error) {
+    throw new Error('Error: service/user/getUserNotiState')
+  }
+}
 
 
 export {
   createUser,
-  findUserByIdAndUpdate,
   getUserProfile,
+  userSetUpdate,
+  userSetGet,
+  notiYesNo,
+  getUserNotiState
 }

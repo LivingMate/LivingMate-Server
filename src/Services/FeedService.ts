@@ -3,7 +3,8 @@ const prisma = new PrismaClient()
 import { FeedCreateRequestDto } from '../DTOs/Feed/Request/FeedCreateRequestDto'
 import { FeedCreateResponseDto } from '../DTOs/Feed/Response/FeedCreateResponseDto'
 import { FeedUpdateResponseDto } from '../DTOs/Feed/Response/FeedUpdateResponseDto'
-import * as UserService from './User/UserService'
+import { FeedPinRequestDto } from '../DTOs/Feed/Request/FeedPinRequestDto'
+import * as UserServiceUtils from './User/UserServiceUtils'
 import message from '../modules/message'
 
 // -------utils--------
@@ -35,8 +36,8 @@ const createFeed = async (userId: string, groupId: string, content: string): Pro
       },
     })
 
-    const resUserName = await UserService.getUserNameByUserId(event.userId)
-    const resUserColor = await UserService.findUserColorByUserId(event.userId)
+    const resUserName = await UserServiceUtils.getUserNameByUserId(event.userId)
+    const resUserColor = await UserServiceUtils.findUserColorByUserId(event.userId)
 
     const data: FeedCreateResponseDto = {
       feedId: event.id,
@@ -97,16 +98,31 @@ const updateFeedContent = async (
 }
 
 //피드 고정
-const pinFeed = async (FeedId: number) => {
-  const pinnedFeed = await prisma.feed.update({
-    where: {
-      id: FeedId,
-    },
-    data: {
-      pin: true,
-    },
-  })
-  return pinnedFeed
+const pinFeed = async (FeedId: number, pin:boolean) => {
+  try{
+    const pinnedFeed = await prisma.feed.update({
+      where: {
+        id: FeedId,
+      },
+      data: {
+        pin: pin
+      },
+    })
+  
+    const data = {
+      feedId: pinnedFeed.id,
+      userId: pinnedFeed.userId,
+      groupId: pinnedFeed.groupId,
+      content: pinnedFeed.content,
+      createdAt: pinnedFeed.createdAt,
+      pin: pinnedFeed.pin,
+    }
+  
+    return(data)
+  } catch (error) {
+    console.error('error :: service/feed/pinfeed', error)
+    throw error
+  }
 }
 
 //피드 삭제
