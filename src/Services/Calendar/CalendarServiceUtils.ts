@@ -552,7 +552,7 @@ export {
   findCalendarEventById,
   findSchedulingEventById,
   findParticipantEventById,
-  // makeCalendarEventExist,
+  //makeCalendarEventExist,
   checkExistSchedule,
   createRepeatCalendar,
   updateRepeatCalendar,

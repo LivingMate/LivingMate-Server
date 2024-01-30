@@ -4,7 +4,6 @@ import * as FeedService from '../Services/FeedService'
 import { isPostfixUnaryExpression } from 'typescript'
 import { FeedCreateRequestDto } from '../DTOs/Feed/Request/FeedCreateRequestDto'
 import { FeedUpdateRequestDto } from '../DTOs/Feed/Request/FeedUpdateRequestDto'
-import { FeedPinRequestDto } from '../DTOs/Feed/Request/FeedPinRequestDto'
 import * as CalendarService from '../Services/Calendar/CalendarService'
 
 

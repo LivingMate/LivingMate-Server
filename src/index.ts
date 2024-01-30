@@ -1,14 +1,16 @@
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
-// import { Router } from 'express';
 import message from './modules/message'
 import express, { Express, Request, Response, NextFunction } from 'express'
 import { FeedRouter } from './Routers/FeedRouter'
 import { CalendarRouter } from './Routers/CalendarRouter';
 import { BudgetRouter } from './Routers/BudgetRouter';
 import { AuthRouter } from './Routers/AuthRouter';
-import { GroupRouter } from './Routers/GroupRouter'
-import { UserRouter } from './Routers/UserRouter'
+import { GroupRouter } from './Routers/GroupRouter';
+import { UserRouter } from './Routers/UserRouter';
+import cookieParser from 'cookie-parser';
+import passport from 'passport';
+import session from 'express-session'
 
 const app = express()
 
@@ -57,26 +59,17 @@ app.listen(3000, () => {
 //   res.render('error')
 // })
 
-/*
-...
-const passport = require('passport');
 
-...
-const passportConfig = require('./passport');
+//const passportConfig = require('./passport');
+//passportConfig(); // 패스포트 설정
 
-...
-const authRouter = require('./routes/auth'); // 인증 라우터
 
-const app = express();
-passportConfig(); // 패스포트 설정
-
-...
 app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(
    session({
       resave: false,
       saveUninitialized: false,
-      secret: process.env.COOKIE_SECRET,
+      secret: process.env.COOKIE_SECRET!,
       cookie: {
          httpOnly: true,
          secure: false,
