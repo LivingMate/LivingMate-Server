@@ -34,6 +34,10 @@ const createBudget = async (
       },
     })
 
+    if(!event){
+      console.log('생성에서 오류남');
+    }
+
     // categoryId와 subCategoryId 변환
     const resCategory = await BudgetServiceUtils.changeCategIdToName(event.categoryId)
     const resSubCategory = await BudgetServiceUtils.changeSubCategIdToName(event.subCategoryId)
