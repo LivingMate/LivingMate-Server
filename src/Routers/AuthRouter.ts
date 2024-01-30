@@ -1,4 +1,3 @@
-
 //import { body } from 'express-validator';
 //import { AuthController } from '../Controllers';
 import passport from "passport";
@@ -49,62 +48,62 @@ const isLoggedIn = (req:Request, res:Response, next:NextFunction) => {
 
 
 
-const googleStrategy = async()=>passport.use(
-    new GoogleStrategy(
-        {
-            clientID: process.env.GOOGLE_ID,
-            clientSecret: process.env.GOOGLE_SECRET,
-            callbackURL: '/auth/google/callback',
-            scope: ['email', 'profile'],
-            passReqToCallback: true
-        }, async (req: any, accessToken: any, refreshToken: any, params: any, profile: any, done: any) => {
-            console.log('google profile : ', profile);
-             try {
-                if (req.user) { //logged-in user
-                    const existingUser = await UserServiceUtils.findUserById(profile.id);
+// const googleStrategy = async()=>passport.use(
+//     new GoogleStrategy(
+//         {
+//             clietID: process.env.GOOGLE_ID,
+//             clientSecret: process.env.GOOGLE_SECRET,
+//             callbackURL: '/auth/google/callback',
+//             scope: ['email', 'profile'],
+//             passReqToCallback: true
+//         }, async (req: any, accessToken: any, refreshToken: any, params: any, profile: any, done: any) => {
+//             console.log('google profile : ', profile);
+//              try {
+//                 if (req.user) { //logged-in user
+//                     const existingUser = await UserServiceUtils.findUserById(profile.id);
                     
-                    if (existingUser && (existingUser.id !== req.user.id)) {
-                        throw new Error('There is already a Google account that belongs to you. Sign in with that account or delete it, then link it with your current account.');
-                        //return done(null, existingUser); 
-                    }
+//                     if (existingUser && (existingUser.id !== req.user.id)) {
+//                         throw new Error('There is already a Google account that belongs to you. Sign in with that account or delete it, then link it with your current account.');
+//                         //return done(null, existingUser); 
+//                     }
 
-                const user = await UserServiceUtils.findUserById(req.user.id);
-        return done(null, user);
-      }
+//                 const user = await UserServiceUtils.findUserById(req.user.id);
+//         return done(null, user);
+//       }
 
-      //login 안 한 경우
-      const existingUser = await UserServiceUtils.findUserById(profile.id);
-      if (existingUser) {
-        return done(null, existingUser);
-      }
+//       //login 안 한 경우
+//       const existingUser = await UserServiceUtils.findUserById(profile.id);
+//       if (existingUser) {
+//         return done(null, existingUser);
+//       }
 
-      else{
+//       else{
         
-        const signUpUser = await UserService.createUser({
-          email: profile.emails[0].value,
-          groupId: "aaaaaa",
-          userName: profile.displayName,
-          //sex: profile._json.gender,
-          sex: false,
-          age: profile.age
-        })
-        return done(null, signUpUser);
-      }
+//         const signUpUser = await UserService.createUser({
+//           email: profile.emails[0].value,
+//           groupId: "aaaaaa",
+//           userName: profile.displayName,
+//           //sex: profile._json.gender,
+//           sex: false,
+//           age: profile.age
+//         })
+//         return done(null, signUpUser);
+//       }
 
       
-      // user.tokens.push({
-      //   kind: 'google',
-      //   accessToken,
-      //   accessTokenExpires: moment().add(params.expires_in, 'seconds').format(),
-      //   refreshToken,
-      // });
+//       // user.tokens.push({
+//       //   kind: 'google',
+//       //   accessToken,
+//       //   accessTokenExpires: moment().add(params.expires_in, 'seconds').format(),
+//       //   refreshToken,
+//       // });
       
      
 
-    } catch (err) {
-      return done(err);
-    }
-  }));
+//     } catch (err) {
+//       return done(err);
+//     }
+//   }));
 
   //passport.use('google', googleStrategy);
 
@@ -139,19 +138,8 @@ AuthRouter.get('/profile/:userId', UserController.getUserProfile)
 
 // AuthRouter.get('/logout',isLoggedIn, (req,res)=>{
 //     req.logout();
-//     res.redirect('/auth/login');
-//  });
-//  */
-
-// //export default router;
-
-// //AuthRouter.post('/signup', UserController.createUser)
-// AuthRouter.get('/profile/:userId', UserController.getUserProfile)
-
-// // AuthRouter.get('/logout',isLoggedIn, (req,res)=>{
-// //     req.logout();
-// //     req.session.destroy('/');
-// // });
+//     req.session.destroy('/');
+// });
 
 AuthRouter.get('/google',passport.authenticate('google'));
 
