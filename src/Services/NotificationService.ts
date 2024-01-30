@@ -18,14 +18,17 @@ const makeNotification = async (groupId: string, userId: string, notificationTyp
       case 'createRepeatCalendar':
         notificationText = `${resUserName}가 새로운 반복 일정을 등록했습니다.`
         break
+      case 'createSchedule':
+        notificationText = `${resUserName}가 새로운 일정 조율을 등록했습니다.`
+        break
       case 'createBudget':
         notificationText = `${resUserName}가 새로운 지출을 추가했습니다.`
         break
       case 'startBudget':
-        notificationText = `${resUserName}가 정산을 시작했습니다.`
+        notificationText = `정산을 시작했습니다.`
         break
       case 'endBudget':
-        notificationText = `${resUserName}가 정산을 완료했습니다.`
+        notificationText = `정산이 완료되었습니다.`
         break
       case 'newUser':
         notificationText = `새로운 메이트 ${resUserName}가 들어왔습니다.`
@@ -49,5 +52,15 @@ const makeNotification = async (groupId: string, userId: string, notificationTyp
     throw error
   }
 }
+
+const getNotification = async (groupId:string, userId:string) => {
+  try {
+
+  } catch (error) {
+    console.error('error :: service/notification/getNotification', error)
+    throw error
+  }
+}
+
 
 export { makeNotification }

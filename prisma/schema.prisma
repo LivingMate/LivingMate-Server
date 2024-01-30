@@ -12,11 +12,11 @@ model User {
   userName        String          @unique
   userColor       String
   email           String          @unique
+  groupId         String
   sex             Boolean
   age             Int
   createdAt       DateTime        @default(now()) @db.DateTime(0)
   updatedAt       DateTime        @updatedAt @db.DateTime(0)
-  groupId         String
   fcmToken        String?
   AdjustmentMinus Adjustment[]    @relation("minusUser")
   AdjustmentPlus  Adjustment[]    @relation("plusUser")
@@ -116,7 +116,6 @@ model Participant {
   calendar   Calendar @relation(fields: [calendarId], references: [id])
   group      Group    @relation(fields: [groupId], references: [id])
   user       User     @relation(fields: [userId], references: [id])
-
   @@index([calendarId], map: "Participant_calendarId_fkey")
   @@index([groupId], map: "Participant_groupId_fkey")
   @@index([userId], map: "Participant_userId_fkey")

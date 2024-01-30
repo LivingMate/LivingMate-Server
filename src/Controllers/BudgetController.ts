@@ -141,6 +141,18 @@ const updateBudget = async (req: Request, res: Response, next: NextFunction): Pr
   }
 }
 
+const doneBudget = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+  const groupId = req.params.groupId
+
+  try {
+    const data = await BudgetService.isDone(groupId)
+    console.log(data)
+    res.status(200).send(data)
+  } catch (error) {
+    res.status(500).json({ error: 'Error Updating Budget Content: Controller' })
+  }
+}
+
 /*
 createNewSubCategory
 /budget
@@ -177,7 +189,8 @@ const showSubCategories = async (req: Request, res: Response, next: NextFunction
 }
 
 export { createsubCategory, 
-  updateBudget, 
+  updateBudget,
+  doneBudget, 
   deleteBudget, 
   createBudget, 
   getBudgetSearch,

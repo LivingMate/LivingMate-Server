@@ -11,18 +11,24 @@ import message from '../../modules/message'
 import { sign } from 'crypto'
 
 const findUserById = async (userId: string) => {
-  const user = await prisma.user.findUnique({
-    where: {
-      id: userId,
-    },
-  })
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
 
-  if (!user) {
-    throw new Error('User not found!') //임시
+    if (!user) {
+      throw new Error('User not found!');
+    }
+
+    return user;
+  } catch (error) {
+    console.error('Error finding user by ID:', error);
+    throw error;
   }
+};
 
-  return user
-}
 
 //유저 아이디로 유저 이름 찾기
 async function getUserNameByUserId(userId: string) {
@@ -110,6 +116,7 @@ const addUserToGroup = async (userId: string, groupId: string) => {
     },
   })
   await NotificationService.makeNotification(groupId, userId, 'newUser')
+  
   return data
 }
 
@@ -160,6 +167,24 @@ const findUserNotiIdbyUserId = async (userId:string) => {
     throw error
   }
 }
+
+const findGroupOwner = async(groupId:string) => {
+  try {
+    const data = await prisma.group.findUnique({
+      where: {
+        id: groupId
+      },
+    })
+    if (!data) {
+      throw new Error(message.UNAUTHORIZED)
+    }
+
+    return data.groupOwner
+  } catch (error) {
+    console.error('error :: service/userUtils/findGroupOwner', error)
+    throw error
+  }
+}
 export {
   findUserById,
   getUserNameByUserId,
@@ -171,4 +196,5 @@ export {
   duplicateId,
   createUserId,
   findUserNotiIdbyUserId,
+  findGroupOwner
 }

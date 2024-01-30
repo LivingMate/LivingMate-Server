@@ -8,6 +8,7 @@ import message from '../../modules/message'
 import * as UserServiceUtils from '../User/UserServiceUtils'
 import * as GroupServiceUtils from '../Group/GroupServiceUtils'
 import * as BudgetServiceUtils from '../Budget/BudgetServiceUtils'
+import * as NotificationService from '../NotificationService'
 
 // -------------real service----------------
 // 지출 등록
@@ -33,6 +34,9 @@ const createBudget = async (
         subCategoryId: reqSubCategoryId,
       },
     })
+
+    // 알림 생성
+    await NotificationService.makeNotification(groupId, userId, "createBudget")
 
     // categoryId와 subCategoryId 변환
     const resCategory = await BudgetServiceUtils.changeCategIdToName(event.categoryId)
@@ -367,6 +371,10 @@ const AdjAtBudget = async (groupId: string) => {
       member.userSpending -= groupAvg
     })
 
+    const groupOwner = await UserServiceUtils.findGroupOwner(groupId)
+    // 알림 생성
+    await NotificationService.makeNotification(groupId, groupOwner, "createSchedule")
+    
     return {
       groupAvg,
       groupSum,
@@ -512,6 +520,7 @@ const getDayReturn = async (groupId: string) => {
   return lastday.createdAt
 }
 
+// 정산완료 버튼(isDone update되고, 알림도 줌)
 const isDone = async (groupId: string) => {
   await prisma.userSpendings.updateMany({
     where: {
@@ -522,13 +531,15 @@ const isDone = async (groupId: string) => {
       isDone: true,
     },
   })
+
+  const groupOwner = await UserServiceUtils.findGroupOwner(groupId)
+  // 알림 생성
+  await NotificationService.makeNotification(groupId, groupOwner, "endBudget")
 }
 
 const getAdjustments = async (groupId: string) => {
   const AdjustedResult = await takeFromAdjustments(groupId)
   const LastCalculatedDate = await getDayReturn(groupId)
-
-  await isDone(groupId)
 
   return { LastCalculatedDate, AdjustedResult }
 }
@@ -552,6 +563,7 @@ export {
   //takeFromAdjustments,
   //sendToAdjustments,
   //getAdjustmentsCalc,
+  isDone,
   getAdjustments,
   searchBudget,
   createSubCategory,

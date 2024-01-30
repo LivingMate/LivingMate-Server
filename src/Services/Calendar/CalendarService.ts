@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 import dayjs from 'dayjs'
 import * as CalendarServiceUtils from './CalendarServiceUtils'
+import { ParticipantInfo } from '../../DTOs/Calendar/Request/CalendarCreateDto'
 import { CalendarCreateDto } from '../../DTOs/Calendar/Request/CalendarCreateDto'
 import { CalendarCreateResponseDto } from '../../DTOs/Calendar/Response/CalendarCreateResponseDto'
 import { ScheduleCreateDto } from '../../DTOs/Calendar/Request/ScheduleCreateDto'
@@ -13,94 +14,13 @@ import { SchedulingCreateResponseDto } from '../../DTOs/Calendar/Response/Schedu
 import * as UserService from '../User/UserService'
 import * as UserServiceUtils from '../User/UserServiceUtils'
 import * as GroupServiceUtils from '../Group/GroupServiceUtils'
+import * as NotificationService from '../NotificationService'
 import message from '../../modules/message'
 import { da } from 'date-fns/locale'
 import { preloadStyle } from 'next/dist/server/app-render/entry-base'
 
 // CREATE -------------------------------
-// 주기 생성을 위한 서비스
-const createRepeatCalendar = async (
-  userId: string,
-  groupId: string,
-  calendarCreateDto: CalendarCreateDto,
-  recurrenceCount: number,
-) => {
-  try {
-    const createdEvents = []
-
-    const startDate = new Date(dayjs(calendarCreateDto.dateStart).format('YYYY-MM-DD HH:mm:ss'))
-    const endDate = new Date(dayjs(calendarCreateDto.dateEnd).format('YYYY-MM-DD HH:mm:ss'))
-
-    for (let i = 0; i < recurrenceCount; i++) {
-      const event = await prisma.calendar.create({
-        data: {
-          userId: userId,
-          groupId: groupId,
-          title: calendarCreateDto.title,
-          dateStart: new Date(startDate),
-          dateEnd: new Date(endDate),
-          term: calendarCreateDto.term,
-          memo: calendarCreateDto.memo || '',
-        },
-      })
-
-      await CalendarServiceUtils.multipleParticipants(calendarCreateDto.participants, groupId, event.id)
-
-      const data = {
-        calendarId: event.id,
-        userId: event.userId,
-        groupId: event.groupId,
-        title: event.title,
-        // userColor: resUserColor,
-        // userName: resUserName,
-        dateStart: dayjs(event.dateStart).format('YYYY-MM-DD HH:mm:ss'),
-        dateEnd: dayjs(event.dateEnd).format('YYYY-MM-DD HH:mm:ss'),
-        term: event.term,
-        memo: event.memo,
-        participants: await CalendarServiceUtils.makeArray(event.id),
-      }
-
-      createdEvents.push(data)
-
-      switch (calendarCreateDto.term) {
-        case 1: // 매일
-          startDate.setDate(startDate.getDate() + 1)
-          endDate.setDate(endDate.getDate() + 1)
-          break
-        case 2: // 매주
-          startDate.setDate(startDate.getDate() + 7)
-          endDate.setDate(endDate.getDate() + 7)
-          break
-        case 3: // 매달
-          startDate.setMonth(startDate.getMonth() + 1)
-          endDate.setMonth(endDate.getMonth() + 1)
-          break
-        case 4: // 매년
-          startDate.setFullYear(startDate.getFullYear() + 1)
-          endDate.setFullYear(endDate.getFullYear() + 1)
-          break
-        default:
-          break
-      }
-    }
-
-    const resUserName = await UserServiceUtils.getUserNameByUserId(userId)
-    await prisma.notification.create({
-      data: {
-        groupId: groupId,
-        userId: userId,
-        text: `${resUserName}가 반복 일정을 등록했습니다.`,
-        isDelete: false,
-      },
-    })
-    return createdEvents
-  } catch (error) {
-    console.error('error :: service/calendar/createRecurringCalendar', error)
-    throw error
-  }
-}
-
-// 일정등록하는 부분(바로등록용)
+// 일정등록(바로등록용)
 const createCalendar = async (userId: string, groupId: string, calendarCreateDto: CalendarCreateDto) => {
   try {
     const user = await UserServiceUtils.findUserById(userId)
@@ -111,22 +31,31 @@ const createCalendar = async (userId: string, groupId: string, calendarCreateDto
 
     if (calendarCreateDto.term == 1) {
       // 매일
-      const result = await createRepeatCalendar(userId, groupId, calendarCreateDto, 30)
+      console.log('Creating daily repeat calendar');
+      const result = await CalendarServiceUtils.createRepeatCalendar(userId, groupId, calendarCreateDto, 30)
+      console.log('Result for daily repeat calendar:', result);
       createdEvents = result || []
     } else if (calendarCreateDto.term == 2) {
       // 매주
-      const result = await createRepeatCalendar(userId, groupId, calendarCreateDto, 10)
+      console.log('Creating weekly repeat calendar');
+      const result = await CalendarServiceUtils.createRepeatCalendar(userId, groupId, calendarCreateDto, 10)
+      console.log('Result for weekly repeat calendar:', result);
       createdEvents = result || []
     } else if (calendarCreateDto.term == 3) {
       // 매달
-      const result = await createRepeatCalendar(userId, groupId, calendarCreateDto, 10)
+      console.log('Creating monthly repeat calendar');
+      const result = await CalendarServiceUtils.createRepeatCalendar(userId, groupId, calendarCreateDto, 10)
+      console.log('Result for monthly repeat calendar:', result);
       createdEvents = result || []
     } else if (calendarCreateDto.term == 4) {
       // 매년
-      const result = await createRepeatCalendar(userId, groupId, calendarCreateDto, 10)
+      console.log('Creating yearly repeat calendar');
+      const result = await CalendarServiceUtils.createRepeatCalendar(userId, groupId, calendarCreateDto, 10)
+      console.log('Result for yearly repeat calendar:', result);
       createdEvents = result || []
     } else {
       // 주기 없을때
+      console.log('Creating non-repeating calendar');
       const event = await prisma.calendar.create({
         data: {
           userId: userId,
@@ -139,16 +68,10 @@ const createCalendar = async (userId: string, groupId: string, calendarCreateDto
         },
       })
 
-      const resUserName = await UserServiceUtils.getUserNameByUserId(event.userId)
-      await prisma.notification.create({
-        data: {
-          groupId: groupId,
-          userId: userId,
-          text: `${resUserName}가 일정을 등록했습니다.`,
-          isDelete: false,
-        },
-      })
+      // 알림 생성
+      await NotificationService.makeNotification(groupId, userId, "createCalendar")
 
+      // 참여자 레코드 생성
       await CalendarServiceUtils.multipleParticipants(calendarCreateDto.participants, groupId, event.id)
 
       const data = {
@@ -156,8 +79,6 @@ const createCalendar = async (userId: string, groupId: string, calendarCreateDto
         userId: event.userId,
         groupId: event.groupId,
         title: event.title,
-        // userColor: resUserColor,
-        // userName: resUserName,
         dateStart: dayjs(event.dateStart).format('YYYY-MM-DD HH:mm:ss'),
         dateEnd: dayjs(event.dateEnd).format('YYYY-MM-DD HH:mm:ss'),
         term: event.term,
@@ -194,15 +115,10 @@ const createSchedule = async (
         endTime: scheduleCreateDto.endTime,
       },
     })
-    const resUserName = await UserServiceUtils.getUserNameByUserId(userId)
-    await prisma.notification.create({
-      data: {
-        groupId: groupId,
-        userId: userId,
-        text: `${resUserName}가 일정 조율을 등록했습니다.`,
-        isDelete: false,
-      },
-    })
+
+    // 알림 생성
+    await NotificationService.makeNotification(groupId, userId, "createSchedule")
+
     const datesArray = JSON.parse(event.dates)
 
     const data: ScheduleCreateResponseDto = {
@@ -260,13 +176,17 @@ const createScheduling = async (
 
       const selectedByArray = JSON.parse(event.selectedBy)
 
+      const participantsInfo: ParticipantInfo[] = await Promise.all(
+        selectedByArray.map(async (userId: string) => await CalendarServiceUtils.getParticipantInfo(userId))
+      );
+
       const data: SchedulingCreateResponseDto = {
         schedulingId: event.id,
         groupId: groupId,
         scheduleId: scheduleId,
         date: event.date,
         time: event.time,
-        selectedBy: selectedByArray,
+        selectedBy: participantsInfo,
       }
 
       responseData.push(data)
@@ -286,7 +206,7 @@ const updateCalendar = async (
   groupId: string,
   eventId: number,
   calendarUpdateDto: CalendarUpdateDto,
-) => {
+) : Promise<CalendarUpdateResponseDto[]| CalendarUpdateResponseDto> => {
   try {
     const user = await UserServiceUtils.findUserById(userId)
     const group = await GroupServiceUtils.findGroupById(groupId)
@@ -356,16 +276,12 @@ const updateCalendar = async (
       })
 
       await CalendarServiceUtils.multipleParticipants(calendarUpdateDto.participants, groupId, updatedEvent2.id)
-      const UserName = await UserServiceUtils.getUserNameByUserId(userId)
-      const UserColor = await UserServiceUtils.findUserColorByUserId(userId)
-
+    
       const eventToReturn: CalendarUpdateResponseDto = {
         Id: eventId,
         userId: userId,
         groupId: groupId,
         title: updatedEvent2.title,
-        userColor: UserColor,
-        userName: UserName,
         dateStart: dayjs(updatedEvent2.dateStart).format('YYYY-MM-DD HH:mm:ss'),
         dateEnd: dayjs(updatedEvent2.dateEnd).format('YYYY-MM-DD HH:mm:ss'),
         term: 0,
@@ -422,16 +338,12 @@ const updateCalendar = async (
     })
 
     await CalendarServiceUtils.multipleParticipants(calendarUpdateDto.participants, groupId, updatedEvent.id)
-    const UserName = await UserServiceUtils.getUserNameByUserId(updatedEvent.userId)
-    const UserColor = await UserServiceUtils.findUserColorByUserId(updatedEvent.userId)
 
     const eventToReturn: CalendarUpdateResponseDto = {
       Id: updatedEvent.id,
       userId: userId,
       groupId: groupId,
       title: updatedEvent.title,
-      userColor: UserColor,
-      userName: UserName,
       dateStart: dayjs(updatedEvent.dateStart).format('YYYY-MM-DD HH:mm:ss'),
       dateEnd: dayjs(updatedEvent.dateEnd).format('YYYY-MM-DD HH:mm:ss'),
       term: updatedEvent.term,
@@ -536,19 +448,29 @@ const showCalendar = async (groupId: string) => {
           },
         })
 
+        // 각 참여자의 상세 정보 가져오기
+        const participantDetails = await Promise.all(
+          participants.map(async (participant) => {
+            const participantInfo = await CalendarServiceUtils.getParticipantInfo(participant.userId);
+
+            return participantInfo;
+          }),
+        );
+
         return {
           ...event,
-          participants: participants.map((participant) => participant.userId),
-        }
+          participants: participantDetails,
+        };
       }),
-    )
+    );
 
-    return calendarEventsWithParticipants
+    return calendarEventsWithParticipants;
   } catch (error) {
-    console.error('error :: service/calendar/showCalendarWithParticipants', error)
-    throw error
+    console.error('error :: service/calendar/showCalendarWithParticipants', error);
+    throw error;
   }
 }
+
 
 // 이번주 일정 보여주기
 interface CalendarEvent {
@@ -581,14 +503,27 @@ const getThisWeeksDuty = async (groupId: string) => {
 
     const groupedEvents = await CalendarServiceUtils.groupThisWeekEvents(calendarEventsThisWeek)
 
-    const data = groupedEvents.map((group) => ({
-      title: group.title,
-      groupId: group.groupId,
-      daysOfWeek: group.daysOfWeek,
-      participants: group.participants,
-    }))
+    const data = groupedEvents.map(async (group) => {
+      const participantsInfo = await Promise.all(
+        group.participants.map(async (participant) => {
+          const userInfo = await CalendarServiceUtils.getParticipantInfo(participant);
+          return {
+            userId: userInfo.userId,
+            userName: userInfo.userName,
+            userColor: userInfo.userColor,
+          };
+        })
+      );
 
-    return data
+      return {
+        title: group.title,
+        groupId: group.groupId,
+        daysOfWeek: group.daysOfWeek,
+        participants: participantsInfo,
+      };
+    });
+
+    return Promise.all(data);
   } catch (error) {
     console.error('이번 주의 일정 검색 중 오류', error)
     throw error
@@ -634,19 +569,27 @@ const showScheduling = async (groupId: string, scheduleId: number) => {
         scheduleId: scheduleId,
       },
       select: {
-        id: true,
-        groupId: true,
         date: true,
         time: true,
         selectedBy: true,
       },
     })
-    const schedulingEventsWithParsedSelectedBy = schedulingEvents.map((event) => ({
-      ...event,
-      selectedBy: JSON.parse(event.selectedBy),
-    }))
 
-    return schedulingEventsWithParsedSelectedBy
+    const schedulingEventsWithUserInfo = await Promise.all(
+      schedulingEvents.map(async (event) => {
+        const selectedByArray = JSON.parse(event.selectedBy);
+        const participantsInfo: ParticipantInfo[] = await Promise.all(
+          selectedByArray.map(async (userId: string) => await CalendarServiceUtils.getParticipantInfo(userId))
+        );
+
+        return {
+          ...event,
+          selectedBy: participantsInfo,
+        };
+      })
+    );
+
+    return schedulingEventsWithUserInfo;
   } catch (error) {
     console.error('스케줄링 반환 오류', error)
     throw error
@@ -655,7 +598,6 @@ const showScheduling = async (groupId: string, scheduleId: number) => {
 
 export {
   createCalendar,
-  createRepeatCalendar,
   createSchedule,
   createScheduling,
   showCalendar,

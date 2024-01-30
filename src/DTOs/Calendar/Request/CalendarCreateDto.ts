@@ -1,3 +1,9 @@
+export interface ParticipantInfo {
+  userId: string;
+  userColor: string;
+  userName: string;
+}
+
 export interface CalendarCreateDto {
   Id: number;
   title: string;

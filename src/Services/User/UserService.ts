@@ -15,12 +15,14 @@ const prisma = new PrismaClient()
 // 신규 유저 생성 & 알림 상태 생성
 const createUser = async (signupDtO: SignupDto) => {
   const Id = await UserServiceUtils.createUserId()
+  const userC = await UserServiceUtils.createColor()
+  
   const user = await prisma.user.create({
     data: {
       id: Id,
       userName: signupDtO.userName,
-      groupId: signupDtO.groupId || 'aaaaaa', //default
-      userColor: 'FFFFFF', //default, just temporary value for now
+      groupId: 'aaaaaa', //default
+      userColor: userC, //default, just temporary value for now
       email: signupDtO.email,
       sex: signupDtO.sex,
       age: signupDtO.age,

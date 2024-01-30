@@ -3,8 +3,8 @@ const prisma = new PrismaClient()
 import { FeedCreateRequestDto } from '../DTOs/Feed/Request/FeedCreateRequestDto'
 import { FeedCreateResponseDto } from '../DTOs/Feed/Response/FeedCreateResponseDto'
 import { FeedUpdateResponseDto } from '../DTOs/Feed/Response/FeedUpdateResponseDto'
-import { FeedPinRequestDto } from '../DTOs/Feed/Request/FeedPinRequestDto'
 import * as UserServiceUtils from './User/UserServiceUtils'
+import * as NotificationService from './NotificationService'
 import message from '../modules/message'
 
 // -------utils--------
@@ -36,6 +36,7 @@ const createFeed = async (userId: string, groupId: string, content: string): Pro
       },
     })
 
+    await NotificationService.makeNotification(groupId, userId, "createFeed")
     const resUserName = await UserServiceUtils.getUserNameByUserId(event.userId)
     const resUserColor = await UserServiceUtils.findUserColorByUserId(event.userId)
 

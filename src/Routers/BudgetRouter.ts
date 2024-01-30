@@ -16,6 +16,7 @@ BudgetRouter.post('/budget/:groupId/:userId', BudgetController.createBudget);
 BudgetRouter.post('/budget/subcat/:groupId/:categoryId', BudgetController.createsubCategory);
 
 BudgetRouter.patch('/budget/:budgetId', BudgetController.updateBudget);
+BudgetRouter.patch('/budget/done/:groupId', BudgetController.doneBudget);
 
 BudgetRouter.delete('/budget/:budgetId', BudgetController.deleteBudget);
 
