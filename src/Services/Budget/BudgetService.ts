@@ -35,14 +35,7 @@ const createBudget = async (
       },
     })
 
-<<<<<<< HEAD
-    // 알림 생성
     await NotificationService.makeNotification(groupId, userId, "createBudget")
-=======
-    if(!event){
-      console.log('생성에서 오류남');
-    }
->>>>>>> 77d386ee944c89f9fd73e0c49104516a7d8425fd
 
     // categoryId와 subCategoryId 변환
     const resCategory = await BudgetServiceUtils.changeCategIdToName(event.categoryId)
