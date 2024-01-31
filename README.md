@@ -18,7 +18,7 @@
 
 <div>
   <h2>📚Documentation📚</h2>
-  <a href="https%3A%2F%2Fdisco-orca-7f4.notion.site%2FAPI-293e91b3d2564fe8a40cd710a6e50a4a%3Fpvs%3D4"><img src="https://img.shields.io/badge/API_Doc-%23000000?style=flat-square&logo=notion&logoColor=white&link=https%3A%2F%2Fdisco-orca-7f4.notion.site%2FAPI-293e91b3d2564fe8a40cd710a6e50a4a%3Fpvs%3D4"></a>
-<a href="https://img.shields.io/badge/DB%20ERD-%23000000?style=flat-square&logo=notion&logoColor=white&link=https%3A%2F%2Fchill-hellebore-048.notion.site%2FLivingMate-ERD-92817655490d49e19884f848dd343750%3Fpvs%3D4"><img src="https://img.shields.io/badge/DB%20ERD-%23000000?style=flat-square&logo=notion&logoColor=white&link=https%3A%2F%2Fchill-hellebore-048.notion.site%2FLivingMate-ERD-92817655490d49e19884f848dd343750%3Fpvs%3D4"></a>
+  <a href="https://disco-orca-7f4.notion.site/API-293e91b3d2564fe8a40cd710a6e50a4a"><img src="https://img.shields.io/badge/API_Doc-%23000000?style=flat-square&logo=notion&logoColor=white&link=https%3A%2F%2Fdisco-orca-7f4.notion.site%2FAPI-293e91b3d2564fe8a40cd710a6e50a4a%3Fpvs%3D4"></a>
+<a href="https://chill-hellebore-048.notion.site/LivingMate-ERD-92817655490d49e19884f848dd343750?pvs=4"><img src="https://img.shields.io/badge/DB%20ERD-%23000000?style=flat-square&logo=notion&logoColor=white&link=https%3A%2F%2Fchill-hellebore-048.notion.site%2FLivingMate-ERD-92817655490d49e19884f848dd343750%3Fpvs%3D4"></a>
 </div>
 
