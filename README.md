@@ -1,6 +1,5 @@
-<div>
+
 	<h2>✨우리들의 공동생활 퍼실리테이터 : LivingMate✨</h2>
-</div>
 
 <div>
   <h2>📚Documentation📚</h2>
