@@ -1,5 +1,5 @@
 <div>
-	<h2>✨우리들의 공동생활 퍼실리테이터 : LivingMate✨</h><br><br>
+	<h2>✨우리들의 공동생활 퍼실리테이터 : LivingMate✨</h>
 </div>
 
 <div>
