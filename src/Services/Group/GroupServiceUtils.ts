@@ -3,7 +3,25 @@ const prisma = new PrismaClient()
 import { SignupDto } from '../../DTOs/Auth/Requests/SignupDto'
 import { GroupResponseDto } from '../../DTOs/Group/Responses/GroupResponseDto'
 import * as UserService from '../User/UserService'
+import * as UserServiceUtils from '../User/UserServiceUtils'
 import { group } from 'console'
+
+// userId로 groupId찾기
+const findGroupIdByUserId = async (userId:string) => {
+  try {
+    const user = await UserServiceUtils.findUserById(userId)
+    
+    if (user) {
+      return user.groupId;
+    } else {
+      return 'error'
+    }
+
+  } catch (error) {
+    console.error('error :: group/GroupServiceUtils/findGroupIdByUserId', error)
+    throw error
+  }
+}
 
 // groupID로 groupName찾기
 const findGroupByGroupId = async (groupId: string) => {
@@ -104,6 +122,7 @@ const findGroupMembersColorsByGroupId = async (groupId: string) => {
 //멤버 이름과 컬러를 따로 받는 방법의 문제점: 순서가 그대로일지.. 모름... 색이 서로 바뀔 수도 있음.
 
 export {
+  findGroupIdByUserId,
   findGroupByGroupId,
   findGroupById,
   checkForbiddenGroup,

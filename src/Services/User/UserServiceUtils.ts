@@ -83,23 +83,6 @@ const findUserColorByUserId = async (userId: string) => {
   }
 }
 
-// userName으로 userID 찾기
-const getUserIdbyName = async (userName: string[]) => {
-  // userId가 정의되어 있지 않거나 문자열이 아닌 경우 에러 발생
-  if (!userName || typeof userName !== 'string') {
-    throw new Error('Invalid userName')
-  }
-
-  const data = await prisma.user.findUnique({
-    where: {
-      userName: userName,
-    },
-  })
-  if (!data) {
-    throw new Error(message.UNAUTHORIZED)
-  }
-  return data.id
-}
 
 //+ 그룹 참여하는 서비스
 const addUserToGroup = async (userId: string, groupId: string) => {
@@ -136,6 +119,21 @@ const duplicateId = async (id: string) => {
 }
 
 const createUserId = async () => {
+  const size: number = 8
+  const characters: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+  const charactersLength: number = characters.length
+  let result: string = ''
+  do {
+    result = ''
+    for (let i: number = 0; i < size; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength))
+    }
+  } while (await duplicateId(result))
+
+  return result
+}
+
+const createEmail = async () => {
   const size: number = 8
   const characters: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
   const charactersLength: number = characters.length
@@ -193,11 +191,11 @@ export {
   getUserNameByUserId,
   updateUserColor,
   findUserColorByUserId,
-  getUserIdbyName,
   addUserToGroup,
   createColor,
   duplicateId,
   createUserId,
+  createEmail,
   findUserNotiIdbyUserId,
   findGroupOwner
 }

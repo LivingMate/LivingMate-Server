@@ -8,26 +8,25 @@ datasource db {
 }
 
 model User {
-  id        String   @id
-  userName  String   @unique
-  userColor String
-  email     String   @unique
-  password  String
-  groupId   String
-  birth     String
-  sex       String
-  notiDTime DateTime @default(now()) @db.DateTime(0)
-  createdAt DateTime @default(now()) @db.DateTime(0)
-  updatedAt DateTime @updatedAt @db.DateTime(0)
-
+  id              String          @id
+  userName        String         
+  userColor       String
+  email           String          @unique
+  groupId         String
+  birth           String
+  sex             String
+  notiDTime       DateTime        @default(now()) @db.DateTime(0)
+  createdAt       DateTime        @default(now()) @db.DateTime(0)
+  updatedAt       DateTime        @updatedAt @db.DateTime(0)
+  password        String
   AdjustmentMinus Adjustment[]    @relation("minusUser")
   AdjustmentPlus  Adjustment[]    @relation("plusUser")
   CalendarUser    Calendar[]      @relation("user")
   Feed            Feed[]
-  UserNoti        UserNoti[]
   Notification    Notification[]
   Participant     Participant[]
   group           Group           @relation(fields: [groupId], references: [id])
+  UserNoti        UserNoti?
   UserSpendings   UserSpendings[]
 
   @@index([groupId], map: "User_groupId_fkey")
@@ -42,13 +41,13 @@ model Group {
   Adjustment    Adjustment[]
   Calendar      Calendar[]
   Feed          Feed[]
-  UserNoti      UserNoti[]
   Notification  Notification[]
   Participant   Participant[]
   Schedule      Schedule[]
   Scheduling    Scheduling[]
   SubCategory   SubCategory[]
   User          User[]
+  UserNoti      UserNoti[]
   UserSpendings UserSpendings[]
 }
 
@@ -66,7 +65,6 @@ model Feed {
   @@index([userId], map: "Feed_userId_fkey")
 }
 
-// 알림
 model Notification {
   id        Int      @id @default(autoincrement())
   groupId   String
@@ -76,6 +74,9 @@ model Notification {
   isDelete  Boolean  @default(false)
   group     Group    @relation(fields: [groupId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
+
+  @@index([groupId], map: "Notification_groupId_fkey")
+  @@index([userId], map: "Notification_userId_fkey")
 }
 
 model UserNoti {
@@ -87,9 +88,10 @@ model UserNoti {
   state     Boolean  @default(true)
   group     Group    @relation(fields: [groupId], references: [id])
   User      User     @relation(fields: [userId], references: [id])
+
+  @@index([groupId], map: "UserNoti_groupId_fkey")
 }
 
-// 캘린더
 model Calendar {
   id          Int           @id @default(autoincrement())
   userId      String
@@ -121,7 +123,6 @@ model Participant {
   @@index([userId], map: "Participant_userId_fkey")
 }
 
-// 스케줄
 model Schedule {
   id         Int          @id @default(autoincrement())
   groupId    String

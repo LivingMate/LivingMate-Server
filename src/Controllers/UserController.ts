@@ -89,6 +89,24 @@ const userNotiYesNo = async (req: Request, res: Response, next: NextFunction): P
   }
 }
 
+const quitUser = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+  const userId = req.params.userId;
+  try {
+    const data = await UserService.quitUser(userId);
+    console.log(data);
+    return res.status(200).send(data);
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error('Error quiting user in Controller:', error.message);
+      res.status(500).json({ error: 'Error quiting user in Controller' });
+    } else {
+      // If the error is of unknown type, handle it accordingly
+      console.error('Unknown error quiting user in Controller:', error);
+      res.status(500).json({ error: 'Unknown error quiting user in Controller' });
+    }
+  }
+};
+
 
 // GET
 const getUserProfile = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
@@ -132,6 +150,7 @@ const getUserNotiState = async (req: Request, res: Response, next: NextFunction)
   }
 }
 
+
 export {
   createUser,
   userSetUpdate,
@@ -139,6 +158,6 @@ export {
   getUserProfile,
   getAllMember,
   getUserSet,
-  getUserNotiState
-  // addUserToGroup
+  getUserNotiState,
+  quitUser
 }
