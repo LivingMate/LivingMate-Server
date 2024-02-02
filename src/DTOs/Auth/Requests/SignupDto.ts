@@ -3,7 +3,7 @@ export interface SignupDto {
   groupId?: string
   userName: string
   sex: string
-  age: number
+  birth: string
   password: string
   fcmToken?: string
 }
