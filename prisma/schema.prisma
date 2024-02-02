@@ -12,6 +12,7 @@ model User {
   userName  String   @unique
   userColor String
   email     String   @unique
+  password  String 
   groupId   String
   sex       String
   age       Int
