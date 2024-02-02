@@ -76,9 +76,6 @@ model Notification {
   isDelete  Boolean  @default(false)
   group     Group    @relation(fields: [groupId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
-
-  @@index([groupId], map: "Notification_groupId_fkey")
-  @@index([userId], map: "Notification_userId_fkey")
 }
 
 model UserNoti {
