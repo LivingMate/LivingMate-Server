@@ -12,7 +12,7 @@ model User {
   userName  String   @unique
   userColor String
   email     String   @unique
-  password  String 
+  password  String
   groupId   String
   birth     String
   sex       String
@@ -69,16 +69,13 @@ model Feed {
 // 알림
 model Notification {
   id        Int      @id @default(autoincrement())
-  groupId   String   @unique
+  groupId   String
   userId    String
   text      String   @db.LongText
   createdAt DateTime @default(now())
   isDelete  Boolean  @default(false)
   group     Group    @relation(fields: [groupId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
-
-  @@index([groupId], map: "Notification_groupId_fkey")
-  @@index([userId], map: "Notification_userId_fkey")
 }
 
 model UserNoti {

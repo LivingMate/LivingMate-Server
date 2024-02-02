@@ -34,15 +34,15 @@ const signup = async (
 
     const accessToken: string = getToken(data.userId);
 
-    return res
-      .status(statusCode.CREATED)
-      .send(
-        util.success(statusCode.CREATED, message.SIGNUP_SUCCESS, accessToken)
-      );
-  } catch (error) {
-    next(error);
-  }
-};
+//     return res
+//       .status(statusCode.CREATED)
+//       .send(
+//         util.success(statusCode.CREATED, message.SIGNUP_SUCCESS, accessToken)
+//       );
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 
 //login
@@ -61,20 +61,20 @@ const login = async (
       );
   }
 
-  const LoginDto: LoginDto = req.body;
+//   const LoginDto: LoginDto = req.body;
 
   try {
     const data = await AuthService.login(LoginDto);
 
     const accessToken: string = getToken(data.userId);
     
-    return res
-      .status(statusCode.OK)
-      .send(util.success(statusCode.OK, message.LOGIN_SUCCESS, accessToken));
-  } catch (error) {
-    next(error);
-  }
-};
+//     return res
+//       .status(statusCode.OK)
+//       .send(util.success(statusCode.OK, message.LOGIN_SUCCESS, accessToken));
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 export {
   signup,
