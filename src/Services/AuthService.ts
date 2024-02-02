@@ -10,15 +10,7 @@ const prisma = new PrismaClient()
 
 const login = async (loginDto: LoginDto): Promise<PostBaseResponseDto> => {
   try {
-    /*
-    const user = await User.findOneAndUpdate(
-      {
-        email: loginDto.email
-      },
-      
-    );
-    */
-
+    
     const user = await prisma.user.findUnique({
       where: {
         email: loginDto.email
