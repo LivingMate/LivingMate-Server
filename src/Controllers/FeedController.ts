@@ -4,8 +4,9 @@ import * as FeedService from '../Services/FeedService'
 import { isPostfixUnaryExpression } from 'typescript'
 import { FeedCreateRequestDto } from '../DTOs/Feed/Request/FeedCreateRequestDto'
 import { FeedUpdateRequestDto } from '../DTOs/Feed/Request/FeedUpdateRequestDto'
-import * as CalendarService from '../Services/Calendar/CalendarService'
-
+import * as GroupServiceUtils from '../Services/Group/GroupServiceUtils'
+import { PrismaClient } from '@prisma/client'
+const prisma = new PrismaClient;
 
 
 /*
@@ -14,7 +15,8 @@ get
 */
 
 const showFeed = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
-  const groupId: string = req.params.groupId
+  const userId: string = req.body.user.id;
+  
 
   try {
     const data = await FeedService.showFeed(groupId)
