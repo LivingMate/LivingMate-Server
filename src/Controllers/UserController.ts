@@ -101,6 +101,16 @@ const getUserProfile = async (req: Request, res: Response, next: NextFunction): 
   }
 }
 
+const getAllMember = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+  const userId = req.params.userId
+  try {
+    const data = await UserService.getAllMember(userId)
+    return res.status(200).send(data)
+  } catch (error) {
+    res.status(500).json({ error: 'Error getting user member: Controller' })
+  }
+}
+
 const getUserSet = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
   const userId = req.params.userId
   try {
@@ -127,6 +137,7 @@ export {
   userSetUpdate,
   userNotiYesNo,
   getUserProfile,
+  getAllMember,
   getUserSet,
   getUserNotiState
   // addUserToGroup

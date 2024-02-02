@@ -185,6 +185,9 @@ const findGroupOwner = async(groupId:string) => {
     throw error
   }
 }
+
+
+
 export {
   findUserById,
   getUserNameByUserId,

@@ -133,7 +133,7 @@ AuthRouter.get('/auth/logout', function(req, res, next) {
 
 //export default router;
 
-AuthRouter.get('/signup', UserController.createUser)
+AuthRouter.post('/signup', UserController.createUser)
 AuthRouter.get('/profile/:userId', UserController.getUserProfile)
 
 // AuthRouter.get('/logout',isLoggedIn, (req,res)=>{
