@@ -16,6 +16,7 @@ get
 
 const showFeed = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
   const userId: string = req.body.user.id;
+  const groupId: string = await GroupServiceUtils.findGroupIdByUserId(userId);
   
 
   try {
