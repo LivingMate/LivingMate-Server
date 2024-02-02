@@ -13,8 +13,8 @@ model User {
   userColor String
   email     String   @unique
   groupId   String
+  birth     String
   sex       String
-  age       Int
   notiDTime DateTime @default(now()) @db.DateTime(0)
   createdAt DateTime @default(now()) @db.DateTime(0)
   updatedAt DateTime @updatedAt @db.DateTime(0)

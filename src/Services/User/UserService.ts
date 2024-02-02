@@ -26,7 +26,7 @@ const createUser = async (signupDtO: SignupDto) => {
       userColor: userC,
       email: signupDtO.email,
       sex: signupDtO.sex,
-      age: signupDtO.age,
+      birth: signupDtO.birth,
     },
   })
 
@@ -45,7 +45,7 @@ const createUser = async (signupDtO: SignupDto) => {
       groupId: user.groupId,
       email: user.email,
       sex: user.sex,
-      age: user.age,
+      birth: user.birth,
       notificationState: userNoti.state
     }
 
