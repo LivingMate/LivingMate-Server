@@ -1,22 +1,39 @@
-//import { body } from 'express-validator';
-//import { AuthController } from '../Controllers';
-import passport from "passport";
-import * as UserController from '../Controllers/UserController'
-import * as session from 'express-session';
-import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-// import GoogleStrategy from "passport-google-oauth20";
-import * as UserServiceUtils from "../Services/User/UserServiceUtils";
-import * as UserService from "../Services/User/UserService";
-import express, { Request, Response, NextFunction } from 'express';
-import {PrismaClient} from '@prisma/client';
+import { Router } from 'express';
+//import { body } from 'express-validator/check';
+import * as AuthController from '../Controllers/AuthController';
+
+const AuthRouter: Router = Router();
+
+AuthRouter.post(
+  '/signup',
+  /*
+  [
+    body('email').isEmail(),
+    body('password').not().isEmpty(),
+    body('userName').not().isEmpty(),
+    body('sex').not().isEmpty(),
+  ],*/
+  AuthController.signup
+);
+
+AuthRouter.post(
+  '/login',/*
+  [
+    body('email').isEmail(),
+    body('password').not().isEmpty(),
+    body('fcmToken').not().isEmpty()
+  ],
+*/
+  AuthController.login
+
+);
+
+export {AuthRouter}
 
 
-const prisma = new PrismaClient;
 
 
-
-const AuthRouter = express.Router();
-
+/*
 passport.serializeUser((user:any, done) => {
     done(null, {id: user.id, groupId: user.groupId});
 });
@@ -44,7 +61,7 @@ const isLoggedIn = (req:Request, res:Response, next:NextFunction) => {
     res.redirect('/login');
 };
 
-
+*/
 
 
 
@@ -114,6 +131,7 @@ const isLoggedIn = (req:Request, res:Response, next:NextFunction) => {
 
 // router.get('/google', passport.authenticate('google', {scope:['profile', 'email']}));
 
+/*
 AuthRouter.get('/auth/google/callback',
     passport.authenticate('google', {successRedirect: '/', failureRedirect: '/auth/login', failureFlash: true
 }))
@@ -146,4 +164,4 @@ AuthRouter.get('/google',passport.authenticate('google'));
 
 
 
-export {AuthRouter};
+export {AuthRouter};*/

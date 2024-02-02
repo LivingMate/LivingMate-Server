@@ -31,7 +31,7 @@ const login = async (loginDto: LoginDto) => {
 
 
     const data = {
-      _id: user.id
+      userId: user.id
     };
 
     return data;
