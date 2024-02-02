@@ -31,31 +31,31 @@ const createCalendar = async (userId: string, groupId: string, calendarCreateDto
 
     if (calendarCreateDto.term == 1) {
       // 매일
-      console.log('Creating daily repeat calendar');
+      console.log('Creating daily repeat calendar')
       const result = await CalendarServiceUtils.createRepeatCalendar(userId, groupId, calendarCreateDto, 30)
-      console.log('Result for daily repeat calendar:', result);
+      console.log('Result for daily repeat calendar:', result)
       createdEvents = result || []
     } else if (calendarCreateDto.term == 2) {
       // 매주
-      console.log('Creating weekly repeat calendar');
+      console.log('Creating weekly repeat calendar')
       const result = await CalendarServiceUtils.createRepeatCalendar(userId, groupId, calendarCreateDto, 10)
-      console.log('Result for weekly repeat calendar:', result);
+      console.log('Result for weekly repeat calendar:', result)
       createdEvents = result || []
     } else if (calendarCreateDto.term == 3) {
       // 매달
-      console.log('Creating monthly repeat calendar');
+      console.log('Creating monthly repeat calendar')
       const result = await CalendarServiceUtils.createRepeatCalendar(userId, groupId, calendarCreateDto, 10)
-      console.log('Result for monthly repeat calendar:', result);
+      console.log('Result for monthly repeat calendar:', result)
       createdEvents = result || []
     } else if (calendarCreateDto.term == 4) {
       // 매년
-      console.log('Creating yearly repeat calendar');
+      console.log('Creating yearly repeat calendar')
       const result = await CalendarServiceUtils.createRepeatCalendar(userId, groupId, calendarCreateDto, 10)
-      console.log('Result for yearly repeat calendar:', result);
+      console.log('Result for yearly repeat calendar:', result)
       createdEvents = result || []
     } else {
       // 주기 없을때
-      console.log('Creating non-repeating calendar');
+      console.log('Creating non-repeating calendar')
       const event = await prisma.calendar.create({
         data: {
           userId: userId,
@@ -69,7 +69,7 @@ const createCalendar = async (userId: string, groupId: string, calendarCreateDto
       })
 
       // 알림 생성
-      await NotificationService.makeNotification(groupId, userId, "createCalendar")
+      await NotificationService.makeNotification(groupId, userId, 'createCalendar')
 
       // 참여자 레코드 생성
       await CalendarServiceUtils.multipleParticipants(calendarCreateDto.participants, groupId, event.id)
@@ -117,7 +117,7 @@ const createSchedule = async (
     })
 
     // 알림 생성
-    await NotificationService.makeNotification(groupId, userId, "createSchedule")
+    await NotificationService.makeNotification(groupId, userId, 'createSchedule')
 
     const datesArray = JSON.parse(event.dates)
 
@@ -177,8 +177,8 @@ const createScheduling = async (
       const selectedByArray = JSON.parse(event.selectedBy)
 
       const participantsInfo: ParticipantInfo[] = await Promise.all(
-        selectedByArray.map(async (userId: string) => await CalendarServiceUtils.getParticipantInfo(userId))
-      );
+        selectedByArray.map(async (userId: string) => await CalendarServiceUtils.getParticipantInfo(userId)),
+      )
 
       const data: SchedulingCreateResponseDto = {
         schedulingId: event.id,
@@ -206,7 +206,7 @@ const updateCalendar = async (
   groupId: string,
   eventId: number,
   calendarUpdateDto: CalendarUpdateDto,
-) : Promise<CalendarUpdateResponseDto[]| CalendarUpdateResponseDto> => {
+): Promise<CalendarUpdateResponseDto[] | CalendarUpdateResponseDto> => {
   try {
     const user = await UserServiceUtils.findUserById(userId)
     const group = await GroupServiceUtils.findGroupById(groupId)
@@ -276,7 +276,7 @@ const updateCalendar = async (
       })
 
       await CalendarServiceUtils.multipleParticipants(calendarUpdateDto.participants, groupId, updatedEvent2.id)
-    
+
       const eventToReturn: CalendarUpdateResponseDto = {
         Id: eventId,
         userId: userId,
@@ -451,26 +451,25 @@ const showCalendar = async (groupId: string) => {
         // 각 참여자의 상세 정보 가져오기
         const participantDetails = await Promise.all(
           participants.map(async (participant) => {
-            const participantInfo = await CalendarServiceUtils.getParticipantInfo(participant.userId);
+            const participantInfo = await CalendarServiceUtils.getParticipantInfo(participant.userId)
 
-            return participantInfo;
+            return participantInfo
           }),
-        );
+        )
 
         return {
           ...event,
           participants: participantDetails,
-        };
+        }
       }),
-    );
+    )
 
-    return calendarEventsWithParticipants;
+    return calendarEventsWithParticipants
   } catch (error) {
-    console.error('error :: service/calendar/showCalendarWithParticipants', error);
-    throw error;
+    console.error('error :: service/calendar/showCalendarWithParticipants', error)
+    throw error
   }
 }
-
 
 // 이번주 일정 보여주기
 interface CalendarEvent {
@@ -503,27 +502,36 @@ const getThisWeeksDuty = async (groupId: string) => {
 
     const groupedEvents = await CalendarServiceUtils.groupThisWeekEvents(calendarEventsThisWeek)
 
-    const data = groupedEvents.map(async (group) => {
-      const participantsInfo = await Promise.all(
-        group.participants.map(async (participant) => {
-          const userInfo = await CalendarServiceUtils.getParticipantInfo(participant);
-          return {
-            userId: userInfo.userId,
-            userName: userInfo.userName,
-            userColor: userInfo.userColor,
-          };
-        })
-      );
-
-      return {
-        title: group.title,
-        groupId: group.groupId,
-        daysOfWeek: group.daysOfWeek,
-        participants: participantsInfo,
-      };
+    // 일정을 날짜 순으로 정렬
+    groupedEvents.sort((a, b) => {
+      const dateA = new Date(a.dateStart).getTime()
+      const dateB = new Date(b.dateStart).getTime()
+      return dateA - dateB
     });
 
-    return Promise.all(data);
+    const data = await Promise.all(
+      groupedEvents.map(async (group) => {
+        const participantsInfo = await Promise.all(
+          group.participants.map(async (participant) => {
+            const userInfo = await CalendarServiceUtils.getParticipantInfo(participant)
+            return {
+              userId: userInfo.userId,
+              userName: userInfo.userName,
+              userColor: userInfo.userColor,
+            }
+          }),
+        )
+
+        return {
+          title: group.title,
+          groupId: group.groupId,
+          daysOfWeek: group.daysOfWeek,
+          participants: participantsInfo,
+        }
+      }),
+    )
+
+    return data
   } catch (error) {
     console.error('이번 주의 일정 검색 중 오류', error)
     throw error
@@ -577,19 +585,19 @@ const showScheduling = async (groupId: string, scheduleId: number) => {
 
     const schedulingEventsWithUserInfo = await Promise.all(
       schedulingEvents.map(async (event) => {
-        const selectedByArray = JSON.parse(event.selectedBy);
+        const selectedByArray = JSON.parse(event.selectedBy)
         const participantsInfo: ParticipantInfo[] = await Promise.all(
-          selectedByArray.map(async (userId: string) => await CalendarServiceUtils.getParticipantInfo(userId))
-        );
+          selectedByArray.map(async (userId: string) => await CalendarServiceUtils.getParticipantInfo(userId)),
+        )
 
         return {
           ...event,
           selectedBy: participantsInfo,
-        };
-      })
-    );
+        }
+      }),
+    )
 
-    return schedulingEventsWithUserInfo;
+    return schedulingEventsWithUserInfo
   } catch (error) {
     console.error('스케줄링 반환 오류', error)
     throw error

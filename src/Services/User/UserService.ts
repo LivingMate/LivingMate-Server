@@ -16,13 +16,14 @@ const prisma = new PrismaClient()
 const createUser = async (signupDtO: SignupDto) => {
   const Id = await UserServiceUtils.createUserId()
   const userC = await UserServiceUtils.createColor()
+  const defaultGroupId = 'aaaaaa';
   
   const user = await prisma.user.create({
     data: {
       id: Id,
       userName: signupDtO.userName,
-      groupId: 'aaaaaa', //default
-      userColor: userC, //default, just temporary value for now
+      groupId: defaultGroupId, //default
+      userColor: userC,
       email: signupDtO.email,
       sex: signupDtO.sex,
       age: signupDtO.age,
@@ -51,7 +52,7 @@ const createUser = async (signupDtO: SignupDto) => {
   return data
 }
 
-// 마이페이지 유저 정보 반환
+// 마이페이지 유저 정보 반환(본인 제외)
 const getUserProfile = async (userId: string) => {
   try {
     const userProfile = await UserServiceUtils.findUserById(userId)
@@ -65,9 +66,14 @@ const getUserProfile = async (userId: string) => {
 
     const groupName = await GroupServiceUtils.findGroupByGroupId(userProfile.groupId)
 
-    const userGroupMembersNamesColors = await GroupServiceUtils.findGroupMembersNamesColorsByGroupId(
-      userProfile.groupId,
-    )
+    const userGroupMembers = await GroupServiceUtils.findGroupMembersNamesColorsByGroupId(userProfile.groupId);
+
+    const userGroupMembersNamesColors = userGroupMembers
+      .filter(member => member.id !== userId) // 자신의 정보 제외
+      .map(member => ({
+        userName: member.userName,
+        userColor: member.userColor,
+      }));
 
     const data = {
       userName: userProfile.userName,
@@ -79,6 +85,33 @@ const getUserProfile = async (userId: string) => {
     return data
   } catch (error) {
     throw new Error('Error: getUserProfile:service')
+  }
+}
+
+// 그룹유저 정보 반환(본인 포함)
+const getAllMember = async (userId:string) => {
+  try {
+    const userProfile = await UserServiceUtils.findUserById(userId)
+    if (!userProfile) {
+      throw new Error('User Not Found!')
+    }
+
+    if (userProfile.groupId === null || userProfile.groupId === undefined) {
+      throw new Error('User has no group!')
+    }
+
+    const userGroupMembersNamesColors = await GroupServiceUtils.findGroupMembersNamesColorsByGroupId(
+      userProfile.groupId,
+    )
+
+    const data = {
+      membernamesandcolors: userGroupMembersNamesColors,
+    }
+
+    return data
+
+  } catch (error) {
+    throw new Error('Error: Service/UserService/getAllMember')
   }
 }
 
@@ -164,6 +197,7 @@ const getUserNotiState = async(userId:string) => {
 export {
   createUser,
   getUserProfile,
+  getAllMember,
   userSetUpdate,
   userSetGet,
   notiYesNo,

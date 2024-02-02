@@ -8,16 +8,17 @@ datasource db {
 }
 
 model User {
-  id              String          @id
-  userName        String          @unique
-  userColor       String
-  email           String          @unique
-  groupId         String
-  sex             Boolean
-  age             Int
-  createdAt       DateTime        @default(now()) @db.DateTime(0)
-  updatedAt       DateTime        @updatedAt @db.DateTime(0)
-  fcmToken        String?
+  id        String   @id
+  userName  String   @unique
+  userColor String
+  email     String   @unique
+  groupId   String
+  sex       String
+  age       Int
+  notiDTime DateTime @default(now()) @db.DateTime(0)
+  createdAt DateTime @default(now()) @db.DateTime(0)
+  updatedAt DateTime @updatedAt @db.DateTime(0)
+
   AdjustmentMinus Adjustment[]    @relation("minusUser")
   AdjustmentPlus  Adjustment[]    @relation("plusUser")
   CalendarUser    Calendar[]      @relation("user")
@@ -67,7 +68,7 @@ model Feed {
 // 알림
 model Notification {
   id        Int      @id @default(autoincrement())
-  groupId   String
+  groupId   String   @unique
   userId    String
   text      String   @db.LongText
   createdAt DateTime @default(now())
@@ -96,8 +97,8 @@ model Calendar {
   userId      String
   groupId     String
   title       String        @db.VarChar(255)
-  dateStart   DateTime
-  dateEnd     DateTime
+  dateStart   DateTime      @db.DateTime(0)
+  dateEnd     DateTime      @db.DateTime(0)
   memo        String        @db.Text
   term        Int
   group       Group         @relation(fields: [groupId], references: [id])
@@ -116,6 +117,7 @@ model Participant {
   calendar   Calendar @relation(fields: [calendarId], references: [id])
   group      Group    @relation(fields: [groupId], references: [id])
   user       User     @relation(fields: [userId], references: [id])
+
   @@index([calendarId], map: "Participant_calendarId_fkey")
   @@index([groupId], map: "Participant_groupId_fkey")
   @@index([userId], map: "Participant_userId_fkey")
@@ -156,7 +158,7 @@ model UserSpendings {
   spendings     Float       @default(0)
   categoryId    Int
   subCategoryId Int
-  createdAt     DateTime    @default(now())
+  createdAt     DateTime    @default(now()) @db.DateTime(0)
   spendingName  String
   isDone        Boolean     @default(false)
   category      Category    @relation(fields: [categoryId], references: [id])

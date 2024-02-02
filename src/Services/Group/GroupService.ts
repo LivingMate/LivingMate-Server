@@ -65,77 +65,84 @@ const goGroup = async(userId: string, groupId: string) => {
 }
 
 // 그룹 나가기
-const leaveGroup = async (userId: string, groupId: string): Promise<void> => {
+const leaveGroup = async (userId: string) => {
   try {
-    const user = await prisma.user.findUnique({
-      where: {
-        id: userId,
-      },
-    })
-
-    if (!user) {
-      throw new Error('User not found')
-    }
-
-    const group = await prisma.group.findUnique({
-      where: {
-        id: groupId,
-      },
-    })
-
-    if (!group) {
-      throw new Error('Group not found')
-    }
+    const user = await UserServiceUtils.findUserById(userId)
+    const group = await GroupServiceUtils.findGroupById(user.groupId)
 
     // user가 나가는지 groupOwner가 나가는지
-    if (group.groupOwner === userId) {
-      // groupOwner가 나가면 group 걍 사라짐
-      await prisma.group.delete({
-        where: {
-          id: groupId,
-        },
-      })
-    } else {
-      // 일반 user가 나가면 그룹 탈퇴로 적용
-      await prisma.user.update({
-        where: {
-          id: userId,
-        },
-        data: {
-          groupId: undefined, // 또는 원하는 값으로 갱신
-        },
-      })
-    }
-  } catch (error) {
-    throw error
-  } finally {
-    await prisma.$disconnect()
-  }
-}
-
-// 그룹 받기
-const getGroup = async (userId: string): Promise<string | null> => {
-  try {
-    const user = await prisma.user.findUnique({
+    const event = prisma.user.update({
       where: {
         id: userId,
       },
+      data: {
+        groupId: 'aaaaaa', // 또는 원하는 값으로 갱신
+      },
     })
-
-    if (!user) {
-      throw new Error('User not found')
+    
+    const data = {
+      userId : (await event).id,
+      groupId: (await event).groupId
     }
+    return data
 
-    return user.groupId ?? null
   } catch (error) {
-    throw error
-  } finally {
-    await prisma.$disconnect()
+    console.error('error :: service/group/leaveGroup', error)
   }
 }
+
+// 그룹 이름 수정
+const updateGroupName = async (userId:string, groupName:string) => {
+  try {
+    const user = await UserServiceUtils.findUserById(userId)
+    const group = await GroupServiceUtils.findGroupById(user.groupId)
+
+    const event = await prisma.group.update({
+      where: {
+        id: group.id,
+      },
+      data: {
+        groupName: groupName,
+      },
+    })
+
+    const data = {
+      groupId : event.id,
+      groupName : event.groupName
+    }
+
+    return data
+
+  } catch (error) {
+    console.error('error :: service/group/updateGroupName', error)
+  }
+}
+
+// 그룹 탈퇴
+const outGroup = async (userId:string) => {
+  try {
+    const user = await UserServiceUtils.findUserById(userId)
+    const group = await GroupServiceUtils.findGroupById(user.groupId)
+
+    const event = await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        id: 'aaaaaa'
+      },
+    })
+
+  } catch (error) {
+    console.error('error :: service/group/outGroup', error)
+  }
+}
+
 
 export { 
   createGroup,
   goGroup, 
   leaveGroup, 
-  getGroup }
+  updateGroupName,
+  outGroup
+}

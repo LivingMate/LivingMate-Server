@@ -82,6 +82,7 @@ const findGroupMembersNamesColorsByGroupId = async (groupId: string) => {
   const groupMembers = await prisma.user.findMany({
     where: { groupId: groupId },
     select: {
+      id: true,
       userName: true,
       userColor: true,
     },

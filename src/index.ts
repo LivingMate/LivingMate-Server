@@ -8,6 +8,7 @@ import { BudgetRouter } from './Routers/BudgetRouter';
 import { AuthRouter } from './Routers/AuthRouter';
 import { GroupRouter } from './Routers/GroupRouter';
 import { UserRouter } from './Routers/UserRouter';
+import { NotiRouter } from './Routers/NotificationRouter'
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
 import session from 'express-session'
@@ -30,7 +31,8 @@ app.use(CalendarRouter);
 app.use(BudgetRouter);
 app.use(AuthRouter);
 app.use(GroupRouter);
-app.use(UserRouter)
+app.use(UserRouter);
+app.use(NotiRouter);
 
 app.listen(3000, () => {
   console.log('서버가 3000번 포트에서 실행 중')

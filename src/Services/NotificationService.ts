@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
-import * as UserService from './User/UserService'
 import * as UserServiceUtils from './User/UserServiceUtils'
+import * as GroupServiceUtils from './Group/GroupServiceUtils'
 
 const makeNotification = async (groupId: string, userId: string, notificationType: string) => {
   try {
@@ -53,8 +53,78 @@ const makeNotification = async (groupId: string, userId: string, notificationTyp
   }
 }
 
-const getNotification = async (groupId:string, userId:string) => {
+
+const getUserNotiState = async ( userId:string ) => {
   try {
+    const user = await UserServiceUtils.findUserById(userId)
+
+    const notiState = await prisma.userNoti.findUnique({
+      where: {
+        userId: user.id
+      }
+    })
+    if (notiState) {
+      return notiState.state
+    } else {
+      return 'error'
+    }
+  } catch (error) {
+    console.error('error :: service/notification/getUserNotiState', error)
+    throw error
+  }
+}
+
+const getUserNotiTime = async ( userId:string ) => {
+  try {
+    const user = await UserServiceUtils.findUserById(userId)
+
+    const notiTime = await prisma.userNoti.findUnique({
+      where: {
+        userId: user.id
+      }
+    })
+    if (notiTime) {
+      return notiTime.updatedAt
+    } else {
+      return 'error'
+    }
+  } catch (error) {
+    console.error('error :: service/notification/getUserNotiTime', error)
+    throw error
+  }
+}
+
+const getNotification = async ( userId:string ) => {
+  try {
+    const user = await UserServiceUtils.findUserById(userId)
+    const group = await GroupServiceUtils.findGroupById(user.groupId)
+    const notiState = await getUserNotiState(user.id)
+    const notiTime = await getUserNotiTime(user.id)
+
+    if (notiState !== true || notiTime === 'error') {
+      return '알림이 없습니다';
+    }
+
+    const notis = await prisma.notification.findMany({
+      where: {
+        groupId: group.id,
+        createdAt: {
+          gte: notiTime
+        }
+      }
+    })
+
+    const formattedNotis = notis.map(({ id, text, createdAt }) => ({
+      Id: id,
+      text,
+      createdAt,
+    }));
+
+    const data = {
+      Notifications: formattedNotis,
+    };
+
+    return data;
 
   } catch (error) {
     console.error('error :: service/notification/getNotification', error)
@@ -63,4 +133,9 @@ const getNotification = async (groupId:string, userId:string) => {
 }
 
 
-export { makeNotification }
+export { 
+  makeNotification,
+  getUserNotiState,
+  getUserNotiTime,
+  getNotification
+ }
