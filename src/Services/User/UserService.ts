@@ -27,6 +27,7 @@ const createUser = async (signupDtO: SignupDto) => {
       email: signupDtO.email,
       sex: signupDtO.sex,
       age: signupDtO.age,
+      password: signupDtO.password
     },
   })
 

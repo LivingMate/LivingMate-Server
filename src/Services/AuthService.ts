@@ -1,14 +1,13 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from 'bcrypt';
 import errorGenerator from '../../error/errorGenerator';
-import { PostBaseResponseDto } from '../../interfaces/common/response/PostBaseResponseDto';
 import message from '../modules/message';
 import statusCode from '../modules/statusCode';
 import { LoginDto } from "../DTOs/Auth/Requests/LoginDto";
 const prisma = new PrismaClient()
 
 
-const login = async (loginDto: LoginDto): Promise<PostBaseResponseDto> => {
+const login = async (loginDto: LoginDto) => {
   try {
     
     const user = await prisma.user.findUnique({
@@ -31,7 +30,7 @@ const login = async (loginDto: LoginDto): Promise<PostBaseResponseDto> => {
       });
 
 
-    const data: PostBaseResponseDto = {
+    const data = {
       _id: user.id
     };
 
@@ -41,9 +40,8 @@ const login = async (loginDto: LoginDto): Promise<PostBaseResponseDto> => {
   }
 };
 
-export default {
-  login
-};
+export { login }
+ 
 
 
 

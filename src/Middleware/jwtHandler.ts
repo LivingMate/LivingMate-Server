@@ -5,7 +5,7 @@ import { JwtPayloadInfo } from "../DTOs/Auth/JwtPayloadInfo";
 const getToken = (userId: string): string => {
   const payload: JwtPayloadInfo = {
     user: {
-      _id: userId
+      id: userId
     }
   };
 
@@ -16,4 +16,4 @@ const getToken = (userId: string): string => {
   return accessToken;
 };
 
-export default getToken;
+export { getToken };
