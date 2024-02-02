@@ -5,5 +5,4 @@ export interface SignupDto {
   sex: string
   birth: string
   password: string
-  fcmToken?: string
 }

@@ -9,8 +9,10 @@ import util from '../modules/util';
 import * as AuthService from '../Services/AuthService';
 import * as UserService from '../Services/User/UserService';
 
-// POST /auth/signup
 
+
+
+// POST /auth/signup
 
 const signup = async (
   req: Request,
@@ -22,15 +24,15 @@ const signup = async (
     return res
       .status(statusCode.BAD_REQUEST)
       .send(
-        util.fail(statusCode.BAD_REQUEST, message.BAD_REQUEST, errors.array())
+        util.fail(statusCode.BAD_REQUEST, message.BAD_REQUEST)
       );
   }
 
   const signupDto: SignupDto = req.body;
   try {
-    const data: PostBaseResponseDto = await UserService.createUser(signupDto);
+    const data = await UserService.createUser(signupDto);
 
-    const accessToken: string = getToken(data._id);
+    const accessToken: string = getToken(data.userId);
 
     return res
       .status(statusCode.CREATED)
@@ -42,11 +44,9 @@ const signup = async (
   }
 };
 
-/**
- * @route POST /auth/login
- * @desc login
- * @access Public
- */
+
+//login
+
 const login = async (
   req: Request,
   res: Response,
@@ -57,16 +57,16 @@ const login = async (
     return res
       .status(statusCode.BAD_REQUEST)
       .send(
-        util.fail(statusCode.BAD_REQUEST, message.BAD_REQUEST, errors.array())
+        util.fail(statusCode.BAD_REQUEST, message.BAD_REQUEST)
       );
   }
 
   const LoginDto: LoginDto = req.body;
 
   try {
-    const data: PostBaseResponseDto = await AuthService.login(LoginDto);
+    const data = await AuthService.login(LoginDto);
 
-    const accessToken: string = getToken(data._id);
+    const accessToken: string = getToken(data.userId);
     
     return res
       .status(statusCode.OK)
@@ -76,7 +76,7 @@ const login = async (
   }
 };
 
-export default {
+export {
   signup,
   login
 };

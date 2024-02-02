@@ -1,6 +1,3 @@
-import { PrismaClient } from '@prisma/client'
-const prisma = new PrismaClient()
-import message from './modules/message'
 import express, { Express, Request, Response, NextFunction } from 'express'
 import { FeedRouter } from './Routers/FeedRouter'
 import { CalendarRouter } from './Routers/CalendarRouter';
