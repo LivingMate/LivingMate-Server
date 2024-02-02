@@ -194,6 +194,36 @@ const getUserNotiState = async(userId:string) => {
   }
 }
 
+// 유저 탈퇴
+const quitUser = async(userId : string) => {
+  try {
+    const user = await UserServiceUtils.findUserById(userId)
+    if (!user) {
+      throw new Error('User not found');
+    }
+    const changedEmail = await UserServiceUtils.createEmail()
+
+    const quiting = await prisma.user.updateMany({
+      where:{
+        id : user.id
+      },
+      data : {
+        userName : '알수없음',
+        userColor : '#ffffff',
+        email: changedEmail + '@LivingMate.com',
+        groupId: user.groupId,
+        birth: '0000-00-00',
+        sex: 'none'
+      }
+    });
+
+    return '탈퇴'
+
+  } catch (error) {
+    console.error('Error: service/user/quitUser', error);
+    throw new Error('Error: service/user/quitUser');
+  }
+}
 
 export {
   createUser,
@@ -202,5 +232,6 @@ export {
   userSetUpdate,
   userSetGet,
   notiYesNo,
-  getUserNotiState
+  getUserNotiState,
+  quitUser
 }
