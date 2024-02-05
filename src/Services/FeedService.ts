@@ -42,8 +42,8 @@ const createFeed = async (userId: string, groupId: string, content: string): Pro
     const data: FeedCreateResponseDto = {
       feedId: event.id,
       userId: event.userId,
-      //userName: resUserName,
-      //userColor: resUserColor,
+      userName: resUserName,
+      userColor: resUserColor,
       groupId: event.groupId,
       content: event.content,
       createdAt: event.createdAt,
@@ -77,14 +77,14 @@ const updateFeedContent = async (
       },
     })
 
-    //const resUserName = await UserService.getUserNameByUserId(updatedEvent.userId)
-    //const resUserColor = await UserService.findUserColorByUserId(updatedEvent.userId)
+    const resUserName = await UserServiceUtils.getUserNameByUserId(updatedEvent.userId)
+    const resUserColor = await UserServiceUtils.findUserColorByUserId(updatedEvent.userId)
 
     const FeedToReturn: FeedUpdateResponseDto = {
       feedId: updatedEvent.id,
       userId: updatedEvent.userId,
-      //userName: resUserName,
-      //userColor: resUserColor,
+      userName: resUserName,
+      userColor: resUserColor,
       groupId: updatedEvent.groupId,
       content: updatedEvent.content,
       createdAt: updatedEvent.createdAt,
@@ -98,20 +98,25 @@ const updateFeedContent = async (
 }
 
 //피드 고정
-const pinFeed = async (FeedId: number, pin:boolean) => {
+const pinFeed = async (FeedId: number) => {
   try{
     const pinnedFeed = await prisma.feed.update({
       where: {
         id: FeedId,
       },
       data: {
-        pin: pin
+        pin: true
       },
     })
+
+    const resUserName = await UserServiceUtils.getUserNameByUserId(pinnedFeed.userId)
+    const resUserColor = await UserServiceUtils.findUserColorByUserId(pinnedFeed.userId)
   
     const data = {
       feedId: pinnedFeed.id,
       userId: pinnedFeed.userId,
+      userName: resUserName,
+      userColor: resUserColor,
       groupId: pinnedFeed.groupId,
       content: pinnedFeed.content,
       createdAt: pinnedFeed.createdAt,
@@ -140,13 +145,13 @@ const deleteFeed = async (FeedId: number) => {
     })
 
     return 0
-    //삭제 이후에는 null값이나 빈 객체를 반환하기 때문에... 왜 Hous 팀이 msg를 만들었는지 알겠음. msg를 만들거나.. 해아 할 것 같음
+    
   } catch (error) {
     throw new Error('Error deleting feed')
   }
 }
 
-//피드 보여주기 : 객체 타입의 배열로 반환됨!
+
 const showFeed = async (GroupId: string) => {
   const Feeds = await prisma.feed.findMany({
     where: {
@@ -156,8 +161,31 @@ const showFeed = async (GroupId: string) => {
       id: 'desc',
     },
   })
-  return Feeds
+
+  let FeedsToShow:FeedCreateResponseDto[] =[];
+
+  await Promise.all(
+    Feeds.map(async (feed)=>{
+      let resUserName = await UserServiceUtils.getUserNameByUserId(feed.userId)
+      let resUserColor = await UserServiceUtils.findUserColorByUserId(feed.userId)
+
+      FeedsToShow.push({
+        feedId: feed.id,
+        userId: feed.userId,
+        groupId: feed.groupId,
+        userName : resUserName,
+        userColor : resUserColor,
+        content: feed.content,
+        createdAt : feed.createdAt,
+        pinned: feed.pin
+      })
+
+    })
+  )
+
+  return FeedsToShow;
 }
+
 
 //피드 찾기
 const findFeedByFeedId = async (FeedId: number) => {

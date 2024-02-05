@@ -4,8 +4,8 @@ import * as FeedController from "../Controllers/FeedController"
 
 const FeedRouter = Router();
 
-FeedRouter.get('/feed',auth,FeedController.showFeed);
-FeedRouter.post('/feed/:groupId/:userId',FeedController.createFeed);
+FeedRouter.get('/feed', auth, FeedController.showFeed);
+FeedRouter.post('/feed', auth, FeedController.createFeed);
 FeedRouter.patch('/feed/:feedId',FeedController.updateFeed);
 FeedRouter.patch('/feed/pin/:feedId',FeedController.pinFeed);
 FeedRouter.delete('/feed/:feedId', FeedController.deleteFeed);

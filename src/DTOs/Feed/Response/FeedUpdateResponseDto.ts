@@ -4,8 +4,8 @@ export interface FeedUpdateResponseDto extends FeedUpdateRequestDto {
   feedId: number
   groupId: string
   userId: string
-  //userName : string,
-  //userColor : string,
+  userName : string,
+  userColor : string,
   createdAt: Date
   pinned: boolean
 }
