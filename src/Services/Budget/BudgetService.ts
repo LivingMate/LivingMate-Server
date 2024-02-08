@@ -343,20 +343,30 @@ const getUserSpending = async (groupId: string): Promise<{ userId: string; userS
     },
   })
 
-  const groupMemberSpendingsBefore: { userId: string; userSpending: number }[] = []
+  const groupMemberSpendingsBefore: { userId: string; userName: string; userColor: string; userSpending: number }[] = []
 
-  userSpendings.forEach((record) => {
-    const userId = record.userId
-    const userSpending = record._sum.spendings
 
-    if (userSpending == null) {
-      throw new Error('Null error: groupMemberSpendings')
-    }
 
-    groupMemberSpendingsBefore.push({ userId, userSpending })
-  })
+  await Promise.all(
+    userSpendings.map(async (budget) => {
+      let resUserColor = await UserServiceUtils.findUserColorByUserId(budget.userId);
+      let resUserName = await UserServiceUtils.getUserNameByUserId(budget.userId);
+      let spending = budget._sum.spendings;
 
-  return groupMemberSpendingsBefore
+      if (spending == null) {
+        throw new Error('Null error: groupMemberSpendings')
+      }
+
+      groupMemberSpendingsBefore.push({
+        userId: budget.userId,
+        userColor: resUserColor,
+        userName: resUserName,
+        userSpending: spending
+      })
+    }),
+  )
+
+  return groupMemberSpendingsBefore;
 }
 
 //가계부 내부 정산 반환 함수
@@ -396,9 +406,9 @@ const AdjAtBudget = async (groupId: string) => {
       member.userSpending -= groupAvg
     })
 
-    const groupOwner = await UserServiceUtils.findGroupOwner(groupId)
+    //const groupOwner = await UserServiceUtils.findGroupOwner(groupId)
     // 알림 생성
-    await NotificationService.makeNotification(groupId, groupOwner, "createSchedule")
+    //await NotificationService.makeNotification(groupId, groupOwner, "createSchedule")
     
     return {
       groupAvg,
@@ -484,6 +494,8 @@ const takeFromAdjustments = async (groupId: string) => {
     },
   })
   
+  console.log(Adjustment);
+
   const AdjustmentToReturn: {
     plusUserName: string
     plusUserColor: string

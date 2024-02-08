@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import { validationResult, Result, ValidationError } from 'express-validator'
 import * as BudgetService from '../Services/Budget/BudgetService'
 import { BudgetCreateRequestDto } from '../DTOs/Budget/Request/BudgetCreateRequestDto'
+import * as GroupServiceUtils from '../Services/Group/GroupServiceUtils'
 
 /*
 get
@@ -10,8 +11,8 @@ get
 */
 
 const showBudget = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
-  //const groupId: string = req.params.groupId;
-  const groupId = req.params.groupId //작동 안 하면 이거때문임. { } 이거 고쳤음. params 이거랑
+  const userId = req.body.user.id;
+  const groupId = await GroupServiceUtils.findGroupIdByUserId(userId);
 
   try {
     const data = await BudgetService.showBudget(groupId)
@@ -30,7 +31,8 @@ const showBudget = async (req: Request, res: Response, next: NextFunction): Prom
 */
 
 const getBudgetSearch = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
-  const groupId: string = req.params.groupId
+  const userId = req.body.user.id;
+  const groupId = await GroupServiceUtils.findGroupIdByUserId(userId);
   const searchKey: string = req.params.searchKey
 
   try {
@@ -50,7 +52,8 @@ get
 
 
 const getBudgetSearchByCategory = async(req: Request, res: Response, next: NextFunction)=>{
-  const groupId: string = req.params.groupId;
+  const userId = req.body.user.id;
+  const groupId = await GroupServiceUtils.findGroupIdByUserId(userId);
   const category: string = req.params.category;
 
   try {
@@ -62,12 +65,14 @@ const getBudgetSearchByCategory = async(req: Request, res: Response, next: NextF
   }
 }
 
+
 // /*
 // get
 // 정산
 // */
 const getFinalAdjustment = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
-  const groupId: string = req.params.groupId
+  const userId = req.body.user.id;
+  const groupId = await GroupServiceUtils.findGroupIdByUserId(userId);
   
   try {
     const data = await BudgetService.finalAdjustment(groupId);
@@ -79,7 +84,8 @@ const getFinalAdjustment = async (req: Request, res: Response, next: NextFunctio
 }
 
 const getAdjforBudget = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
-  const groupId: string = req.params.groupId
+  const userId = req.body.user.id;
+  const groupId = await GroupServiceUtils.findGroupIdByUserId(userId);
   
   try {
     const data = await BudgetService.AdjAtBudget(groupId);
@@ -95,8 +101,8 @@ post
 /budget
 */
 const createBudget = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
-  const groupId: string = req.params.groupId
-  const userId: string = req.params.userId
+  const userId = req.body.user.id;
+  const groupId = await GroupServiceUtils.findGroupIdByUserId(userId);
   const BudgetCreateRequestDto: BudgetCreateRequestDto = req.body
 
   try {
@@ -142,7 +148,8 @@ const updateBudget = async (req: Request, res: Response, next: NextFunction): Pr
 }
 
 const doneBudget = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
-  const groupId = req.params.groupId
+  const userId = req.body.user.id;
+  const groupId = await GroupServiceUtils.findGroupIdByUserId(userId);
 
   try {
     const data = await BudgetService.isDone(groupId)
@@ -158,7 +165,8 @@ createNewSubCategory
 /budget
 */
 const createsubCategory = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
-  const groupId = req.params.groupId
+  const userId = req.body.user.id;
+  const groupId = await GroupServiceUtils.findGroupIdByUserId(userId);
   const subCategoryName = req.body.name
   const StrcategoryId = req.params.categoryId
   const categoryId = parseInt(StrcategoryId)
@@ -176,7 +184,8 @@ showSubCategory
 */
 
 const showSubCategories = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
-  const groupId = req.params.groupId
+  const userId = req.body.user.id;
+  const groupId = await GroupServiceUtils.findGroupIdByUserId(userId);
   const categoryName = req.params.categoryName
 
   try {

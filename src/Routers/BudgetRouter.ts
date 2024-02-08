@@ -1,24 +1,24 @@
 import express from 'express'
 import * as BudgetController from '../Controllers/BudgetController'
-
+import auth from '../Middleware/auth';
 
 const BudgetRouter = express.Router();
 
 
-BudgetRouter.get('/budget/:groupId', BudgetController.showBudget);
-BudgetRouter.get('/budget/search/:groupId/:searchKey', BudgetController.getBudgetSearch); 
-BudgetRouter.get('/budget/sub/:groupId/:categoryName', BudgetController.showSubCategories);
-BudgetRouter.get('/budget/calc/:groupId', BudgetController.getFinalAdjustment);
-BudgetRouter.get('/budget/calcbudget/:groupId', BudgetController.getAdjforBudget);
-BudgetRouter.get('/budget/category/search/:groupId/:category', BudgetController.getBudgetSearchByCategory);
+BudgetRouter.get('/budget', auth,  BudgetController.showBudget);
+BudgetRouter.get('/budget/search/:searchKey',auth, BudgetController.getBudgetSearch); 
+BudgetRouter.get('/budget/sub/:categoryName', auth, BudgetController.showSubCategories);
+BudgetRouter.get('/budget/calc', auth, BudgetController.getFinalAdjustment);
+BudgetRouter.get('/budget/calcbudget', auth,  BudgetController.getAdjforBudget);
+BudgetRouter.get('/budget/category/search/:category', auth, BudgetController.getBudgetSearchByCategory);
 
-BudgetRouter.post('/budget/:groupId/:userId', BudgetController.createBudget);
-BudgetRouter.post('/budget/subcat/:groupId/:categoryId', BudgetController.createsubCategory);
+BudgetRouter.post('/budget', auth, BudgetController.createBudget);
+BudgetRouter.post('/budget/subcat/:categoryId', auth,  BudgetController.createsubCategory);
 
-BudgetRouter.patch('/budget/:budgetId', BudgetController.updateBudget);
-BudgetRouter.patch('/budget/done/:groupId', BudgetController.doneBudget);
+BudgetRouter.patch('/budget/:budgetId', auth, BudgetController.updateBudget);
+BudgetRouter.patch('/budget/done', auth,  BudgetController.doneBudget);
 
-BudgetRouter.delete('/budget/:budgetId', BudgetController.deleteBudget);
+BudgetRouter.delete('/budget/:budgetId', auth, BudgetController.deleteBudget);
 
 
 export {BudgetRouter};
