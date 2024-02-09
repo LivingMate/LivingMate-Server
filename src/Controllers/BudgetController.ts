@@ -171,7 +171,7 @@ const createsubCategory = async (req: Request, res: Response, next: NextFunction
   const userId = req.body.user.id;
   const groupId = await GroupServiceUtils.findGroupIdByUserId(userId);
   const subCategoryName = req.body.name
-  const categoryId = await BudgetServiceUtil.findCategIdByName(req.params.categoryId)
+  const categoryId = await BudgetServiceUtil.findCategIdByName(req.params.categoryName)
 
   try {
     const data = await BudgetService.createSubCategory(groupId, categoryId, subCategoryName)

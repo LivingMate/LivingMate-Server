@@ -71,6 +71,9 @@ const showBudget = async (groupId: string) => {
       where: {
         groupId: groupId,
       },
+      orderBy: {
+        id: 'desc',
+      }
     })
 
     let BudgetsToShow: BudgetCreateResponseDto[] = []
@@ -201,29 +204,36 @@ const searchBudget = async (groupId: string, searchKey: string) => {
 }
 
 // 서브카테고리 새로 만들기 // categoryName-<id
-const createSubCategory = async (groupId: string, categoryId: number, name: string) => {
-
-  const duplicateName = await prisma.subCategory.findMany({
-    where:{
-      groupId :  groupId,
-      categoryId : categoryId,
-      name :  name
+const createSubCategory = async (groupId: string, categoryId: number, subCategoryName: string) => {
+  try {
+    const duplicateName = await prisma.subCategory.findMany({
+      where:{
+        groupId :  groupId,
+        categoryId : categoryId,
+        name :  subCategoryName
+      }
+    })
+    if (duplicateName.length>0){
+      throw new Error("중복된 서브 카테고리를 등록할 수 없습니다.")
     }
-  })
+    else{
+      const newSubCategory = await prisma.subCategory.create({
+        data: {
+          name: subCategoryName,
+          groupId: groupId,
+          categoryId: categoryId,
+        },
+      })
+  
+      return newSubCategory
 
-  if (duplicateName){
-    throw new Error("한 카테고리에 중복된 서브카테고리 등록은 불가합니다.")
+    }
+    
   }
-  
-  const newSubCategory = await prisma.subCategory.create({
-    data: {
-      name: name,
-      groupId: groupId,
-      categoryId: categoryId,
-    },
-  })
-  
-  return newSubCategory
+  catch (error) {
+    console.error('subcategory create failed', error)
+    throw error
+  }
 }
 
 //서브카테고리 보여주기
@@ -492,6 +502,7 @@ const sendToAdjustments = async (groupId: string, fromId: string, toId: string, 
       plusUserId: toId,
       minusUserId: fromId,
       change: change,
+      isDone: false
     },
   })
 }
@@ -505,6 +516,7 @@ const takeFromAdjustments = async (groupId: string) => {
     },
     where: {
       groupId: groupId,
+      isDone:false
     },
   })
   
@@ -543,16 +555,7 @@ const takeFromAdjustments = async (groupId: string) => {
   
 }
 
-//adjustment 지우기 -> 정산 완료 눌렀을 때 사용할 것..-> isDone을 주자..
 
-// const deleteAdjustment = async (groupId: string) => {
-//   await prisma.adjustment.deleteMany({
-//     where: {
-//       groupId: groupId,
-//     },
-//   })
-//   return 0
-// }
 
 //정산 마이너 기능 (날짜 반환)
 const getDayReturn = async (groupId: string) => {
@@ -580,6 +583,16 @@ const isDone = async (groupId: string) => {
     data: {
       isDone: true,
     },
+  })
+
+  await prisma.adjustment.updateMany({
+    where: {
+      groupId: groupId,
+      isDone: false
+    },
+    data:{
+      isDone: true
+    }
   })
 
   const groupOwner = await UserServiceUtils.findGroupOwner(groupId)

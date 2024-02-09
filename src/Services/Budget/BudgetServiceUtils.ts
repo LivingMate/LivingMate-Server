@@ -14,7 +14,7 @@ const findCategIdByName = async (categoryName: string) => {
     const data = await prisma.category.findUnique({
       where: {
         name: categoryName,
-      },
+      }
     })
     if (!data) {
       throw new Error(message.UNAUTHORIZED)

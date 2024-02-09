@@ -181,7 +181,7 @@ model Adjustment {
   group       Group    @relation(fields: [groupId], references: [id])
   minusUser   User?    @relation("minusUser", fields: [minusUserId], references: [id])
   plusUser    User?    @relation("plusUser", fields: [plusUserId], references: [id])
-  isDone      Boolean 
+  isDone      Boolean  @default(false)
 
   @@index([groupId], map: "Adjustment_groupId_fkey")
   @@index([minusUserId], map: "Adjustment_minusUserId_fkey")

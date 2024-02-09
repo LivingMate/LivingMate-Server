@@ -14,7 +14,7 @@ BudgetRouter.get('/budget/category/search/:category', auth, BudgetController.get
 
 
 BudgetRouter.post('/budget', auth, BudgetController.createBudget);
-BudgetRouter.post('/budget/subcat/:categoryId', auth,  BudgetController.createsubCategory);
+BudgetRouter.post('/budget/subcat/:categoryName', auth,  BudgetController.createsubCategory);
 
 BudgetRouter.patch('/budget/:budgetId', auth, BudgetController.updateBudget);
 BudgetRouter.patch('/budget/done', auth,  BudgetController.doneBudget);
