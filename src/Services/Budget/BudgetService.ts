@@ -508,7 +508,9 @@ const sendToAdjustments = async (groupId: string, fromId: string, toId: string, 
 }
 
 const takeFromAdjustments = async (groupId: string) => {
+
   const Adjustment = await prisma.adjustment.findMany({
+    take: 10,
     select: {
       plusUserId: true,
       minusUserId: true,
@@ -609,9 +611,10 @@ const getAdjustments = async (groupId: string) => {
 
 const finalAdjustment = async (groupId: string) => {
   await getAdjustmentsCalc(groupId)
-  let final = await getAdjustments(groupId)
+  
+  const final = await getAdjustments(groupId)
 
-  return { final }
+  return {final}
 }
 
 export {
