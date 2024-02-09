@@ -1,13 +1,14 @@
-import { Router, Request, Response } from "express";
-import {body, query} from "express-validator";
-import * as GroupController from "../Controllers/GroupController"
+import { Router, Request, Response } from 'express'
+import { body, query } from 'express-validator'
+import auth from '../Middleware/auth'
+import * as GroupController from '../Controllers/GroupController'
 
-const GroupRouter = Router();
+const GroupRouter = Router()
 
-GroupRouter.post('/group/create/:userId',GroupController.createGroup)
+GroupRouter.post('/group/create', auth, GroupController.createGroup)
 
-GroupRouter.patch('/group/insert/:userId',GroupController.goGroup)
-GroupRouter.patch('/group/patch/:userId',GroupController.updateGroupName)
-GroupRouter.patch('/group/leave/:userId',GroupController.leaveGroup)
+GroupRouter.patch('/group/insert', auth, GroupController.goGroup)
+GroupRouter.patch('/group/patch', auth, GroupController.updateGroupName)
+GroupRouter.patch('/group/leave', auth, GroupController.leaveGroup)
 
-export {GroupRouter};
+export { GroupRouter }

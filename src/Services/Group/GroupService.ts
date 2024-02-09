@@ -51,14 +51,12 @@ const createGroup = async (userId: string, groupName: string) => {
 }
 
 // 참여자들이 자기 그룹 찾아들어가기
-const goGroup = async(userId: string, groupId: string) => {
+const goGroup = async (userId: string, groupId: string) => {
   try {
     const user = await UserServiceUtils.findUserById(userId)
-    const group = await GroupServiceUtils.findGroupById(groupId)
 
-    const GroupReturn = await UserServiceUtils.addUserToGroup(user.id, group.id)
+    const GroupReturn = await UserServiceUtils.addUserToGroup(user.id, groupId)
     return GroupReturn
-
   } catch (error) {
     console.error('Error at entering Group: group service', error)
   }
@@ -79,20 +77,19 @@ const leaveGroup = async (userId: string) => {
         groupId: 'aaaaaa', // 또는 원하는 값으로 갱신
       },
     })
-    
+
     const data = {
-      userId : (await event).id,
-      groupId: (await event).groupId
+      userId: (await event).id,
+      groupId: (await event).groupId,
     }
     return data
-
   } catch (error) {
     console.error('error :: service/group/leaveGroup', error)
   }
 }
 
 // 그룹 이름 수정
-const updateGroupName = async (userId:string, groupName:string) => {
+const updateGroupName = async (userId: string, groupName: string) => {
   try {
     const user = await UserServiceUtils.findUserById(userId)
     const group = await GroupServiceUtils.findGroupById(user.groupId)
@@ -107,19 +104,18 @@ const updateGroupName = async (userId:string, groupName:string) => {
     })
 
     const data = {
-      groupId : event.id,
-      groupName : event.groupName
+      groupId: event.id,
+      groupName: event.groupName,
     }
 
     return data
-
   } catch (error) {
     console.error('error :: service/group/updateGroupName', error)
   }
 }
 
 // 그룹 탈퇴
-const outGroup = async (userId:string) => {
+const outGroup = async (userId: string) => {
   try {
     const user = await UserServiceUtils.findUserById(userId)
     const group = await GroupServiceUtils.findGroupById(user.groupId)
@@ -129,20 +125,12 @@ const outGroup = async (userId:string) => {
         id: user.id,
       },
       data: {
-        id: 'aaaaaa'
+        id: 'aaaaaa',
       },
     })
-
   } catch (error) {
     console.error('error :: service/group/outGroup', error)
   }
 }
 
-
-export { 
-  createGroup,
-  goGroup, 
-  leaveGroup, 
-  updateGroupName,
-  outGroup
-}
+export { createGroup, goGroup, leaveGroup, updateGroupName, outGroup }

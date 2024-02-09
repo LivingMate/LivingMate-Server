@@ -36,10 +36,6 @@ const createUser = async (signupDtO: SignupDto) => {
     },
   })
 
-
-
-
-
   const userNoti = await prisma.userNoti.create({
     data: {
       userId: user.id,

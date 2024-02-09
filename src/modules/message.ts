@@ -42,8 +42,13 @@ const message = {
     UPDATE_CAL_SUCCESS: '일정 수정 성공입니다.',
     DELETE_CAL_SUCCESS: '일정 삭제 성공입니다.',
     READ_CAL_SUCCESS: '일정 조회 성공입니다.',
+    READ_ONE_CAL_SUCCESS: '일정 조회 성공입니다.',
+    READ_THISWEEK_SUCCESS: '이번주 일정 조회 성공입니다.',
     CREATE_SCDL_SUCCESS: '스케줄 생성 성공입니다.',
     READ_SCDL_SUCCESS: '스케줄 조회 성공입니다.',
+    CREATE_TS_SUCCESS: '타임슬럿 생성 성공입니다.',
+    READ_TS_SUCCESS: '타임슬럿 조회 성공입니다.',
+    DELETE_SCDL_TS_SUCCESS: '스케줄,타임슬럿 삭제 성공입니다.',
     FORBIDDEN_CAL: '참가하고 있지 않은 그룹의 캘린더입니다.',
 
 
@@ -62,7 +67,7 @@ const message = {
 
 
     // 알림
-    DELETE_NOTIFICATION_SUCCESS: '알림 삭제 성공입니다.',
+    GET_NOTIFICATION_SUCCESS: '알림 반환 성공입니다.',
 
     
     // 그룹
@@ -72,16 +77,19 @@ const message = {
   
     READ_GROUP_SUCCESS: '그룹 조회 성공입니다.',
     CREATE_GROUP_SUCCESS: '그룹 생성 성공입니다.',
+    UPDATE_GROUP_SUCCESS: '그룹 이름 변경 성공입니다.',
     JOIN_GROUP_SUCCESS: '그룹 참가 성공입니다.',
     LEAVE_GROUP_SUCCESS: '그룹 탈퇴 성공입니다.',
   
 
     // 사용자
     READ_USER_SUCCESS: '사용자 정보 조회 성공입니다.',
+    READ_MEMBERS_SUCCESS: '모든 유저 정보 조회 성공입니다.',
     UPDATE_USER_SUCCESS: '사용자 정보 수정 성공입니다.',
     NOT_FOUND_USER: '조회할 사용자 정보가 없습니다.',
     FORBIDDEN_USER: '참가하고 있지 않은 방의 사용자입니다.',
-    READ_USER_SETTING_SUCCESS: '사용자 설정 조회 성공입니다.',
+    READ_USER_NOTIFICATION_SUCCESS: '사용자 알림 조회 성공입니다.',
+    READ_MYPAGE_SUCCESS: '마이페이지 반환 성공입니다.',
     UPDATE_USER_NOTIFICATION_STATE_SUCCESS: '사용자 알림 설정 수정 성공입니다.',
     DELETE_USER_SUCCESS: '사용자 탈퇴 성공입니다.',
     

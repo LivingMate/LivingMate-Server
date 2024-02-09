@@ -121,7 +121,7 @@ const getNotification = async ( userId:string ) => {
     }));
 
     const data = {
-      Notifications: formattedNotis,
+      Notifications : formattedNotis,
     };
 
     return data;
