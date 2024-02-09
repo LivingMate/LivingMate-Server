@@ -68,7 +68,6 @@ const createBudget = async (
 const showBudget = async (groupId: string) => {
   try {
     const Budgets = await prisma.userSpendings.findMany({
-      take: 10,
       where: {
         groupId: groupId,
       },

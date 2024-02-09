@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { validationResult, Result, ValidationError } from 'express-validator'
 import * as BudgetService from '../Services/Budget/BudgetService'
+import * as BudgetServiceUtil from '../Services/Budget/BudgetServiceUtils'
 import { BudgetCreateRequestDto } from '../DTOs/Budget/Request/BudgetCreateRequestDto'
 import * as GroupServiceUtils from '../Services/Group/GroupServiceUtils'
 
@@ -170,8 +171,7 @@ const createsubCategory = async (req: Request, res: Response, next: NextFunction
   const userId = req.body.user.id;
   const groupId = await GroupServiceUtils.findGroupIdByUserId(userId);
   const subCategoryName = req.body.name
-  const StrcategoryId = req.params.categoryId
-  const categoryId = parseInt(StrcategoryId)
+  const categoryId = await BudgetServiceUtil.findCategIdByName(req.params.categoryId)
 
   try {
     const data = await BudgetService.createSubCategory(groupId, categoryId, subCategoryName)

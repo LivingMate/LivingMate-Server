@@ -127,4 +127,21 @@ const deleteFeed = async (req: Request, res: Response, next: NextFunction): Prom
   }
 }
 
-export { showFeed, createFeed, updateFeed, deleteFeed, pinFeed }
+const getFeed = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+  const errors: Result<ValidationError> = validationResult(req)
+  if (!errors.isEmpty()) {
+    throw new Error('Error at Controller: getFeed')
+  }
+
+  const feedId = parseInt(req.params.feedId)
+
+  try {
+    const data = await FeedService.findFeedByFeedId(feedId)
+    return res.status(200).send(data);
+    
+  } catch (error) {
+    next(error)
+  }
+}
+
+export { showFeed, createFeed, updateFeed, deleteFeed, pinFeed, getFeed }
