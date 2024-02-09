@@ -1,16 +1,17 @@
 import express from 'express';
+import auth from '../Middleware/auth';
 import * as UserController from '../Controllers/UserController'
 
 const UserRouter = express.Router();
 
-UserRouter.patch('/user/setting/:userId', UserController.userSetUpdate)
-UserRouter.patch('/user/setting/notification/:userId', UserController.userNotiYesNo)
-UserRouter.patch('/user/quit/:userId', UserController.quitUser)
+UserRouter.patch('/user/update/setting', auth, UserController.userSetUpdate)
+UserRouter.patch('/user/update/setting/notification', auth, UserController.userNotiYesNo)
+UserRouter.patch('/user/leave', auth, UserController.quitUser)
 
-UserRouter.get('/user/mypage/:userId', UserController.getUserProfile)
-UserRouter.get('/user/all/:userId', UserController.getAllMember)
-UserRouter.get('/user/setting/:userId', UserController.getUserSet)
-UserRouter.get('/user/setting/notification/:userId', UserController.getUserNotiState)
+UserRouter.get('/user/mypage', auth, UserController.getUserProfile)
+UserRouter.get('/user/all', auth, UserController.getAllMember)
+UserRouter.get('/user/setting', auth, UserController.getUserSet)
+UserRouter.get('/user/setting/notification', auth, UserController.getUserNotiState)
 
 
 export { UserRouter }

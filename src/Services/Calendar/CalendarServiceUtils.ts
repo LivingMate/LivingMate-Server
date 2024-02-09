@@ -275,7 +275,7 @@ const deleteRepeatCalendar = async (
 
 // 반복 일정 '삭제'에 사용되는 삭제 유틸
 const deleteThisRepeatCalendar = async (
-  eventId: number,
+  calendarId: number,
   term: number,
   userId: string,
   groupId: string,
@@ -287,7 +287,7 @@ const deleteThisRepeatCalendar = async (
     const calendarIdsToDelete = await prisma.calendar.findMany({
       where: {
         id: {
-          gte: eventId,
+          gte: calendarId,
         },
         term: term,
         userId: userId,

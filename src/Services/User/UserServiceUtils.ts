@@ -90,7 +90,7 @@ const addUserToGroup = async (userId: string, groupId: string) => {
   //2. put her groupId in her record at User table
   //3. assign her id(? not sure) to Group's User[]? Did it mean it had foreign relations with the table?
 
-  const data = await prisma.user.update({
+  await prisma.user.update({
     where: {
       id: userId,
     },
@@ -98,9 +98,10 @@ const addUserToGroup = async (userId: string, groupId: string) => {
       groupId: groupId,
     },
   })
+  
   await NotificationService.makeNotification(groupId, userId, 'newUser')
   
-  return data
+  //return data
 }
 
 const createColor = async () => {
