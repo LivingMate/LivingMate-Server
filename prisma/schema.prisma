@@ -15,8 +15,8 @@ model User {
   groupId         String
   birth           String
   sex             String
-  notiDTime       DateTime        @default(now()) @db.DateTime(0)
-  createdAt       DateTime        @default(now()) @db.DateTime(0)
+  notiDTime       DateTime        @default(dbgenerated("NOW()")) @db.DateTime(0)
+  createdAt       DateTime        @default(dbgenerated("NOW()")) @db.DateTime(0)  
   updatedAt       DateTime        @updatedAt @db.DateTime(0)
   password        String
   AdjustmentMinus Adjustment[]    @relation("minusUser")
@@ -37,7 +37,7 @@ model Group {
   groupName     String          @db.VarChar(255)
   groupOwner    String          @unique
   groupSpending Float
-  createdAt     DateTime        @default(now())
+  createdAt     DateTime        @default(dbgenerated("NOW()")) @db.DateTime(0)
   Adjustment    Adjustment[]
   Calendar      Calendar[]
   Feed          Feed[]
@@ -56,7 +56,7 @@ model Feed {
   userId    String
   groupId   String
   content   String   @default("")
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(dbgenerated("NOW()")) @db.DateTime(0)
   pin       Boolean  @default(false)
   group     Group    @relation(fields: [groupId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
@@ -70,7 +70,7 @@ model Notification {
   groupId   String
   userId    String
   text      String   @db.LongText
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(dbgenerated("NOW()")) @db.DateTime(0)
   isDelete  Boolean  @default(false)
   group     Group    @relation(fields: [groupId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
@@ -83,7 +83,7 @@ model UserNoti {
   id        Int      @id @default(autoincrement())
   groupId   String
   userId    String   @unique
-  createdAt DateTime @default(now()) @db.DateTime(0)
+  createdAt DateTime @default(dbgenerated("NOW()")) @db.DateTime(0)
   updatedAt DateTime @updatedAt @db.DateTime(0)
   state     Boolean  @default(true)
   group     Group    @relation(fields: [groupId], references: [id])
@@ -157,7 +157,7 @@ model UserSpendings {
   spendings     Float       @default(0)
   categoryId    Int
   subCategoryId Int
-  createdAt     DateTime    @default(now()) @db.DateTime(0)
+  createdAt     DateTime    @default(dbgenerated("NOW()")) @db.DateTime(0)
   spendingName  String
   isDone        Boolean     @default(false)
   category      Category    @relation(fields: [categoryId], references: [id])
@@ -177,10 +177,11 @@ model Adjustment {
   minusUserId String?
   plusUserId  String?
   change      Int
-  createdAt   DateTime @default(now())
+  createdAt   DateTime @default(dbgenerated("NOW()")) @db.DateTime(0)
   group       Group    @relation(fields: [groupId], references: [id])
   minusUser   User?    @relation("minusUser", fields: [minusUserId], references: [id])
   plusUser    User?    @relation("plusUser", fields: [plusUserId], references: [id])
+  isDone      Boolean  @default(false)
 
   @@index([groupId], map: "Adjustment_groupId_fkey")
   @@index([minusUserId], map: "Adjustment_minusUserId_fkey")
@@ -198,11 +199,12 @@ model SubCategory {
   id         Int             @id @default(autoincrement())
   groupId    String
   categoryId Int
-  name       String          @unique
+  name       String         
   category   Category        @relation(fields: [categoryId], references: [id])
   group      Group           @relation(fields: [groupId], references: [id])
   spendings  UserSpendings[]
 
   @@index([categoryId], map: "SubCategory_categoryId_fkey")
   @@index([groupId], map: "SubCategory_groupId_fkey")
+  
 }

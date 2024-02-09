@@ -98,14 +98,14 @@ const updateFeedContent = async (
 }
 
 //피드 고정
-const pinFeed = async (FeedId: number) => {
+const pinFeed = async (FeedId: number, Pinned: boolean) => {
   try{
     const pinnedFeed = await prisma.feed.update({
       where: {
         id: FeedId,
       },
       data: {
-        pin: true
+        pin: Pinned
       },
     })
 
@@ -197,7 +197,23 @@ const findFeedByFeedId = async (FeedId: number) => {
   if (!Feed) {
     throw new Error('No Feed Found!')
   }
-  return Feed
+  
+  const resUserName = await UserServiceUtils.getUserNameByUserId(Feed.userId)
+  const resUserColor = await UserServiceUtils.findUserColorByUserId(Feed.userId)
+  
+    const data = {
+      feedId: Feed.id,
+      userId: Feed.userId,
+      userName: resUserName,
+      userColor: resUserColor,
+      groupId: Feed.groupId,
+      content: Feed.content,
+      createdAt: Feed.createdAt,
+      pin: Feed.pin,
+    }
+
+  return data;
 }
+
 
 export { createFeed, deleteFeed, findFeedByFeedId, pinFeed, showFeed, updateFeedContent }

@@ -1,4 +1,4 @@
-import { Category, PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 import message from '../../modules/message'
 
@@ -14,7 +14,7 @@ const findCategIdByName = async (categoryName: string) => {
     const data = await prisma.category.findUnique({
       where: {
         name: categoryName,
-      },
+      }
     })
     if (!data) {
       throw new Error(message.UNAUTHORIZED)
@@ -23,19 +23,27 @@ const findCategIdByName = async (categoryName: string) => {
   }
   
   // 섭카테고리 이름으로 섭카테고리 id 찾기
-  async function findSubCategIdByName(subCategoryName: string) {
+  async function findSubCategIdByName(subCategoryName: string, groupId: string, categoryId: number) {
     try {
-      const subCategory = await prisma.subCategory.findUnique({
+      const subCategory = await prisma.subCategory.findMany({
         where: {
           name: subCategoryName,
+          groupId : groupId,
+          categoryId: categoryId
         },
       })
-  
-      if (subCategory) {
-        return subCategory.id
-      } else {
-        return -1
-      }
+      let subcategories: number[] = [];
+
+      subCategory.forEach((subcategory)=>{
+        if(!subcategory){
+          throw new Error("등록되지 않은 subCategory입니다.")
+        }
+        else{
+          subcategories.push(subcategory.id)
+        }
+      })
+      return subcategories[0];
+      
     } catch (error) {
       console.error('Error in findSubCategIdByName:', error)
       throw error
