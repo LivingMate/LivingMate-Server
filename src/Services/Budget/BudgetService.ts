@@ -21,7 +21,7 @@ const createBudget = async (
     const user = await UserServiceUtils.findUserById(userId)
     const group = await GroupServiceUtils.findGroupById(groupId)
     const reqCategoryId = await BudgetServiceUtils.findCategIdByName(budgetCreateRequestDto.category)
-    const reqSubCategoryId = await BudgetServiceUtils.findSubCategIdByName(budgetCreateRequestDto.subCategory)
+    const reqSubCategoryId = await BudgetServiceUtils.findSubCategIdByName(budgetCreateRequestDto.subCategory, groupId, reqCategoryId)
     await checkForbiddenGroup(user.groupId, groupId)
 
     const event = await prisma.userSpendings.create({
@@ -106,7 +106,8 @@ const showBudget = async (groupId: string) => {
 }
 
 //지출내역 수정
-const updateBudget = async (budgetId: number, BudgetUpdateRequestDto: BudgetUpdateRequestDto) => {
+const updateBudget = async (budgetId: number, groupId: string, BudgetUpdateRequestDto: BudgetUpdateRequestDto) => {
+  let categoryId = await BudgetServiceUtils.findCategIdByName(BudgetUpdateRequestDto.category)
   try {
     const updatedBudget = await prisma.userSpendings.update({
       where: {
@@ -115,11 +116,11 @@ const updateBudget = async (budgetId: number, BudgetUpdateRequestDto: BudgetUpda
       data: {
         spendingName: BudgetUpdateRequestDto.spendingName,
         spendings: BudgetUpdateRequestDto.spending,
-        categoryId: await BudgetServiceUtils.findCategIdByName(BudgetUpdateRequestDto.category),
-        subCategoryId: await BudgetServiceUtils.findSubCategIdByName(BudgetUpdateRequestDto.subCategory),
+        categoryId: categoryId,
+        subCategoryId: await BudgetServiceUtils.findSubCategIdByName(BudgetUpdateRequestDto.subCategory, groupId,categoryId),
       },
     })
-    //return updatedBudget;
+    
 
     const UserName = await UserServiceUtils.getUserNameByUserId(updatedBudget.userId)
     const UserColor = await UserServiceUtils.findUserColorByUserId(updatedBudget.userId)
@@ -202,6 +203,19 @@ const searchBudget = async (groupId: string, searchKey: string) => {
 
 // 서브카테고리 새로 만들기 // categoryName-<id
 const createSubCategory = async (groupId: string, categoryId: number, name: string) => {
+
+  const duplicateName = await prisma.subCategory.findMany({
+    where:{
+      groupId :  groupId,
+      categoryId : categoryId,
+      name :  name
+    }
+  })
+
+  if (duplicateName){
+    throw new Error("한 카테고리에 중복된 서브카테고리 등록은 불가합니다.")
+  }
+  
   const newSubCategory = await prisma.subCategory.create({
     data: {
       name: name,
@@ -209,6 +223,7 @@ const createSubCategory = async (groupId: string, categoryId: number, name: stri
       categoryId: categoryId,
     },
   })
+  
   return newSubCategory
 }
 

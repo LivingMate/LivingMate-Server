@@ -135,12 +135,14 @@ updateBudget
 /budget/:budgetId
 */
 const updateBudget = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+  const userId = req.body.user.id;
+  const groupId = await GroupServiceUtils.findGroupIdByUserId(userId)
   const StrbudgetId = req.params.budgetId
   const budgetId = parseInt(StrbudgetId)
   const BudgetUpdateRequestDto = req.body
 
   try {
-    const data = await BudgetService.updateBudget(budgetId, BudgetUpdateRequestDto)
+    const data = await BudgetService.updateBudget(budgetId, groupId, BudgetUpdateRequestDto)
     res.status(200).send(data)
   } catch (error) {
     res.status(500).json({ error: 'Error Updating Budget Content: Controller' })

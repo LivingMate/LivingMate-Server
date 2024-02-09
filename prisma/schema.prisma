@@ -198,11 +198,12 @@ model SubCategory {
   id         Int             @id @default(autoincrement())
   groupId    String
   categoryId Int
-  name       String          @unique
+  name       String         
   category   Category        @relation(fields: [categoryId], references: [id])
   group      Group           @relation(fields: [groupId], references: [id])
   spendings  UserSpendings[]
 
   @@index([categoryId], map: "SubCategory_categoryId_fkey")
   @@index([groupId], map: "SubCategory_groupId_fkey")
+  
 }

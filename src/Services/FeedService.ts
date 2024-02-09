@@ -98,14 +98,14 @@ const updateFeedContent = async (
 }
 
 //피드 고정
-const pinFeed = async (FeedId: number) => {
+const pinFeed = async (FeedId: number, Pinned: boolean) => {
   try{
     const pinnedFeed = await prisma.feed.update({
       where: {
         id: FeedId,
       },
       data: {
-        pin: true
+        pin: Pinned
       },
     })
 
