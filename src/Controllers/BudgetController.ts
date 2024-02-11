@@ -159,7 +159,7 @@ const doneBudget = async (req: Request, res: Response, next: NextFunction): Prom
     console.log(data)
     res.status(200).send(data)
   } catch (error) {
-    res.status(500).json({ error: 'Error Updating Budget Content: Controller' })
+    res.status(500).json({ error: 'Error Updating Budget Content Done: Controller' })
   }
 }
 

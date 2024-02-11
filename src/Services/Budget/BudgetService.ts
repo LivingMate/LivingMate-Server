@@ -510,7 +510,7 @@ const sendToAdjustments = async (groupId: string, fromId: string, toId: string, 
 const takeFromAdjustments = async (groupId: string) => {
 
   const Adjustment = await prisma.adjustment.findMany({
-    take: 10,
+    
     select: {
       plusUserId: true,
       minusUserId: true,
@@ -577,29 +577,37 @@ const getDayReturn = async (groupId: string) => {
 
 // 정산완료 버튼(isDone update되고, 알림도 줌)
 const isDone = async (groupId: string) => {
-  await prisma.userSpendings.updateMany({
-    where: {
-      groupId: groupId,
-      isDone: false,
-    },
-    data: {
-      isDone: true,
-    },
-  })
+  try{
+    await prisma.userSpendings.updateMany({
+      where: {
+        groupId: groupId,
+        isDone: false,
+      },
+      data: {
+        isDone: true,
+      },
+    })
+  
+    await prisma.adjustment.updateMany({
+      where: {
+        groupId: groupId,
+        isDone: false
+      },
+      data:{
+        isDone: true
+      }
+    })
+  
+    const groupOwner = await UserServiceUtils.findGroupOwner(groupId)
+    // 알림 생성
+    await NotificationService.makeNotification(groupId, groupOwner, "endBudget")
 
-  await prisma.adjustment.updateMany({
-    where: {
-      groupId: groupId,
-      isDone: false
-    },
-    data:{
-      isDone: true
-    }
-  })
-
-  const groupOwner = await UserServiceUtils.findGroupOwner(groupId)
-  // 알림 생성
-  await NotificationService.makeNotification(groupId, groupOwner, "endBudget")
+    return console.log('Successfully updated the isDone status!')
+  }catch (error) {
+      console.error('error :: service/budgetsercive/isDone', error)
+      throw error
+  }
+  
 }
 
 const getAdjustments = async (groupId: string) => {
@@ -610,11 +618,17 @@ const getAdjustments = async (groupId: string) => {
 }
 
 const finalAdjustment = async (groupId: string) => {
-  await getAdjustmentsCalc(groupId)
+  await getAdjustmentsCalc(groupId);
+  await delay(1000);
   
-  const final = await getAdjustments(groupId)
+  const final = await getAdjustments(groupId);
 
   return {final}
+}
+
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export {
