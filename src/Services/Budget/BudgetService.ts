@@ -214,7 +214,7 @@ const createSubCategory = async (groupId: string, categoryId: number, subCategor
       }
     })
     if (duplicateName.length>0){
-      throw new Error("중복된 서브 카테고리를 등록할 수 없습니다.")
+      throw new Error("같은 카테고리 내에 중복된 서브 카테고리를 등록할 수 없습니다.")
     }
     else{
       const newSubCategory = await prisma.subCategory.create({
@@ -251,6 +251,33 @@ const showSubCategory = async (groupId: string, categoryName: string) => {
 
   return SubCategories
 }
+
+//서브카테고리 지우기
+const deleteSubCategory = async (groupId: string, categoryName: string, subCategoryName: string) => {
+  try {
+    const categoryId = await BudgetServiceUtils.findCategIdByName(categoryName);
+    const subCategory = await prisma.subCategory.findMany({
+      where: {
+        groupId: groupId,
+        categoryId: categoryId,
+        name: subCategoryName
+      }
+    });
+    if (subCategory.length<1) {
+      throw new Error('Subcategory not found');
+    }
+    await prisma.subCategory.delete({
+      where: {
+        id: subCategory[0].id 
+      }
+    });
+    return 0;
+  } catch (error) {
+    console.error('subcategory delete failed at service level', error);
+    throw error;
+  }
+}
+
 
 
 //카테고리별 정렬+검색
@@ -650,5 +677,6 @@ export {
   showSubCategory,
   finalAdjustment,
   AdjAtBudget,
-  showByCategory
+  showByCategory,
+  deleteSubCategory
 }

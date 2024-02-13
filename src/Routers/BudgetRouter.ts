@@ -7,7 +7,7 @@ const BudgetRouter = express.Router();
 
 BudgetRouter.get('/budget', auth,  BudgetController.showBudget);
 BudgetRouter.get('/budget/search/:searchKey',auth, BudgetController.getBudgetSearch); 
-BudgetRouter.get('/budget/sub/:categoryName', auth, BudgetController.showSubCategories);
+BudgetRouter.get('/budget/subcat/:categoryName', auth, BudgetController.showSubCategories);
 BudgetRouter.get('/budget/calc', auth, BudgetController.getFinalAdjustment);
 BudgetRouter.get('/budget/calcbudget', auth,  BudgetController.getAdjforBudget);
 BudgetRouter.get('/budget/category/search/:category', auth, BudgetController.getBudgetSearchByCategory);
@@ -20,6 +20,6 @@ BudgetRouter.patch('/budget/update/:budgetId', auth, BudgetController.updateBudg
 BudgetRouter.patch('/budget/done', auth,  BudgetController.doneBudget);
 
 BudgetRouter.delete('/budget/:budgetId', auth, BudgetController.deleteBudget);
-
+BudgetRouter.delete('/budget/subcat/:categoryName/:subCategoryName', auth, BudgetController.deleteSubCategory);
 
 export {BudgetRouter};
