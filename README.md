@@ -1,7 +1,7 @@
+<h2>✨우리들의 공동생활 퍼실리테이터 : LivingMate✨</h2>
+
 ![Frame 13](https://github.com/LivingMate/LivingMate-Server/assets/123355786/ca15e1b2-8840-4737-9c3b-544b232163d7)
-<div>
-	<h2>✨우리들의 공동생활 퍼실리테이터 : LivingMate✨</h2>
-</div>
+
 
 <div>
   <h2>📚Documentation📚</h2>
