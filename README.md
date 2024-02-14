@@ -13,6 +13,7 @@
 
 ![Frame 12](https://github.com/LivingMate/LivingMate-Server/assets/123355786/d08da1f5-1ba3-466c-9982-c2c77f6fcad1)
 
+<h2>⚙️Architectures⚙️</h2>
 ![Frame 17](https://github.com/LivingMate/LivingMate-Server/assets/123355786/46cf2899-d9b0-4c85-aa58-954b4246cf4f)
 
 
