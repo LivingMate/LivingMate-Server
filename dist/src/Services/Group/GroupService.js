@@ -65,6 +65,15 @@ const createGroup = (userId, groupName) => __awaiter(void 0, void 0, void 0, fun
                 groupSpending: 0,
             },
         });
+        for (let index = 1; index < 5; index++) {
+            yield prisma.subCategory.create({
+                data: {
+                    groupId: groupId,
+                    name: "기타",
+                    categoryId: index
+                }
+            });
+        }
         const GroupReturn = yield UserServiceUtils.addUserToGroup(userId, createdGroup.id);
         return createdGroup;
         //return createdGroup;

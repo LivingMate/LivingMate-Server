@@ -40,6 +40,16 @@ const createGroup = async (userId: string, groupName: string) => {
       },
     })
 
+    for(let index = 1; index<5; index++){
+      await prisma.subCategory.create({
+        data: {
+          groupId: groupId,
+          name: "기타",
+          categoryId: index
+        }
+      })
+    }
+
     const GroupReturn = await UserServiceUtils.addUserToGroup(userId, createdGroup.id)
     return createdGroup
 
