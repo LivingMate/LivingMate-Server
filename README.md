@@ -1,3 +1,4 @@
+![Frame 13](https://github.com/LivingMate/LivingMate-Server/assets/123355786/ca15e1b2-8840-4737-9c3b-544b232163d7)
 <div>
 	<h2>✨우리들의 공동생활 퍼실리테이터 : LivingMate✨</h2>
 </div>
@@ -9,13 +10,13 @@
 </div>
 <br>
 
-![Frame 13](https://github.com/LivingMate/LivingMate-Server/assets/123355786/ca15e1b2-8840-4737-9c3b-544b232163d7)
-
 ![Frame 12](https://github.com/LivingMate/LivingMate-Server/assets/123355786/d08da1f5-1ba3-466c-9982-c2c77f6fcad1)
 
-<h2>⚙️Architectures⚙️</h2>
-![Frame 17](https://github.com/LivingMate/LivingMate-Server/assets/123355786/46cf2899-d9b0-4c85-aa58-954b4246cf4f)
-
+<div>
+   <h2>⚙️Architectures⚙️</h2>
+	
+   ![Frame 17](https://github.com/LivingMate/LivingMate-Server/assets/123355786/46cf2899-d9b0-4c85-aa58-954b4246cf4f)
+</div>
 
 <div>
   <h2>🛠Stacks🛠</h2>
