@@ -28,7 +28,7 @@
  </div>
 
 
-<br>
+<br><br>
 <div>
    <h2>⚙️Architectures⚙️</h2>
 	
