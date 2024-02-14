@@ -4,18 +4,18 @@ import dayjs from 'dayjs'
 import { CalendarUpdateDto } from '../../DTOs/Calendar/Request/CalendarUpdateDto'
 import { ParticipantInfo } from '../../DTOs/Calendar/Request/CalendarCreateDto'
 import { CalendarUpdateResponseDto } from '../../DTOs/Calendar/Response/CalendarUpdateResponseDto'
-import { differenceInDays, startOfWeek, endOfWeek } from 'date-fns'
+import { differenceInDays, startOfWeek, endOfWeek, startOfMonth, endOfMonth } from 'date-fns'
 import * as UserServiceUtils from '../User/UserServiceUtils'
 import * as NotificationService from '../NotificationService'
 import { CalendarCreateDto } from '../../DTOs/Calendar/Request/CalendarCreateDto'
 import message from '../../modules/message'
 
 // 캘린더Id로 레코드 갖고오기
-const findCalendarEventById = async (eventId: number) => {
+const findCalendarEventById = async (calendarId: number) => {
   try {
     const event = await prisma.calendar.findUnique({
       where: {
-        id: eventId,
+        id: calendarId,
       },
     })
 
@@ -341,6 +341,21 @@ const getCurrentWeekDates = () => {
   }
 }
 
+// 이번달 날짜 반환
+const getCurrentMonthDates = () => {
+  try {
+    const currentDate = new Date()
+
+    const startDate = startOfMonth(currentDate)
+    const endDate = endOfMonth(currentDate)
+
+    return { startDate, endDate }
+  } catch (error) {
+    console.error('error :: service/calendar/CalendarServiceUtils/getCurrentMonthDates', error)
+    throw error
+  }
+}
+
 // 날짜를 요일로 변환
 const getDayOfWeek = (date: Date): string => {
   const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토']
@@ -559,6 +574,7 @@ export {
   deleteRepeatCalendar,
   deleteThisRepeatCalendar,
   getCurrentWeekDates,
+  getCurrentMonthDates,
   getDayOfWeek,
   groupThisWeekEvents,
   getParticipantsForEvent,

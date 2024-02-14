@@ -471,10 +471,93 @@ const showCalendar = async (groupId: string) => {
   }
 }
 
-const showOneCalendar = async(calendarId:number) => {
+const showMonthCalendar = async (groupId: string) => {
   try {
-    const data = await CalendarServiceUtils.findCalendarEventById(calendarId)
-    return data
+    const { startDate, endDate } = CalendarServiceUtils.getCurrentMonthDates()
+
+    const calendarEventsThisMonth = await prisma.calendar.findMany({
+      where: {
+        groupId: groupId,
+        dateStart: {
+          gte: startDate,
+        },
+        dateEnd: {
+          lte: endDate,
+        },
+      },
+    })
+
+    // 각 이벤트에 대한 참여자 정보 가져오기
+    const calendarEventsWithParticipants = await Promise.all(
+      calendarEventsThisMonth.map(async (event) => {
+        const participants = await prisma.participant.findMany({
+          where: {
+            calendarId: event.id,
+          },
+          select: {
+            userId: true,
+          },
+        })
+
+        // 각 참여자의 상세 정보 가져오기
+        const participantDetails = await Promise.all(
+          participants.map(async (participant) => {
+            const participantInfo = await CalendarServiceUtils.getParticipantInfo(participant.userId)
+
+            return participantInfo
+          }),
+        )
+
+        return {
+          ...event,
+          participants: participantDetails,
+        }
+      }),
+    )
+
+    return calendarEventsWithParticipants
+  } catch (error) {
+    console.error('이번 달의 일정 검색 중 오류', error)
+    throw error
+  }
+}
+
+const showOneCalendar = async (calendarId: number) => {
+  try {
+    const calendarEvents = await prisma.calendar.findMany({
+      where: {
+        id: calendarId,
+      },
+    })
+
+    // 각 이벤트에 대한 참여자 정보 가져오기
+    const calendarEventsWithParticipants = await Promise.all(
+      calendarEvents.map(async (event) => {
+        const participants = await prisma.participant.findMany({
+          where: {
+            calendarId: event.id,
+          },
+          select: {
+            userId: true,
+          },
+        })
+
+        // 각 참여자의 상세 정보 가져오기
+        const participantDetails = await Promise.all(
+          participants.map(async (participant) => {
+            const participantInfo = await CalendarServiceUtils.getParticipantInfo(participant.userId)
+
+            return participantInfo
+          }),
+        )
+
+        return {
+          ...event,
+          participants: participantDetails,
+        }
+      }),
+    )
+    return calendarEventsWithParticipants
   } catch (error) {
     console.error('개별 일정 반환 오류', error)
     throw error
@@ -517,7 +600,7 @@ const getThisWeeksDuty = async (groupId: string) => {
       const dateA = new Date(a.dateStart).getTime()
       const dateB = new Date(b.dateStart).getTime()
       return dateA - dateB
-    });
+    })
 
     const data = await Promise.all(
       groupedEvents.map(async (group) => {
@@ -552,7 +635,6 @@ const getThisWeeksDuty = async (groupId: string) => {
 const showSchedule = async (groupId: string) => {
   try {
     const scheduleEvents = await prisma.schedule.findMany({
-      take: 100,
       where: {
         groupId: groupId,
       },
@@ -567,10 +649,10 @@ const showSchedule = async (groupId: string) => {
     })
     const scheduleEventsWithParsedDates = scheduleEvents.map((event) => ({
       ...event,
-      dates: JSON.parse(event.dates),
-    }))
+      dates: typeof event.dates === 'string' ? JSON.parse(event.dates) : event.dates,
+    }));
 
-    return scheduleEventsWithParsedDates
+    return scheduleEventsWithParsedDates;
   } catch (error) {
     console.error('스케줄 반환 오류', error)
     throw error
@@ -620,6 +702,7 @@ export {
   createScheduling,
   showCalendar,
   showOneCalendar,
+  showMonthCalendar,
   updateCalendar,
   deleteCalendar,
   deleteSchedule,

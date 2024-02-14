@@ -44,6 +44,7 @@ const message = {
     READ_CAL_SUCCESS: '일정 조회 성공입니다.',
     READ_ONE_CAL_SUCCESS: '일정 조회 성공입니다.',
     READ_THISWEEK_SUCCESS: '이번주 일정 조회 성공입니다.',
+    READ_THIMONTH_SUCCESS: '이번달 일정 조회 성공입니다.',
     CREATE_SCDL_SUCCESS: '스케줄 생성 성공입니다.',
     READ_SCDL_SUCCESS: '스케줄 조회 성공입니다.',
     CREATE_TS_SUCCESS: '타임슬럿 생성 성공입니다.',
