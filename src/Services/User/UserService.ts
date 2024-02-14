@@ -160,17 +160,22 @@ const userSetGet = async (userId:string) => {
 // 유저 알림 설정 여부(on off)
 const notiYesNo = async (userId: string, notificationState:boolean) => {
   try {
+    const currentDate = new Date();
+    currentDate.setHours(currentDate.getHours() + 9);
+
     const notiState = await prisma.userNoti.update({
       where: {
         userId: userId,
       },
       data: {
         state: notificationState,
+        updatedAt: currentDate,
       },
     })
 
     const data = {
-      notificationState : notiState.state
+      notificationState : notiState.state,
+      updatedAt: notiState.updatedAt,
     }
   
     return data
