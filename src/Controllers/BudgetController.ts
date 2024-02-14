@@ -24,6 +24,27 @@ const showBudget = async (req: Request, res: Response, next: NextFunction): Prom
   }
 }
 
+
+/*
+get
+/budget/:budgetId
+*/
+
+const getBudget = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+  const BudgetId = req.params.budgetId;
+  try {
+    const data = await BudgetService.showBudget(BudgetId)
+
+    return res.send(data)
+  } catch (error) {
+    res.status(500).json({ error: 'Error Fetching Budget Data: Controller' })
+  }
+}
+
+
+
+
+
 /*
   get
   /:groupId
@@ -227,5 +248,6 @@ export { createsubCategory,
   getFinalAdjustment, 
   getAdjforBudget, 
   getBudgetSearchByCategory,
-  deleteSubCategory 
+  deleteSubCategory,
+  getBudget 
 }

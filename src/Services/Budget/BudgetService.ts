@@ -161,6 +161,49 @@ const deleteBudget = async (BudgetId: number) => {
   }
 }
 
+//지출내역 한 개 반환
+const getBudget = async( BudgetId: number) =>{
+  try{
+    const Budget = await prisma.userSpendings.findUnique({
+      where:{
+        id : BudgetId
+      }
+    })
+
+    const userId = Budget?.userId;
+    if(!userId){
+      return "User Not Found : getBudget"
+    }
+
+    const resName = await UserServiceUtils.getUserNameByUserId(userId);
+    const resColor = await UserServiceUtils.findUserColorByUserId(userId);
+    const resCategory = await BudgetServiceUtils.changeCategIdToName(Budget.categoryId);
+    const resSubCategory = await BudgetServiceUtils.changeSubCategIdToName(Budget.subCategoryId);
+
+
+    const budgetToReturn: BudgetCreateResponseDto = {
+      userColor: resColor,
+      userName: resName,
+      id: Budget.id,
+      userId: Budget.userId,
+      groupId: Budget.groupId,
+      createdAt: Budget.createdAt,
+      spendings: Budget.spendings,
+      spendingName: Budget.spendingName,
+      category: resCategory,
+      subCategory: resSubCategory,
+    }
+    return budgetToReturn
+  }catch (error) {
+    throw new Error('error :: service/budget/getBudget')
+  }
+}
+
+
+
+
+
+
 //지출내역 검색
 const searchBudget = async (groupId: string, searchKey: string) => {
   try {
@@ -678,5 +721,6 @@ export {
   finalAdjustment,
   AdjAtBudget,
   showByCategory,
-  deleteSubCategory
+  deleteSubCategory,
+  getBudget
 }
