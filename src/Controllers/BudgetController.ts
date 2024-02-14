@@ -199,15 +199,33 @@ const showSubCategories = async (req: Request, res: Response, next: NextFunction
   }
 }
 
+/*
+deleteSubCategory
+*/
+const deleteSubCategory = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+  const userId = req.body.user.id;
+  const groupId = await GroupServiceUtils.findGroupIdByUserId(userId);
+  const categoryName = req.params.categoryName;
+  const subCategoryName = req.params.subCategoryName;
+
+  try {
+    await BudgetService.deleteSubCategory(groupId, categoryName, subCategoryName)
+    res.status(200).send()
+  } catch (error) {
+    res.status(500).json({ error: 'Error Deleting SubCategory: Controller' })
+  }
+}
+
 export { createsubCategory, 
   updateBudget,
   doneBudget, 
   deleteBudget, 
   createBudget, 
   getBudgetSearch,
-   showBudget, 
-   showSubCategories,
-    getFinalAdjustment, 
-    getAdjforBudget, 
-    getBudgetSearchByCategory 
+  showBudget, 
+  showSubCategories,
+  getFinalAdjustment, 
+  getAdjforBudget, 
+  getBudgetSearchByCategory,
+  deleteSubCategory 
 }
