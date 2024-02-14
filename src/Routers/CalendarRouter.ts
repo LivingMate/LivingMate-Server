@@ -15,7 +15,8 @@ CalendarRouter.delete('/calendar/delete/schedule/:scheduleId', auth, CalendarCon
 
 CalendarRouter.get('/calendar', auth, CalendarController.showCalendar)
 CalendarRouter.get('/calendar/:calendarId', auth, CalendarController.showOneCalendar)
-CalendarRouter.get('/calendar/thisweek', auth, CalendarController.getThisWeeksDuty)
-CalendarRouter.get('/calendar/schedule', auth, CalendarController.showSchedule)
+CalendarRouter.get('/calendar/get/month', auth, CalendarController.showMonthCalendar)
+CalendarRouter.get('/calendar/get/week', auth, CalendarController.getThisWeeksDuty)
+CalendarRouter.get('/calendar/schedule/schedule', auth, CalendarController.showSchedule)
 CalendarRouter.get('/calendar/schedule/timeslot/:scheduleId', auth, CalendarController.showScheduling)
 export { CalendarRouter }

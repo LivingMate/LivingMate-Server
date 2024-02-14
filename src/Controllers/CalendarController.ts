@@ -182,6 +182,20 @@ const showOneCalendar = async (req: Request, res: Response) => {
   }
 }
 
+const showMonthCalendar = async (req: Request, res: Response) => {
+  const userId = req.body.user.id;
+  const groupId = await GroupServiceUtils.findGroupIdByUserId(userId);
+
+  try {
+    const calendarEvents = await CalendarService.showMonthCalendar(groupId)
+    return res.status(statusCode.OK).send(util.success(statusCode.OK, message.READ_THIMONTH_SUCCESS, calendarEvents))
+
+  } catch (error) {
+    console.error('Error getting month calendar events', error)
+    res.status(500).json({ error: 'Internal Server Error' })
+  }
+}
+
 const showSchedule = async (req: Request, res: Response) => {
   const userId = req.body.user.id;
   const groupId = await GroupServiceUtils.findGroupIdByUserId(userId);
@@ -221,6 +235,7 @@ export {
   getThisWeeksDuty,
   showCalendar,
   showOneCalendar,
+  showMonthCalendar,
   showSchedule,
   showScheduling
 }
