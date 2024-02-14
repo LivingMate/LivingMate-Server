@@ -17,7 +17,7 @@ model User {
   sex             String
   notiDTime       DateTime        @default(dbgenerated("NOW()")) @db.DateTime(0)
   createdAt       DateTime        @default(dbgenerated("NOW()")) @db.DateTime(0)  
-  updatedAt       DateTime        @updatedAt @db.DateTime(0)
+  updatedAt       DateTime        @updatedAt @default(dbgenerated("NOW()"))
   password        String
   AdjustmentMinus Adjustment[]    @relation("minusUser")
   AdjustmentPlus  Adjustment[]    @relation("plusUser")
@@ -97,8 +97,8 @@ model Calendar {
   userId      String
   groupId     String
   title       String        @db.VarChar(255)
-  dateStart   DateTime      @db.DateTime(0)
-  dateEnd     DateTime      @db.DateTime(0)
+  dateStart   DateTime      @default(dbgenerated("NOW()")) @db.DateTime(0)
+  dateEnd     DateTime      @default(dbgenerated("NOW()")) @db.DateTime(0)
   memo        String        @db.Text
   term        Int
   group       Group         @relation(fields: [groupId], references: [id])
