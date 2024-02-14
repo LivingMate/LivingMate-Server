@@ -8,7 +8,7 @@
 <a href="https://chill-hellebore-048.notion.site/LivingMate-ERD-92817655490d49e19884f848dd343750?pvs=4"><img src="https://img.shields.io/badge/DB%20ERD-%23000000?style=flat-square&logo=notion&logoColor=white&link=https%3A%2F%2Fchill-hellebore-048.notion.site%2FLivingMate-ERD-92817655490d49e19884f848dd343750%3Fpvs%3D4"></a>
 </div>
 <br>
-
+![Frame 13](https://github.com/LivingMate/LivingMate-Server/assets/123355786/e65835d7-03fe-42f4-9c59-106eea240fa6)
 ![Frame 12](https://github.com/LivingMate/LivingMate-Server/assets/123355786/d08da1f5-1ba3-466c-9982-c2c77f6fcad1)
 
 
