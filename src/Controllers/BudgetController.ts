@@ -31,9 +31,11 @@ get
 */
 
 const getBudget = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
-  const BudgetId = req.params.budgetId;
+  const strbudgetId = req.params.budgetId;
+  const BudgetId = parseInt(strbudgetId);
+
   try {
-    const data = await BudgetService.showBudget(BudgetId)
+    const data = await BudgetService.getBudget(BudgetId)
 
     return res.send(data)
   } catch (error) {
