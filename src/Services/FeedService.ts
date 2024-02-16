@@ -38,6 +38,7 @@ const createFeed = async (userId: string, groupId: string, content: string): Pro
 
     const resUserName = await UserServiceUtils.getUserNameByUserId(event.userId)
     const resUserColor = await UserServiceUtils.findUserColorByUserId(event.userId)
+    await NotificationService.makeNotification(groupId, userId, 'createFeed')
 
     const data: FeedCreateResponseDto = {
       feedId: event.id,
