@@ -39,6 +39,7 @@ exports.updateFeedContent = exports.showFeed = exports.pinFeed = exports.findFee
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const UserServiceUtils = __importStar(require("./User/UserServiceUtils"));
+const NotificationService = __importStar(require("./NotificationService"));
 const message_1 = __importDefault(require("../modules/message"));
 // -------utils--------
 // 존재하는 feedId인지 찾기
@@ -69,6 +70,7 @@ const createFeed = (userId, groupId, content) => __awaiter(void 0, void 0, void 
         });
         const resUserName = yield UserServiceUtils.getUserNameByUserId(event.userId);
         const resUserColor = yield UserServiceUtils.findUserColorByUserId(event.userId);
+        yield NotificationService.makeNotification(groupId, userId, 'createFeed');
         const data = {
             feedId: event.id,
             userId: event.userId,

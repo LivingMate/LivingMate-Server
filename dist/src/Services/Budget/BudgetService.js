@@ -557,14 +557,18 @@ const takeFromAdjustments = (groupId) => __awaiter(void 0, void 0, void 0, funct
         if (!record.plusUserId || !record.minusUserId) {
             throw new Error('Null Error: Adjustment to Return');
         }
+        let plusUserId = record.plusUserId;
         let plusUserName = yield UserServiceUtils.getUserNameByUserId(record.plusUserId);
         let plusUserColor = yield UserServiceUtils.findUserColorByUserId(record.plusUserId);
+        let minusUserId = record.minusUserId;
         let minusUserName = yield UserServiceUtils.getUserNameByUserId(record.minusUserId);
         let minusUserColor = yield UserServiceUtils.findUserColorByUserId(record.plusUserId);
         let change = record.change;
         AdjustmentToReturn.push({
+            plusUserId,
             plusUserName,
             plusUserColor,
+            minusUserId,
             minusUserName,
             minusUserColor,
             change,
