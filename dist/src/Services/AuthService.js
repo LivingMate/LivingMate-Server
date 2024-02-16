@@ -37,6 +37,14 @@ const login = (loginDto) => __awaiter(void 0, void 0, void 0, function* () {
                 msg: message_1.default.INVALID_PASSWORD,
                 statusCode: statusCode_1.default.UNAUTHORIZED
             });
+        /*
+      const isGroupped = await GroupServiceUtils.findGroupIdByUserId(user.id);
+      if (isGroupped == "aaaaaa"){
+        throw errorGenerator({
+          msg:
+        })
+  
+      }*/
         const data = {
             userId: user.id
         };

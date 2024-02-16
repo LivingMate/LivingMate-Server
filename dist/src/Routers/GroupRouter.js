@@ -36,4 +36,5 @@ GroupRouter.post('/group/create', auth_1.default, GroupController.createGroup);
 GroupRouter.patch('/group/insert', auth_1.default, GroupController.goGroup);
 GroupRouter.patch('/group/patch', auth_1.default, GroupController.updateGroupName);
 GroupRouter.patch('/group/leave', auth_1.default, GroupController.leaveGroup);
+GroupRouter.get('/group/invitation', auth_1.default, GroupController.getGroupId);
 //# sourceMappingURL=GroupRouter.js.map

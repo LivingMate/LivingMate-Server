@@ -35,8 +35,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.leaveGroup = exports.updateGroupName = exports.goGroup = exports.createGroup = void 0;
+exports.getGroupId = exports.leaveGroup = exports.updateGroupName = exports.goGroup = exports.createGroup = void 0;
 const GroupService = __importStar(require("../Services/Group/GroupService"));
+const GroupServiceUtils = __importStar(require("../Services/Group/GroupServiceUtils"));
 const statusCode_1 = __importDefault(require("../modules/statusCode"));
 const message_1 = __importDefault(require("../modules/message"));
 const util_1 = __importDefault(require("../modules/util"));
@@ -96,4 +97,18 @@ const leaveGroup = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.leaveGroup = leaveGroup;
+// groupId get해주기 
+const getGroupId = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.body.user.id;
+    try {
+        const data = yield GroupServiceUtils.findGroupIdByUserId(userId);
+        console.log(data);
+        return res.status(statusCode_1.default.OK).send(util_1.default.success(statusCode_1.default.OK, message_1.default.INVITATION_GROUP_SUCCESS, data));
+    }
+    catch (error) {
+        console.error('Error at getting GroupId : Controller', error);
+        res.status(500).json({ error: 'Error getting GroupId: Controller' });
+    }
+});
+exports.getGroupId = getGroupId;
 //# sourceMappingURL=GroupController.js.map

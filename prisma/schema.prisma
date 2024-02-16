@@ -17,7 +17,6 @@ model User {
   birth           String
   sex             String
   createdAt       DateTime        @default(dbgenerated("NOW()")) @db.DateTime(0)  
-  updatedAt       DateTime        @updatedAt() @db.DateTime(0)
   password        String
   AdjustmentMinus Adjustment[]    @relation("minusUser")
   AdjustmentPlus  Adjustment[]    @relation("plusUser")
