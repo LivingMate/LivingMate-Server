@@ -595,8 +595,10 @@ const takeFromAdjustments = async (groupId: string) => {
   console.log(Adjustment);
 
   const AdjustmentToReturn: {
+    plusUserId: string
     plusUserName: string
     plusUserColor: string
+    minusUserId: string
     minusUserName: string
     minusUserColor: string
     change: number
@@ -608,15 +610,19 @@ const takeFromAdjustments = async (groupId: string) => {
         throw new Error('Null Error: Adjustment to Return')
       }
 
+      let plusUserId = record.plusUserId
       let plusUserName = await UserServiceUtils.getUserNameByUserId(record.plusUserId)
       let plusUserColor = await UserServiceUtils.findUserColorByUserId(record.plusUserId)
+      let minusUserId = record.minusUserId
       let minusUserName = await UserServiceUtils.getUserNameByUserId(record.minusUserId)
       let minusUserColor = await UserServiceUtils.findUserColorByUserId(record.plusUserId)
       let change = record.change
 
       AdjustmentToReturn.push({
+        plusUserId,
         plusUserName,
         plusUserColor,
+        minusUserId,
         minusUserName,
         minusUserColor,
         change,
