@@ -143,4 +143,8 @@ const outGroup = async (userId: string) => {
   }
 }
 
+
+
+
+
 export { createGroup, goGroup, leaveGroup, updateGroupName, outGroup }

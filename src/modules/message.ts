@@ -81,6 +81,7 @@ const message = {
     UPDATE_GROUP_SUCCESS: '그룹 이름 변경 성공입니다.',
     JOIN_GROUP_SUCCESS: '그룹 참가 성공입니다.',
     LEAVE_GROUP_SUCCESS: '그룹 탈퇴 성공입니다.',
+    INVITATION_GROUP_SUCCESS: '그룹 코드를 발급했습니다.',
   
 
     // 사용자

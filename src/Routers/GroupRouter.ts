@@ -11,4 +11,5 @@ GroupRouter.patch('/group/insert', auth, GroupController.goGroup)
 GroupRouter.patch('/group/patch', auth, GroupController.updateGroupName)
 GroupRouter.patch('/group/leave', auth, GroupController.leaveGroup)
 
+GroupRouter.get('/group/invitation', auth, GroupController.getGroupId)
 export { GroupRouter }

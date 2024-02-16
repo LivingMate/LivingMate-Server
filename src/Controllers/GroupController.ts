@@ -63,4 +63,18 @@ const leaveGroup = async (req: Request, res: Response, next: NextFunction) => {
   }
 }
 
-export { createGroup, goGroup, updateGroupName, leaveGroup }
+// groupId get해주기 
+const getGroupId = async(req: Request, res: Response, next: NextFunction) => {
+  const userId = req.body.user.id
+
+  try {
+    const data = await GroupServiceUtils.findGroupIdByUserId(userId)
+    console.log(data)
+    return res.status(statusCode.OK).send(util.success(statusCode.OK, message.INVITATION_GROUP_SUCCESS, data))
+  } catch (error) {
+    console.error('Error at getting GroupId : Controller', error)
+    res.status(500).json({ error: 'Error getting GroupId: Controller' })
+  }
+}
+
+export { createGroup, goGroup, updateGroupName, leaveGroup, getGroupId }
