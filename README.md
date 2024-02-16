@@ -32,7 +32,7 @@
 <div>
    <h2>⚙️Architectures⚙️</h2>
 	
-   ![Frame 17](https://github.com/LivingMate/LivingMate-Server/assets/123355786/46cf2899-d9b0-4c85-aa58-954b4246cf4f)
+   ![architecture](https://github.com/LivingMate/LivingMate-Server/assets/123355786/92638f3c-38c5-4105-ad2e-3fff557c784f)
 </div>
 
 
