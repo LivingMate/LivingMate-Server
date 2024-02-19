@@ -54,6 +54,7 @@ const createBudget = async (
       userColor: resUserColor,
       userName: resUserName,
       createdAt: event.createdAt,
+      isDone: event.isDone
     }
 
     
@@ -96,6 +97,7 @@ const showBudget = async (groupId: string) => {
           userColor: resUserColor,
           userName: resUserName,
           createdAt: budget.createdAt,
+          isDone: budget.isDone
         })
       }),
     )
@@ -140,6 +142,7 @@ const updateBudget = async (budgetId: number, groupId: string, BudgetUpdateReque
       spendingName: updatedBudget.spendingName,
       category: resCategory,
       subCategory: resSubCategory,
+      isDone: updatedBudget.isDone
     }
     return budgetToReturn
   } catch (error) {
@@ -192,6 +195,7 @@ const getBudget = async( BudgetId: number) =>{
       spendingName: Budget.spendingName,
       category: resCategory,
       subCategory: resSubCategory,
+      isDone: Budget.isDone
     }
     return budgetToReturn
   }catch (error) {
@@ -236,6 +240,7 @@ const searchBudget = async (groupId: string, searchKey: string) => {
           userColor: resUserColor,
           userName: resUserName,
           createdAt: budget.createdAt,
+          isDone : budget.isDone
         })
       }),
     )
@@ -353,6 +358,7 @@ const showByCategory = async(groupId:string, category: string)=>{
           userColor: resUserColor,
           userName: resUserName,
           createdAt: budget.createdAt,
+          isDone : budget.isDone
         })
       }),
     )
