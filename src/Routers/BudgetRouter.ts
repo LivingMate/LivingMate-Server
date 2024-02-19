@@ -8,10 +8,11 @@ const BudgetRouter = express.Router();
 BudgetRouter.get('/budget', auth,  BudgetController.showBudget);
 BudgetRouter.get('/budget/search/:searchKey',auth, BudgetController.getBudgetSearch); 
 BudgetRouter.get('/budget/subcat/:categoryName', auth, BudgetController.showSubCategories);
-BudgetRouter.get('/budget/calc', auth, BudgetController.getFinalAdjustment);
+BudgetRouter.get('/budget/calc', auth, BudgetController.getAdjCalc);
 BudgetRouter.get('/budget/calcbudget', auth,  BudgetController.getAdjforBudget);
 BudgetRouter.get('/budget/category/search/:category', auth, BudgetController.getBudgetSearchByCategory);
 BudgetRouter.get('/budget/:budgetId',auth, BudgetController.getBudget);
+BudgetRouter.get('/budget/calc/adjnoti', auth, BudgetController.getAdjNoti);
 
 BudgetRouter.post('/budget', auth, BudgetController.createBudget);
 BudgetRouter.post('/budget/subcat/:categoryName', auth,  BudgetController.createsubCategory);

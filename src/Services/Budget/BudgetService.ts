@@ -514,6 +514,7 @@ const AdjAtBudget = async (groupId: string) => {
 }
 
 //정산파트2//
+//정산알림보내기
 const getAdjustmentsCalc = async (groupId: string) => {
   const GroupMemberSpendingsAfter = await getGroupMemberSpending(groupId)
 
@@ -562,7 +563,7 @@ const getAdjustmentsCalc = async (groupId: string) => {
       // console.log('whileneg', Negatives)
     }
   }
-  return 0
+  return console.log("정산이 시작되었습니다.")
 }
 
 const sendToAdjustments = async (groupId: string, fromId: string, toId: string, change: number) => {
@@ -686,6 +687,7 @@ const isDone = async (groupId: string) => {
   
 }
 
+//정산 알림 내역
 const getAdjustments = async (groupId: string) => {
   const AdjustedResult = await takeFromAdjustments(groupId)
   const LastCalculatedDate = await getDayReturn(groupId)
@@ -693,6 +695,7 @@ const getAdjustments = async (groupId: string) => {
   return { LastCalculatedDate, AdjustedResult }
 }
 
+/*
 const finalAdjustment = async (groupId: string) => {
   await getAdjustmentsCalc(groupId);
   await delay(1000);
@@ -701,6 +704,8 @@ const finalAdjustment = async (groupId: string) => {
 
   return {final}
 }
+*/
+
 
 
 function delay(ms: number) {
@@ -713,18 +718,12 @@ export {
   updateBudget,
   deleteBudget,
   getGroupMemberSpending,
-  //getDayReturn,
-  //updateSubCategory,
-  //updateNewSubCategory,
-  //takeFromAdjustments,
-  //sendToAdjustments,
-  //getAdjustmentsCalc,
+  getAdjustmentsCalc,
   isDone,
   getAdjustments,
   searchBudget,
   createSubCategory,
   showSubCategory,
-  finalAdjustment,
   AdjAtBudget,
   showByCategory,
   deleteSubCategory,
