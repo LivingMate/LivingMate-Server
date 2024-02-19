@@ -58,7 +58,7 @@ const createUser = async (signupDtO: SignupDto) => {
   return data
 }
 
-// 마이페이지 유저 정보 반환(본인 제외)
+// 마이페이지 유저 정보 반환
 const getUserProfile = async (userId: string) => {
   try {
     const userProfile = await UserServiceUtils.findUserById(userId)
@@ -77,11 +77,13 @@ const getUserProfile = async (userId: string) => {
     const userGroupMembersNamesColors = userGroupMembers
       .filter(member => member.id !== userId) // 자신의 정보 제외
       .map(member => ({
+        userId: member.id,
         userName: member.userName,
         userColor: member.userColor,
       }));
 
     const data = {
+      userId: userId,
       userName: userProfile.userName,
       userColor: userProfile.userColor,
       groupName: groupName,
