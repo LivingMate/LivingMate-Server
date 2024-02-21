@@ -37,7 +37,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getGroupId = exports.leaveGroup = exports.updateGroupName = exports.goGroup = exports.createGroup = void 0;
 const GroupService = __importStar(require("../Services/Group/GroupService"));
-const GroupServiceUtils = __importStar(require("../Services/Group/GroupServiceUtils"));
 const statusCode_1 = __importDefault(require("../modules/statusCode"));
 const message_1 = __importDefault(require("../modules/message"));
 const util_1 = __importDefault(require("../modules/util"));
@@ -101,7 +100,7 @@ exports.leaveGroup = leaveGroup;
 const getGroupId = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.body.user.id;
     try {
-        const data = yield GroupServiceUtils.findGroupIdByUserId(userId);
+        const data = yield GroupService.getIdandName(userId);
         console.log(data);
         return res.status(statusCode_1.default.OK).send(util_1.default.success(statusCode_1.default.OK, message_1.default.INVITATION_GROUP_SUCCESS, data));
     }

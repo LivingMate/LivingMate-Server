@@ -32,7 +32,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getBudget = exports.deleteSubCategory = exports.getBudgetSearchByCategory = exports.getAdjforBudget = exports.getFinalAdjustment = exports.showSubCategories = exports.showBudget = exports.getBudgetSearch = exports.createBudget = exports.deleteBudget = exports.doneBudget = exports.updateBudget = exports.createsubCategory = void 0;
+exports.getAdjNoti = exports.getBudget = exports.deleteSubCategory = exports.getBudgetSearchByCategory = exports.getAdjforBudget = exports.getAdjCalc = exports.showSubCategories = exports.showBudget = exports.getBudgetSearch = exports.createBudget = exports.deleteBudget = exports.doneBudget = exports.updateBudget = exports.createsubCategory = void 0;
 const BudgetService = __importStar(require("../Services/Budget/BudgetService"));
 const BudgetServiceUtil = __importStar(require("../Services/Budget/BudgetServiceUtils"));
 const GroupServiceUtils = __importStar(require("../Services/Group/GroupServiceUtils"));
@@ -107,20 +107,33 @@ const getBudgetSearchByCategory = (req, res, next) => __awaiter(void 0, void 0, 
 exports.getBudgetSearchByCategory = getBudgetSearchByCategory;
 // /*
 // get
-// 정산
+// 정산 알림 보내기 
 // */
-const getFinalAdjustment = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const getAdjCalc = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.body.user.id;
     const groupId = yield GroupServiceUtils.findGroupIdByUserId(userId);
     try {
-        const data = yield BudgetService.finalAdjustment(groupId);
+        const data = yield BudgetService.getAdjustmentsCalc(groupId);
         return res.send(data);
     }
     catch (error) {
-        res.status(500).json({ error: 'Error getting FinalAdjustment: Controller' });
+        res.sendStatus(500).json({ error: 'Error getting Adj Calculated: Controller' });
     }
 });
-exports.getFinalAdjustment = getFinalAdjustment;
+exports.getAdjCalc = getAdjCalc;
+//정산 알림 내역
+const getAdjNoti = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.body.user.id;
+    const groupId = yield GroupServiceUtils.findGroupIdByUserId(userId);
+    try {
+        const data = yield BudgetService.getAdjustments(groupId);
+        return res.send(data);
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Error getting AdjNoti content: Controller' });
+    }
+});
+exports.getAdjNoti = getAdjNoti;
 const getAdjforBudget = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.body.user.id;
     const groupId = yield GroupServiceUtils.findGroupIdByUserId(userId);
