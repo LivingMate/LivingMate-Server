@@ -92,18 +92,33 @@ const getBudgetSearchByCategory = async(req: Request, res: Response, next: NextF
 
 // /*
 // get
-// 정산
+// 정산 알림 보내기 
 // */
-const getFinalAdjustment = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+const getAdjCalc = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
   const userId = req.body.user.id;
   const groupId = await GroupServiceUtils.findGroupIdByUserId(userId);
   
   try {
-    const data = await BudgetService.finalAdjustment(groupId);
+    const data = await BudgetService.getAdjustmentsCalc(groupId);
 
     return res.send(data)
   } catch (error) {
-    res.status(500).json({ error: 'Error getting FinalAdjustment: Controller' })
+    res.sendStatus(500).json({ error: 'Error getting Adj Calculated: Controller' })
+  }
+}
+
+
+//정산 알림 내역
+const getAdjNoti = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+  const userId = req.body.user.id;
+  const groupId = await GroupServiceUtils.findGroupIdByUserId(userId);
+  
+  try {
+    const data = await BudgetService.getAdjustments(groupId);
+
+    return res.send(data)
+  } catch (error) {
+    res.status(500).json({ error: 'Error getting AdjNoti content: Controller' })
   }
 }
 
@@ -247,9 +262,10 @@ export { createsubCategory,
   getBudgetSearch,
   showBudget, 
   showSubCategories,
-  getFinalAdjustment, 
+  getAdjCalc,
   getAdjforBudget, 
   getBudgetSearchByCategory,
   deleteSubCategory,
-  getBudget 
+  getBudget,
+  getAdjNoti 
 }
