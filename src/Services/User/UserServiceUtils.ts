@@ -86,9 +86,6 @@ const findUserColorByUserId = async (userId: string) => {
 
 //+ 그룹 참여하는 서비스
 const addUserToGroup = async (userId: string, groupId: string) => {
-  //1. createUser with signupDTO
-  //2. put her groupId in her record at User table
-  //3. assign her id(? not sure) to Group's User[]? Did it mean it had foreign relations with the table?
 
   await prisma.user.update({
     where: {
@@ -102,6 +99,20 @@ const addUserToGroup = async (userId: string, groupId: string) => {
   await NotificationService.makeNotification(groupId, userId, 'newUser')
   
   //return data
+}
+
+// userNoti groupId도 바꿔주기
+const addUserNotiToGroup = async (userId: string, groupId: string) => {
+  
+  await prisma.userNoti.update({
+    where: {
+      userId: userId,
+    },
+    data: {
+      groupId: groupId,
+    },
+  })
+  
 }
 
 const createColor = async () => {
@@ -193,6 +204,7 @@ export {
   updateUserColor,
   findUserColorByUserId,
   addUserToGroup,
+  addUserNotiToGroup,
   createColor,
   duplicateId,
   createUserId,

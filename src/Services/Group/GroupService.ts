@@ -23,6 +23,27 @@ const createGroupId = async () => {
   return result
 }
 
+// 그룹 아이디, 그룹 이름 받아오기
+const getIdandName = async( userId:string ) => {
+  try {
+    const user = await UserServiceUtils.findUserById(userId)
+    const group = await GroupServiceUtils.findGroupById(user.groupId)
+
+    const data = {
+      groupId : user.groupId,
+      groupName : group.groupName
+    }
+
+    return data
+
+  } catch (error) {
+    console.error('error :: group/GroupService/getIdandName', error)
+    throw error
+  }
+}
+
+
+
 // 방장이 자신의 그룹 생성 후 자신 그룹 참여
 const createGroup = async (userId: string, groupName: string) => {
   try {
@@ -51,6 +72,8 @@ const createGroup = async (userId: string, groupName: string) => {
     }
 
     const GroupReturn = await UserServiceUtils.addUserToGroup(userId, createdGroup.id)
+    await UserServiceUtils.addUserNotiToGroup(user.id, groupId)
+
     return createdGroup
 
     //return createdGroup;
@@ -66,6 +89,8 @@ const goGroup = async (userId: string, groupId: string) => {
     const user = await UserServiceUtils.findUserById(userId)
 
     const GroupReturn = await UserServiceUtils.addUserToGroup(user.id, groupId)
+    await UserServiceUtils.addUserNotiToGroup(user.id, groupId)
+
     return GroupReturn
   } catch (error) {
     console.error('Error at entering Group: group service', error)
@@ -147,4 +172,4 @@ const outGroup = async (userId: string) => {
 
 
 
-export { createGroup, goGroup, leaveGroup, updateGroupName, outGroup }
+export { createGroup, getIdandName, goGroup, leaveGroup, updateGroupName, outGroup }

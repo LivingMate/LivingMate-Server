@@ -68,9 +68,11 @@ const getGroupId = async(req: Request, res: Response, next: NextFunction) => {
   const userId = req.body.user.id
 
   try {
-    const data = await GroupServiceUtils.findGroupIdByUserId(userId)
+    
+    const data = await GroupService.getIdandName(userId)
     console.log(data)
     return res.status(statusCode.OK).send(util.success(statusCode.OK, message.INVITATION_GROUP_SUCCESS, data))
+
   } catch (error) {
     console.error('Error at getting GroupId : Controller', error)
     res.status(500).json({ error: 'Error getting GroupId: Controller' })

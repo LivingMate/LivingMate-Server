@@ -176,9 +176,9 @@ const createScheduling = async (
 
       const selectedByArray = JSON.parse(event.selectedBy)
 
-      const participantsInfo: ParticipantInfo[] = await Promise.all(
-        selectedByArray.map(async (userId: string) => await CalendarServiceUtils.getParticipantInfo(userId)),
-      )
+      // const participantsInfo: ParticipantInfo[] = await Promise.all(
+      //   selectedByArray.map(async (userId: string) => await CalendarServiceUtils.getParticipantInfo(userId)),
+      // )
 
       const data: SchedulingCreateResponseDto = {
         schedulingId: event.id,
@@ -186,7 +186,7 @@ const createScheduling = async (
         scheduleId: scheduleId,
         date: event.date,
         time: event.time,
-        selectedBy: participantsInfo,
+        selectedBy: selectedByArray,
       }
 
       responseData.push(data)
@@ -474,6 +474,7 @@ const showCalendar = async (groupId: string) => {
 const showMonthCalendar = async (groupId: string) => {
   try {
     const { startDate, endDate } = CalendarServiceUtils.getCurrentMonthDates()
+    // const year =  num.split('-').[0]
 
     const calendarEventsThisMonth = await prisma.calendar.findMany({
       where: {
@@ -678,13 +679,13 @@ const showScheduling = async (groupId: string, scheduleId: number) => {
     const schedulingEventsWithUserInfo = await Promise.all(
       schedulingEvents.map(async (event) => {
         const selectedByArray = JSON.parse(event.selectedBy)
-        const participantsInfo: ParticipantInfo[] = await Promise.all(
-          selectedByArray.map(async (userId: string) => await CalendarServiceUtils.getParticipantInfo(userId)),
-        )
+        // const participantsInfo: ParticipantInfo[] = await Promise.all(
+        //   selectedByArray.map(async (userId: string) => await CalendarServiceUtils.getParticipantInfo(userId)),
+        // )
 
         return {
           ...event,
-          selectedBy: participantsInfo,
+          selectedBy: selectedByArray,
         }
       }),
     )

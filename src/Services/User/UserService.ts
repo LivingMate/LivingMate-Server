@@ -108,10 +108,15 @@ const getAllMember = async (userId:string) => {
       throw new Error('User has no group!')
     }
 
-    const userGroupMembersNamesColors = await GroupServiceUtils.findGroupMembersNamesColorsByGroupId(
-      userProfile.groupId,
-    )
+    const userGroupMembers = await GroupServiceUtils.findGroupMembersNamesColorsByGroupId(userProfile.groupId)
 
+    const userGroupMembersNamesColors = userGroupMembers
+      .map(member => ({
+        userId: member.id,
+        userName: member.userName,
+        userColor: member.userColor,
+      }));
+    
     const data = {
       membernamesandcolors: userGroupMembersNamesColors,
     }
@@ -152,6 +157,7 @@ const userSetGet = async (userId:string) => {
   }
 
   const data = {
+    userId : userId,
     userName: user.userName,
     userColor: user.userColor,
   }
