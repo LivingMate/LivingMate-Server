@@ -32,7 +32,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getBudget = exports.deleteSubCategory = exports.showByCategory = exports.AdjAtBudget = exports.finalAdjustment = exports.showSubCategory = exports.createSubCategory = exports.searchBudget = exports.getAdjustments = exports.isDone = exports.getGroupMemberSpending = exports.deleteBudget = exports.updateBudget = exports.showBudget = exports.createBudget = void 0;
+exports.getBudget = exports.deleteSubCategory = exports.showByCategory = exports.AdjAtBudget = exports.showSubCategory = exports.createSubCategory = exports.searchBudget = exports.getAdjustments = exports.isDone = exports.getAdjustmentsCalc = exports.getGroupMemberSpending = exports.deleteBudget = exports.updateBudget = exports.showBudget = exports.createBudget = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const GroupServiceUtils_1 = require("../Group/GroupServiceUtils");
@@ -76,6 +76,7 @@ const createBudget = (userId, groupId, budgetCreateRequestDto) => __awaiter(void
             userColor: resUserColor,
             userName: resUserName,
             createdAt: event.createdAt,
+            isDone: event.isDone
         };
         return createdBudget;
     }
@@ -113,6 +114,7 @@ const showBudget = (groupId) => __awaiter(void 0, void 0, void 0, function* () {
                 userColor: resUserColor,
                 userName: resUserName,
                 createdAt: budget.createdAt,
+                isDone: budget.isDone
             });
         })));
         return BudgetsToShow;
@@ -153,6 +155,7 @@ const updateBudget = (budgetId, groupId, BudgetUpdateRequestDto) => __awaiter(vo
             spendingName: updatedBudget.spendingName,
             category: resCategory,
             subCategory: resSubCategory,
+            isDone: updatedBudget.isDone
         };
         return budgetToReturn;
     }
@@ -203,6 +206,7 @@ const getBudget = (BudgetId) => __awaiter(void 0, void 0, void 0, function* () {
             spendingName: Budget.spendingName,
             category: resCategory,
             subCategory: resSubCategory,
+            isDone: Budget.isDone
         };
         return budgetToReturn;
     }
@@ -239,6 +243,7 @@ const searchBudget = (groupId, searchKey) => __awaiter(void 0, void 0, void 0, f
                 userColor: resUserColor,
                 userName: resUserName,
                 createdAt: budget.createdAt,
+                isDone: budget.isDone
             });
         })));
         return BudgetsToShow;
@@ -346,6 +351,7 @@ const showByCategory = (groupId, category) => __awaiter(void 0, void 0, void 0, 
             userColor: resUserColor,
             userName: resUserName,
             createdAt: budget.createdAt,
+            isDone: budget.isDone
         });
     })));
     return BudgetsToShow;
@@ -482,6 +488,7 @@ const AdjAtBudget = (groupId) => __awaiter(void 0, void 0, void 0, function* () 
 });
 exports.AdjAtBudget = AdjAtBudget;
 //정산파트2//
+//정산알림보내기
 const getAdjustmentsCalc = (groupId) => __awaiter(void 0, void 0, void 0, function* () {
     const GroupMemberSpendingsAfter = yield getGroupMemberSpending(groupId);
     if (!GroupMemberSpendingsAfter) {
@@ -526,8 +533,12 @@ const getAdjustmentsCalc = (groupId) => __awaiter(void 0, void 0, void 0, functi
             // console.log('whileneg', Negatives)
         }
     }
+    // 정산을 시작했습니다 알림 생성
+    const groupOwner = yield UserServiceUtils.findGroupOwner(groupId);
+    yield NotificationService.makeNotification(groupId, groupOwner, "startBudget");
     return 0;
 });
+exports.getAdjustmentsCalc = getAdjustmentsCalc;
 const sendToAdjustments = (groupId, fromId, toId, change) => __awaiter(void 0, void 0, void 0, function* () {
     yield prisma.adjustment.create({
         data: {
@@ -623,19 +634,23 @@ const isDone = (groupId) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.isDone = isDone;
+//정산 알림 내역
 const getAdjustments = (groupId) => __awaiter(void 0, void 0, void 0, function* () {
     const AdjustedResult = yield takeFromAdjustments(groupId);
     const LastCalculatedDate = yield getDayReturn(groupId);
     return { LastCalculatedDate, AdjustedResult };
 });
 exports.getAdjustments = getAdjustments;
-const finalAdjustment = (groupId) => __awaiter(void 0, void 0, void 0, function* () {
-    yield getAdjustmentsCalc(groupId);
-    yield delay(1000);
-    const final = yield getAdjustments(groupId);
-    return { final };
-});
-exports.finalAdjustment = finalAdjustment;
+/*
+const finalAdjustment = async (groupId: string) => {
+  await getAdjustmentsCalc(groupId);
+  await delay(1000);
+  
+  const final = await getAdjustments(groupId);
+
+  return {final}
+}
+*/
 function delay(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }

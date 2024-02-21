@@ -182,14 +182,16 @@ const createScheduling = (groupId, scheduleId, schedulingArray) => __awaiter(voi
                 },
             });
             const selectedByArray = JSON.parse(event.selectedBy);
-            const participantsInfo = yield Promise.all(selectedByArray.map((userId) => __awaiter(void 0, void 0, void 0, function* () { return yield CalendarServiceUtils.getParticipantInfo(userId); })));
+            // const participantsInfo: ParticipantInfo[] = await Promise.all(
+            //   selectedByArray.map(async (userId: string) => await CalendarServiceUtils.getParticipantInfo(userId)),
+            // )
             const data = {
                 schedulingId: event.id,
                 groupId: groupId,
                 scheduleId: scheduleId,
                 date: event.date,
                 time: event.time,
-                selectedBy: participantsInfo,
+                selectedBy: selectedByArray,
             };
             responseData.push(data);
         }
@@ -432,6 +434,7 @@ exports.showCalendar = showCalendar;
 const showMonthCalendar = (groupId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { startDate, endDate } = CalendarServiceUtils.getCurrentMonthDates();
+        // const year =  num.split('-').[0]
         const calendarEventsThisMonth = yield prisma.calendar.findMany({
             where: {
                 groupId: groupId,
@@ -587,8 +590,10 @@ const showScheduling = (groupId, scheduleId) => __awaiter(void 0, void 0, void 0
         });
         const schedulingEventsWithUserInfo = yield Promise.all(schedulingEvents.map((event) => __awaiter(void 0, void 0, void 0, function* () {
             const selectedByArray = JSON.parse(event.selectedBy);
-            const participantsInfo = yield Promise.all(selectedByArray.map((userId) => __awaiter(void 0, void 0, void 0, function* () { return yield CalendarServiceUtils.getParticipantInfo(userId); })));
-            return Object.assign(Object.assign({}, event), { selectedBy: participantsInfo });
+            // const participantsInfo: ParticipantInfo[] = await Promise.all(
+            //   selectedByArray.map(async (userId: string) => await CalendarServiceUtils.getParticipantInfo(userId)),
+            // )
+            return Object.assign(Object.assign({}, event), { selectedBy: selectedByArray });
         })));
         return schedulingEventsWithUserInfo;
     }

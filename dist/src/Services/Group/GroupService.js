@@ -32,7 +32,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.outGroup = exports.updateGroupName = exports.leaveGroup = exports.goGroup = exports.createGroup = void 0;
+exports.outGroup = exports.updateGroupName = exports.leaveGroup = exports.goGroup = exports.getIdandName = exports.createGroup = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const UserServiceUtils = __importStar(require("../User/UserServiceUtils"));
@@ -51,6 +51,23 @@ const createGroupId = () => __awaiter(void 0, void 0, void 0, function* () {
     } while (yield UserServiceUtils.duplicateId(result));
     return result;
 });
+// 그룹 아이디, 그룹 이름 받아오기
+const getIdandName = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const user = yield UserServiceUtils.findUserById(userId);
+        const group = yield GroupServiceUtils.findGroupById(user.groupId);
+        const data = {
+            groupId: user.groupId,
+            groupName: group.groupName
+        };
+        return data;
+    }
+    catch (error) {
+        console.error('error :: group/GroupService/getIdandName', error);
+        throw error;
+    }
+});
+exports.getIdandName = getIdandName;
 // 방장이 자신의 그룹 생성 후 자신 그룹 참여
 const createGroup = (userId, groupName) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -75,6 +92,7 @@ const createGroup = (userId, groupName) => __awaiter(void 0, void 0, void 0, fun
             });
         }
         const GroupReturn = yield UserServiceUtils.addUserToGroup(userId, createdGroup.id);
+        yield UserServiceUtils.addUserNotiToGroup(user.id, groupId);
         return createdGroup;
         //return createdGroup;
     }
@@ -89,6 +107,7 @@ const goGroup = (userId, groupId) => __awaiter(void 0, void 0, void 0, function*
     try {
         const user = yield UserServiceUtils.findUserById(userId);
         const GroupReturn = yield UserServiceUtils.addUserToGroup(user.id, groupId);
+        yield UserServiceUtils.addUserNotiToGroup(user.id, groupId);
         return GroupReturn;
     }
     catch (error) {

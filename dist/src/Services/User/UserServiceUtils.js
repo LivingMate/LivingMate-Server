@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findGroupOwner = exports.findUserNotiIdbyUserId = exports.createEmail = exports.createUserId = exports.duplicateId = exports.createColor = exports.addUserToGroup = exports.findUserColorByUserId = exports.updateUserColor = exports.getUserNameByUserId = exports.findUserById = void 0;
+exports.findGroupOwner = exports.findUserNotiIdbyUserId = exports.createEmail = exports.createUserId = exports.duplicateId = exports.createColor = exports.addUserNotiToGroup = exports.addUserToGroup = exports.findUserColorByUserId = exports.updateUserColor = exports.getUserNameByUserId = exports.findUserById = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const NotificationService = __importStar(require("../NotificationService"));
@@ -117,9 +117,6 @@ const findUserColorByUserId = (userId) => __awaiter(void 0, void 0, void 0, func
 exports.findUserColorByUserId = findUserColorByUserId;
 //+ 그룹 참여하는 서비스
 const addUserToGroup = (userId, groupId) => __awaiter(void 0, void 0, void 0, function* () {
-    //1. createUser with signupDTO
-    //2. put her groupId in her record at User table
-    //3. assign her id(? not sure) to Group's User[]? Did it mean it had foreign relations with the table?
     yield prisma.user.update({
         where: {
             id: userId,
@@ -132,6 +129,18 @@ const addUserToGroup = (userId, groupId) => __awaiter(void 0, void 0, void 0, fu
     //return data
 });
 exports.addUserToGroup = addUserToGroup;
+// userNoti groupId도 바꿔주기
+const addUserNotiToGroup = (userId, groupId) => __awaiter(void 0, void 0, void 0, function* () {
+    yield prisma.userNoti.update({
+        where: {
+            userId: userId,
+        },
+        data: {
+            groupId: groupId,
+        },
+    });
+});
+exports.addUserNotiToGroup = addUserNotiToGroup;
 const createColor = () => __awaiter(void 0, void 0, void 0, function* () {
     const color = Math.floor(Math.random() * 16777215).toString(16);
     return '#' + color;

@@ -80,7 +80,7 @@ const createUser = (signupDtO) => __awaiter(void 0, void 0, void 0, function* ()
     return data;
 });
 exports.createUser = createUser;
-// 마이페이지 유저 정보 반환(본인 제외)
+// 마이페이지 유저 정보 반환
 const getUserProfile = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userProfile = yield UserServiceUtils.findUserById(userId);
@@ -95,10 +95,12 @@ const getUserProfile = (userId) => __awaiter(void 0, void 0, void 0, function* (
         const userGroupMembersNamesColors = userGroupMembers
             .filter(member => member.id !== userId) // 자신의 정보 제외
             .map(member => ({
+            userId: member.id,
             userName: member.userName,
             userColor: member.userColor,
         }));
         const data = {
+            userId: userId,
             userName: userProfile.userName,
             userColor: userProfile.userColor,
             groupName: groupName,
@@ -121,7 +123,13 @@ const getAllMember = (userId) => __awaiter(void 0, void 0, void 0, function* () 
         if (userProfile.groupId === null || userProfile.groupId === undefined) {
             throw new Error('User has no group!');
         }
-        const userGroupMembersNamesColors = yield GroupServiceUtils.findGroupMembersNamesColorsByGroupId(userProfile.groupId);
+        const userGroupMembers = yield GroupServiceUtils.findGroupMembersNamesColorsByGroupId(userProfile.groupId);
+        const userGroupMembersNamesColors = userGroupMembers
+            .map(member => ({
+            userId: member.id,
+            userName: member.userName,
+            userColor: member.userColor,
+        }));
         const data = {
             membernamesandcolors: userGroupMembersNamesColors,
         };
@@ -157,6 +165,7 @@ const userSetGet = (userId) => __awaiter(void 0, void 0, void 0, function* () {
         throw new Error('User Not Found!');
     }
     const data = {
+        userId: userId,
         userName: user.userName,
         userColor: user.userColor,
     };
