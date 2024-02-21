@@ -474,6 +474,7 @@ const showCalendar = async (groupId: string) => {
 const showMonthCalendar = async ( groupId: string, dateString:string ) => {
   try {
     // const { startDate, endDate } = CalendarServiceUtils.getCurrentMonthDates()
+    // test용
     const [yearStr, monthStr] =  dateString.split('-');
     
     const year = parseInt(yearStr, 10);
