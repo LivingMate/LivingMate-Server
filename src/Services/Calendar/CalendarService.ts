@@ -471,10 +471,17 @@ const showCalendar = async (groupId: string) => {
   }
 }
 
-const showMonthCalendar = async (groupId: string) => {
+const showMonthCalendar = async ( groupId: string, dateString:string ) => {
   try {
-    const { startDate, endDate } = CalendarServiceUtils.getCurrentMonthDates()
-    // const year =  num.split('-').[0]
+    // const { startDate, endDate } = CalendarServiceUtils.getCurrentMonthDates()
+    const [yearStr, monthStr] =  dateString.split('-');
+    
+    const year = parseInt(yearStr, 10);
+    const month = parseInt(monthStr, 10);
+
+    const startDate = new Date(Date.UTC(year, month - 1, 1));
+    const endDate = new Date(Date.UTC(year, month, 0));
+    endDate.setUTCHours(23, 59, 59, 999)
 
     const calendarEventsThisMonth = await prisma.calendar.findMany({
       where: {

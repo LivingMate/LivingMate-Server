@@ -185,9 +185,10 @@ const showOneCalendar = async (req: Request, res: Response) => {
 const showMonthCalendar = async (req: Request, res: Response) => {
   const userId = req.body.user.id;
   const groupId = await GroupServiceUtils.findGroupIdByUserId(userId);
+  const dateString = req.params.dateString
 
   try {
-    const calendarEvents = await CalendarService.showMonthCalendar(groupId)
+    const calendarEvents = await CalendarService.showMonthCalendar(groupId, dateString)
     return res.status(statusCode.OK).send(util.success(statusCode.OK, message.READ_THIMONTH_SUCCESS, calendarEvents))
 
   } catch (error) {
