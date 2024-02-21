@@ -627,7 +627,7 @@ const takeFromAdjustments = async (groupId: string) => {
       let plusUserColor = await UserServiceUtils.findUserColorByUserId(record.plusUserId)
       let minusUserId = record.minusUserId
       let minusUserName = await UserServiceUtils.getUserNameByUserId(record.minusUserId)
-      let minusUserColor = await UserServiceUtils.findUserColorByUserId(record.plusUserId)
+      let minusUserColor = await UserServiceUtils.findUserColorByUserId(record.minusUserId)
       let change = record.change
 
       AdjustmentToReturn.push({
