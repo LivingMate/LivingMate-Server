@@ -569,16 +569,12 @@ const getAdjustmentsCalc = async (groupId: string) => {
       // console.log('whileneg', Negatives)
     }
   }
-<<<<<<< HEAD
 
   // 정산을 시작했습니다 알림 생성
   const groupOwner = await UserServiceUtils.findGroupOwner(groupId)
   await NotificationService.makeNotification(groupId, groupOwner, "startBudget")
 
   return 0
-=======
-  return console.log("정산이 시작되었습니다.")
->>>>>>> 78f9d4b42103bd6f655387a54c7ef199bc1e4bce
 }
 
 const sendToAdjustments = async (groupId: string, fromId: string, toId: string, change: number) => {
