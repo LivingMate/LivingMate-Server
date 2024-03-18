@@ -32,7 +32,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getBudget = exports.deleteSubCategory = exports.showByCategory = exports.AdjAtBudget = exports.showSubCategory = exports.createSubCategory = exports.searchBudget = exports.getAdjustments = exports.isDone = exports.getAdjustmentsCalc = exports.getGroupMemberSpending = exports.deleteBudget = exports.updateBudget = exports.showBudget = exports.createBudget = void 0;
+exports.isCalculating = exports.getBudget = exports.deleteSubCategory = exports.showByCategory = exports.AdjAtBudget = exports.showSubCategory = exports.createSubCategory = exports.searchBudget = exports.getAdjustments = exports.isDone = exports.getAdjustmentsCalc = exports.getGroupMemberSpending = exports.deleteBudget = exports.updateBudget = exports.showBudget = exports.createBudget = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const GroupServiceUtils_1 = require("../Group/GroupServiceUtils");
@@ -536,7 +536,7 @@ const getAdjustmentsCalc = (groupId) => __awaiter(void 0, void 0, void 0, functi
     // 정산을 시작했습니다 알림 생성
     const groupOwner = yield UserServiceUtils.findGroupOwner(groupId);
     yield NotificationService.makeNotification(groupId, groupOwner, "startBudget");
-    return 0;
+    return "정산하는 중이에요!";
 });
 exports.getAdjustmentsCalc = getAdjustmentsCalc;
 const sendToAdjustments = (groupId, fromId, toId, change) => __awaiter(void 0, void 0, void 0, function* () {
@@ -651,6 +651,27 @@ const finalAdjustment = async (groupId: string) => {
   return {final}
 }
 */
+const isCalculating = (groupId) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const isCalculating = yield prisma.adjustment.findMany({
+            where: {
+                groupId: groupId,
+                isDone: false
+            }
+        });
+        if (!isCalculating) {
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+    catch (error) {
+        console.error('error :: service/budgetsercive/isCalculating', error);
+        throw error;
+    }
+});
+exports.isCalculating = isCalculating;
 function delay(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }

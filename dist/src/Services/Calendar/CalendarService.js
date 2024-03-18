@@ -431,10 +431,15 @@ const showCalendar = (groupId) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.showCalendar = showCalendar;
-const showMonthCalendar = (groupId) => __awaiter(void 0, void 0, void 0, function* () {
+const showMonthCalendar = (groupId, dateString) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { startDate, endDate } = CalendarServiceUtils.getCurrentMonthDates();
-        // const year =  num.split('-').[0]
+        // const { startDate, endDate } = CalendarServiceUtils.getCurrentMonthDates()
+        const [yearStr, monthStr] = dateString.split('-');
+        const year = parseInt(yearStr, 10);
+        const month = parseInt(monthStr, 10);
+        const startDate = new Date(Date.UTC(year, month - 1, 1));
+        const endDate = new Date(Date.UTC(year, month, 0));
+        endDate.setUTCHours(23, 59, 59, 999);
         const calendarEventsThisMonth = yield prisma.calendar.findMany({
             where: {
                 groupId: groupId,

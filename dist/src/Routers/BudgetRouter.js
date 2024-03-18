@@ -40,6 +40,7 @@ BudgetRouter.get('/budget/calcbudget', auth_1.default, BudgetController.getAdjfo
 BudgetRouter.get('/budget/category/search/:category', auth_1.default, BudgetController.getBudgetSearchByCategory);
 BudgetRouter.get('/budget/:budgetId', auth_1.default, BudgetController.getBudget);
 BudgetRouter.get('/budget/calc/adjnoti', auth_1.default, BudgetController.getAdjNoti);
+BudgetRouter.get('/budget/calc/isCalculating', auth_1.default, BudgetController.isCalculating);
 BudgetRouter.post('/budget', auth_1.default, BudgetController.createBudget);
 BudgetRouter.post('/budget/subcat/:categoryName', auth_1.default, BudgetController.createsubCategory);
 BudgetRouter.patch('/budget/update/:budgetId', auth_1.default, BudgetController.updateBudget);

@@ -40,7 +40,7 @@ CalendarRouter.delete('/calendar/delete/:calendarId', auth_1.default, CalendarCo
 CalendarRouter.delete('/calendar/delete/schedule/:scheduleId', auth_1.default, CalendarController.deleteScheduleEvent);
 CalendarRouter.get('/calendar', auth_1.default, CalendarController.showCalendar);
 CalendarRouter.get('/calendar/:calendarId', auth_1.default, CalendarController.showOneCalendar);
-CalendarRouter.get('/calendar/get/month', auth_1.default, CalendarController.showMonthCalendar);
+CalendarRouter.get('/calendar/get/month/:dateString', auth_1.default, CalendarController.showMonthCalendar);
 CalendarRouter.get('/calendar/get/week', auth_1.default, CalendarController.getThisWeeksDuty);
 CalendarRouter.get('/calendar/schedule/schedule', auth_1.default, CalendarController.showSchedule);
 CalendarRouter.get('/calendar/schedule/timeslot/:scheduleId', auth_1.default, CalendarController.showScheduling);

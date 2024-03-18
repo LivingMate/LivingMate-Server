@@ -205,8 +205,9 @@ exports.showOneCalendar = showOneCalendar;
 const showMonthCalendar = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const userId = req.body.user.id;
     const groupId = yield GroupServiceUtils.findGroupIdByUserId(userId);
+    const dateString = req.params.dateString;
     try {
-        const calendarEvents = yield CalendarService.showMonthCalendar(groupId);
+        const calendarEvents = yield CalendarService.showMonthCalendar(groupId, dateString);
         return res.status(statusCode_1.default.OK).send(util_1.default.success(statusCode_1.default.OK, message_1.default.READ_THIMONTH_SUCCESS, calendarEvents));
     }
     catch (error) {

@@ -103,7 +103,7 @@ const getAdjCalc = async (req: Request, res: Response, next: NextFunction): Prom
 
     return res.send(data)
   } catch (error) {
-    res.sendStatus(500).json({ error: 'Error getting Adj Calculated: Controller' })
+    res.status(500).json({ error: 'Error getting Adj Calculated: Controller' })
   }
 }
 
@@ -254,6 +254,21 @@ const deleteSubCategory = async (req: Request, res: Response, next: NextFunction
   }
 }
 
+
+const isCalculating = async (req: Request, res: Response, next: NextFunction): Promise<void | Response> => {
+  const userId = req.body.user.id;
+  const groupId = await GroupServiceUtils.findGroupIdByUserId(userId);
+
+  try {
+    const data = await BudgetService.isCalculating(groupId)
+
+    return res.send(data)
+  } catch (error) {
+    res.status(500).json({ error: 'Error getting calculation info: Controller' })
+  }
+}
+
+
 export { createsubCategory, 
   updateBudget,
   doneBudget, 
@@ -267,5 +282,6 @@ export { createsubCategory,
   getBudgetSearchByCategory,
   deleteSubCategory,
   getBudget,
-  getAdjNoti 
+  getAdjNoti,
+  isCalculating
 }

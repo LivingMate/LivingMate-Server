@@ -32,7 +32,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAdjNoti = exports.getBudget = exports.deleteSubCategory = exports.getBudgetSearchByCategory = exports.getAdjforBudget = exports.getAdjCalc = exports.showSubCategories = exports.showBudget = exports.getBudgetSearch = exports.createBudget = exports.deleteBudget = exports.doneBudget = exports.updateBudget = exports.createsubCategory = void 0;
+exports.isCalculating = exports.getAdjNoti = exports.getBudget = exports.deleteSubCategory = exports.getBudgetSearchByCategory = exports.getAdjforBudget = exports.getAdjCalc = exports.showSubCategories = exports.showBudget = exports.getBudgetSearch = exports.createBudget = exports.deleteBudget = exports.doneBudget = exports.updateBudget = exports.createsubCategory = void 0;
 const BudgetService = __importStar(require("../Services/Budget/BudgetService"));
 const BudgetServiceUtil = __importStar(require("../Services/Budget/BudgetServiceUtils"));
 const GroupServiceUtils = __importStar(require("../Services/Group/GroupServiceUtils"));
@@ -117,7 +117,7 @@ const getAdjCalc = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         return res.send(data);
     }
     catch (error) {
-        res.sendStatus(500).json({ error: 'Error getting Adj Calculated: Controller' });
+        res.status(500).json({ error: 'Error getting Adj Calculated: Controller' });
     }
 });
 exports.getAdjCalc = getAdjCalc;
@@ -262,4 +262,16 @@ const deleteSubCategory = (req, res, next) => __awaiter(void 0, void 0, void 0, 
     }
 });
 exports.deleteSubCategory = deleteSubCategory;
+const isCalculating = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.body.user.id;
+    const groupId = yield GroupServiceUtils.findGroupIdByUserId(userId);
+    try {
+        const data = yield BudgetService.isCalculating(groupId);
+        return res.send(data);
+    }
+    catch (error) {
+        res.status(500).json({ error: 'Error getting calculation info: Controller' });
+    }
+});
+exports.isCalculating = isCalculating;
 //# sourceMappingURL=BudgetController.js.map

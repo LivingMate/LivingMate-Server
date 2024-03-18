@@ -574,7 +574,7 @@ const getAdjustmentsCalc = async (groupId: string) => {
   const groupOwner = await UserServiceUtils.findGroupOwner(groupId)
   await NotificationService.makeNotification(groupId, groupOwner, "startBudget")
 
-  return 0
+  return "정산하는 중이에요!";
 }
 
 const sendToAdjustments = async (groupId: string, fromId: string, toId: string, change: number) => {
@@ -717,6 +717,28 @@ const finalAdjustment = async (groupId: string) => {
 }
 */
 
+const isCalculating = async(groupId:string) =>{
+  try{
+    const isCalculating = await prisma.adjustment.findMany({
+      where:{
+        groupId:groupId,
+        isDone: false
+      }
+    })
+
+    if(!isCalculating){
+      return false;
+    }
+
+    else{
+      return true;
+    }
+
+  }catch(error){
+    console.error('error :: service/budgetsercive/isCalculating', error)
+      throw error
+  }
+}
 
 
 function delay(ms: number) {
@@ -738,5 +760,6 @@ export {
   AdjAtBudget,
   showByCategory,
   deleteSubCategory,
-  getBudget
+  getBudget,
+  isCalculating
 }
