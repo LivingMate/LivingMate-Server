@@ -3,14 +3,17 @@ import bcrypt from 'bcrypt';
 import errorGenerator from '../../error/errorGenerator';
 import message from '../modules/message';
 import statusCode from '../modules/statusCode';
-import * as GroupServiceUtils from '../Services/Group/GroupServiceUtils'
 import { LoginDto } from "../DTOs/Auth/Requests/LoginDto";
+import {getToken, getRefreshToken} from "../Middleware/jwtHandler"
+import { signInKakao } from "../Middleware/socialAuth";
+import { SignupDto } from "../DTOs/Auth/Requests/SignupDto";
+
+
 const prisma = new PrismaClient()
 
 
 const login = async (loginDto: LoginDto) => {
   try {
-    
     const user = await prisma.user.findUnique({
       where: {
         email: loginDto.email
@@ -30,14 +33,7 @@ const login = async (loginDto: LoginDto) => {
         statusCode: statusCode.UNAUTHORIZED
       });
 
-      /*
-    const isGroupped = await GroupServiceUtils.findGroupIdByUserId(user.id);
-    if (isGroupped == "aaaaaa"){
-      throw errorGenerator({
-        msg: 
-      })
-
-    }*/
+    
 
     const data = {
       userId: user.id
@@ -49,7 +45,85 @@ const login = async (loginDto: LoginDto) => {
   }
 };
 
-export { login }
+
+//* 소셜 로그인
+const socialLogin = async (socialToken: string, socialPlatform: string) => {
+  //let socialId;
+  let email;
+  let name;
+
+  switch (socialPlatform) {
+    case "kakao":
+      const userKakaoData = await signInKakao(socialToken);
+      name = userKakaoData.profile_nickname;
+      email = userKakaoData.account_email; //kakao_account.email
+      break;
+  }
+
+  if (email === undefined || email === null)
+    return message.NULL_VALUE;
+
+  //* 기존 회원인지 확인
+  const existingUser = await prisma.user.findFirst({
+    where: {
+      email: email
+    },
+  });
+
+  //미등록 유저
+  if (!existingUser) {
+    const refreshToken = getRefreshToken();
+     
+    const createUser = await prisma.user.create({
+      data: {
+        email: email,
+        refreshToken: refreshToken,
+      },
+    });
+    const accessToken = getToken(createUser.id);
+    
+
+    return {
+      accessToken,
+      refreshToken,
+    };
+  }
+
+
+  //* 기존에 회원이 등록되어있으면, 자동 로그인
+  const accessToken = getToken(existingUser.id);
+  const refreshToken = getRefreshToken();
+
+  await prisma.user.update({
+    data: {
+      refreshToken: refreshToken,
+    },
+    where: {
+      email: email,
+    },
+  });
+
+  return {
+    accessToken,
+    refreshToken,
+    isSignedUp: true,
+  };
+};
+
+
+
+export {
+  login,
+  socialLogin
+};
+
+
+
+
+
+
+
+
  
 
 

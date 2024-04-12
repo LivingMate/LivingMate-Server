@@ -10,10 +10,20 @@ const getToken = (userId: string): string => {
   };
 
   const accessToken: string = jwt.sign(payload, config.jwtSecret, {
-    expiresIn: '30d'
+    expiresIn: '7d'
   });
 
   return accessToken;
 };
 
-export { getToken };
+const getRefreshToken = () => {
+  const payload = {};
+
+  const refreshToken = jwt.sign(payload, config.jwtSecret, {
+    expiresIn: "30d",
+  });
+
+  return refreshToken;
+}
+
+export { getToken, getRefreshToken };
