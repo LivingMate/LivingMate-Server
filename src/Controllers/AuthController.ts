@@ -76,7 +76,48 @@ const login = async (
    }
 };
 
+const socialLogin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void | Response> => {
+  const errors: Result<ValidationError> = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res
+      .status(statusCode.BAD_REQUEST)
+      .send(
+        util.fail(statusCode.BAD_REQUEST, message.BAD_REQUEST)
+      );
+  }
+
+  const socialToken = req.header("accessToken")?.split(" ").reverse()[0] as string;
+  const { socialPlatform } = req.body;
+
+if (socialPlatform === null || socialPlatform === undefined) {
+  return res
+  .status(statusCode.BAD_REQUEST)
+  .send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE));
+}
+
+try {
+  const data = await AuthService.socialLogin(socialToken, socialPlatform);
+
+  if (data === message.NULL_VALUE) {
+    return res
+      .status(statusCode.UNAUTHORIZED)
+      .send(util.fail(statusCode.UNAUTHORIZED, message.NULL_VALUE));
+  }
+
+  return res.status(statusCode.OK)
+    .send(util.success(statusCode.OK, message.LOGIN_SUCCESS, data));
+} catch (error) {
+  
+};
+}
+
+
 export {
   signup,
-  login
+  login,
+  socialLogin
 };

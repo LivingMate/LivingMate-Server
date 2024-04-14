@@ -8,7 +8,6 @@ import * as GroupService from '../Group/GroupService'
 import * as GroupServiceUtils from '../Group/GroupServiceUtils'
 import * as NotificationService from '../NotificationService'
 import message from '../../modules/message'
-import { sign } from 'crypto'
 import bcrypt from 'bcrypt'
 import { getRefreshToken } from '../../Middleware/jwtHandler'
 
