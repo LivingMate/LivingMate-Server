@@ -34,7 +34,7 @@ const login = async (loginDto: LoginDto) => {
       })
 
     const accessToken = getToken(user.id)
-    const refreshToken = getRefreshToken()
+    const refreshToken = getRefreshToken(user.id)
 
     await prisma.user.update({
       data: {
@@ -82,8 +82,6 @@ const socialLogin = async (socialToken: string, socialPlatform: string) => {
 
   //미등록 유저
   if (!existingUser) {
-    const refreshToken = getRefreshToken()
-
     const createUser = await prisma.user.create({
       data: {
         id: Id,
@@ -91,11 +89,20 @@ const socialLogin = async (socialToken: string, socialPlatform: string) => {
         userColor: userC,
         groupId: defaultGroupId,
         email: email,
-        refreshToken: refreshToken,
         password: platform,
       },
     })
+    const refreshToken = getRefreshToken(createUser.id)
     const accessToken = getToken(createUser.id)
+
+    await prisma.user.update({
+      data: {
+        refreshToken: refreshToken,
+      },
+      where: {
+        id: createUser.id,
+      },
+    })
 
     return {
       accessToken,
@@ -104,7 +111,7 @@ const socialLogin = async (socialToken: string, socialPlatform: string) => {
 
   //* 기존에 회원이 등록되어있으면, 자동 로그인
   const accessToken = getToken(existingUser.id)
-  const refreshToken = getRefreshToken()
+  const refreshToken = getRefreshToken(existingUser.id)
 
   await prisma.user.update({
     data: {

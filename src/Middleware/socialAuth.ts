@@ -18,6 +18,7 @@ const signInKakao = async (socialToken: string) => {
       })
     }
     console.log(user.data) //모양 확인
+
     return user.data
   } catch (err) {
     throw errorGenerator({

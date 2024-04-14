@@ -63,13 +63,16 @@ const socialLogin = async (req: Request, res: Response, next: NextFunction): Pro
 
   try {
     const data = await AuthService.socialLogin(socialToken, socialPlatform)
+    // const data = await AuthService.socialLogin(socialToken, 'kakao')
 
     if (data === message.NULL_VALUE) {
       return res.status(statusCode.UNAUTHORIZED).send(util.fail(statusCode.UNAUTHORIZED, message.NULL_VALUE))
     }
 
     return res.status(statusCode.OK).send(util.success(statusCode.OK, message.LOGIN_SUCCESS, data))
-  } catch (error) {}
+  } catch (error) {
+    throw new Error('an unknown error occured')
+  }
 }
 
 export { signup, login, socialLogin }
