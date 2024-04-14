@@ -33,11 +33,21 @@ const login = async (loginDto: LoginDto) => {
         statusCode: statusCode.UNAUTHORIZED,
       })
 
-    const data = {
-      userId: user.id,
-    }
+    const accessToken = getToken(user.id)
+    const refreshToken = getRefreshToken()
 
-    return data
+    await prisma.user.update({
+      data: {
+        refreshToken: refreshToken,
+      },
+      where: {
+        id: user.id,
+      },
+    })
+
+    return {
+      accessToken,
+    }
   } catch (error) {
     throw error
   }
@@ -107,8 +117,6 @@ const socialLogin = async (socialToken: string, socialPlatform: string) => {
 
   return {
     accessToken,
-    refreshToken,
-    isSignedUp: true,
   }
 }
 
