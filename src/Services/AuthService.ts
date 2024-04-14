@@ -7,6 +7,8 @@ import { LoginDto } from "../DTOs/Auth/Requests/LoginDto";
 import {getToken, getRefreshToken} from "../Middleware/jwtHandler"
 import { signInKakao } from "../Middleware/socialAuth";
 import { SignupDto } from "../DTOs/Auth/Requests/SignupDto";
+import * as UserService from '../Services/User/UserService';
+import * as UserServiceUtils from "../Services/User/UserServiceUtils"
 
 
 const prisma = new PrismaClient()
@@ -48,7 +50,10 @@ const login = async (loginDto: LoginDto) => {
 
 //* 소셜 로그인
 const socialLogin = async (socialToken: string, socialPlatform: string) => {
-  //let socialId;
+  const userC = await UserServiceUtils.createColor()
+  const Id = await UserServiceUtils.createUserId()
+  const defaultGroupId = 'aaaaaa';
+  let platform = "";
   let email;
   let name;
 
@@ -57,6 +62,7 @@ const socialLogin = async (socialToken: string, socialPlatform: string) => {
       const userKakaoData = await signInKakao(socialToken);
       name = userKakaoData.profile_nickname;
       email = userKakaoData.account_email; //kakao_account.email
+      platform = socialPlatform;
       break;
   }
 
@@ -76,8 +82,13 @@ const socialLogin = async (socialToken: string, socialPlatform: string) => {
      
     const createUser = await prisma.user.create({
       data: {
+        id: Id,
+        userName: name, //컬럼 추가해야 하나? (왜냐면 닉네임이랑 네임을 분리할까 싶어서.. 근데 안 분리해도 될듯)
+        userColor: userC,
+        groupId: defaultGroupId,
         email: email,
         refreshToken: refreshToken,
+        password: platform
       },
     });
     const accessToken = getToken(createUser.id);

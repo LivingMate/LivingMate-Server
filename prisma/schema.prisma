@@ -14,12 +14,12 @@ model User {
   userColor       String
   email           String          @unique
   groupId         String
-  birth           String
-  sex             String
+  birth           String?
+  sex             String?
   createdAt       DateTime        @default(dbgenerated("NOW()")) @db.DateTime(0)  
   password        String
   refreshToken    String
-  fcmToken        String
+  fcmToken        String?
   AdjustmentMinus Adjustment[]    @relation("minusUser")
   AdjustmentPlus  Adjustment[]    @relation("plusUser")
   CalendarUser    Calendar[]      @relation("user")
@@ -161,6 +161,7 @@ model UserSpendings {
   createdAt     DateTime    @default(dbgenerated("NOW()")) @db.DateTime(0)
   spendingName  String
   isDone        Boolean     @default(false)
+  isPanelty     Boolean     @default(false)
   category      Category    @relation(fields: [categoryId], references: [id])
   group         Group       @relation(fields: [groupId], references: [id])
   subCategory   SubCategory @relation(fields: [subCategoryId], references: [id])
@@ -208,4 +209,12 @@ model SubCategory {
   @@index([categoryId], map: "SubCategory_categoryId_fkey")
   @@index([groupId], map: "SubCategory_groupId_fkey")
   
+}
+
+model penalty{
+  id Int @id @default(autoincrement())
+  groupId String
+  penaltyUserId String
+  amount Int
+
 }

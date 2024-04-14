@@ -10,6 +10,7 @@ import * as NotificationService from '../NotificationService'
 import message from '../../modules/message'
 import { sign } from 'crypto'
 import bcrypt from 'bcrypt'
+import { getRefreshToken } from '../../Middleware/jwtHandler'
 
 const prisma = new PrismaClient()
 
@@ -18,7 +19,8 @@ const createUser = async (signupDtO: SignupDto) => {
   const Id = await UserServiceUtils.createUserId()
   const userC = await UserServiceUtils.createColor()
   const defaultGroupId = 'aaaaaa';
-  
+  let refreshToken = getRefreshToken();
+
   const salt: string = await bcrypt.genSalt(10);
   const userpassword = await bcrypt.hash(signupDtO.password, salt);
 
@@ -32,7 +34,8 @@ const createUser = async (signupDtO: SignupDto) => {
       email: signupDtO.email,
       sex: signupDtO.sex,
       birth: signupDtO.birth,
-      password: userpassword
+      password: userpassword,
+      refreshToken: refreshToken,
     },
   })
 
